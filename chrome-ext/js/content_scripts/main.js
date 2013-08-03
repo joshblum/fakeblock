@@ -1,0 +1,1 @@
+//attaches event listeners and handles passing messages
