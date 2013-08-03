@@ -11,10 +11,11 @@
         {
             "js": [
                 "libs/jquery-1.10.1.min.js",
-                "js/content_scripts/*"
+                "js/content_scripts/main.js"
             ], 
             "matches": [
-                "https://*.facebook.com/*"
+                "https://*.facebook.com/*",
+                "http://127.0.0.1:8000/*"
             ]
         }
     ], 
