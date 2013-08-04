@@ -11,14 +11,13 @@
         {
             "js": [
                 "libs/jquery-1.10.1.min.js",
-               "js/content_scripts/common.js",
+                "js/content_scripts/common.js",
                 "js/content_scripts/facebook_overlay.js",
                 "js/content_scripts/main.js",
                 "js/content_scripts/grab_token.js"
             ], 
             "matches": [
                 "https://*.facebook.com/*",
-                "http://172.23.148.40/*",
                 "http://fakeblock.herokuapp.com/*"
             ]
         }
