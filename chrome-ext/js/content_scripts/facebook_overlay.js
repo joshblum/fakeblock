@@ -32,6 +32,9 @@ var textareaUsernameGetters = {
 }
 
 $(function() {
+    if (document.domain !== "facebook.com"){
+        return
+    } 
     $($('textarea')[0]).focus().trigger('keydown');
     makeOverlays();
     $('input[value="Reply"]').click(function() {

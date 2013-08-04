@@ -1,6 +1,9 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
+    if (document.domain !== "facebook.com"){
+        return
+    } 
     decryptFakeblocks();
 
     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
