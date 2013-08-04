@@ -48,7 +48,7 @@ function getFakeblockObjectsFromPage() {
         var match_objects = getFakeBlocksFromText(div.text());
         $.each(match_objects, function() {
             try {
-                debugger
+                // debugger
                 var match_object = $(this);
                 var whole_match = match_object[0];
                 var byte_str = match_object[1];
