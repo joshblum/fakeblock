@@ -28,14 +28,13 @@
     "icons": {
         "128": "img/lock-128.png"
         //"48": "img/lock-48.png"
-    }, 
+    },
+    "homepage_url": "http://fakeblock.herokuapp.com/*",
     "manifest_version": 2,
-    "name": "Fakeblock", 
+    "name": "Fakeblock",
     "permissions": [
-        "http://fakeblock.herokuapp.com/*", 
-        "http://172.23.148.40/*", 
-        "cookies", 
-        "tabs"
+        "http://fakeblock.herokuapp.com/*",
+        "http://172.23.148.40/*"
     ], 
     "version": "0.0.0"
 }

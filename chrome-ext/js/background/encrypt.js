@@ -10,13 +10,13 @@
 function encrypt(plaintext, encrypt_for) {
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
-    if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === "")) {
+    if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === [])) {
         return plaintext
     }
 
     //default to stored username
     if (encrypt_for === []){
-        encrypt_for = [sender_meta.encrypt_for];
+        encrypt_for = sender_meta.encrypt_for;
     }
 
     //add self

@@ -1,26 +1,30 @@
-//houses the login and syncFriends function
+//houses the login and syncFriends functions
 
 var PUB_UPLOAD = "/upload_pubkey/";
 var FRIENDS = "/friends/";
+var SET_ENCRYPT = "/set_encrypt/";
 
 //creates user_meta storage if it does not exist
 //and posts the pub_key to server
-function login(fb_id, fb_handle, auth_token, callback){
+function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
     var user_meta = loadLocalStore('user_meta');
     var username = (fb_handle) ? fb_handle : fb_id;
-    debugger
+
+    //get latest server vals
+    user_meta.auth_token = auth_token;
+    user_meta.username = username;
+    user_meta.will_encrypt = will_encrypt;
+
     if (username === null || auth_token === null) return
     if (!Object.size(user_meta)) {
-        user_meta = _createUserMeta(username, auth_token);
-        _postPubKey(user_meta.pub_key, function(success){
+        user_meta = _createUserMeta(user_meta);
+        _postPubKey(user_meta.pub_key, function(success) {
             if (success) {
                 setTimeout(syncFriends, 500);
             }
             callback(success);
         });
     } else {
-        user_meta.auth_token = auth_token;
-        user_meta.username = username;
         syncFriends();
         callback(true)
     }
@@ -29,14 +33,12 @@ function login(fb_id, fb_handle, auth_token, callback){
 
 //generates a pub/priv RSA key pair for a user
 //stores the user_meta to localStorage
-function _createUserMeta(username, auth_token) {
+function _createUserMeta(user_meta) {
     var key_pair = genKeys();
     var user_meta = {
-        'username' : username,
-        'encrypt_for' : "",
+        'encrypt_for' : [],
         'priv_key' : key_pair.priv_key,
         'pub_key' : key_pair.pub_key,
-        'auth_token' : auth_token,
     }
     writeLocalStorage("user_meta", user_meta);
     return user_meta
@@ -45,11 +47,13 @@ function _createUserMeta(username, auth_token) {
 //post the user's public key to the server
 //returns a bool of success
 function _postPubKey(pub_key, callback) {
-    var url = buildUrl(PUB_UPLOAD, {'key' : encodeURIComponent(pub_key)})
+    var url = buildUrl(PUB_UPLOAD, {
+        'key' : encodeURIComponent(pub_key)
+    });
     $.get(url, function(){
         callback(true); //success
     }).fail(function() {
-        console.log("Pubkey upload error")
+        console.log("Pubkey upload error.");
         callback(false); //failure
     });
 }
@@ -90,5 +94,24 @@ function syncFriends() {
                 writeLocalStorage("user_map", user_map)
             }
         });
+    });
+}
+
+//update whether a user will_encrypt or not
+function setEncrypt(will_encrypt, callback) {
+    var user_meta = loadLocalStore('user_meta');
+    if (!Object.size(user_meta)){
+        return
+    }
+    user_meta.will_encrypt = will_encrypt;
+    writeLocalStorage('user_meta', user_meta);
+    var url = buildUrl(SET_ENCRYPT, {
+        'will_encrypt' : will_encrypt,
+    });
+    $.get(url, function(){
+        callback(true); //success
+    }).fail(function() {
+        console.log("setEncrypt error.");
+        callback(false); //failure
     });
 }

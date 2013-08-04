@@ -60,7 +60,8 @@ function executeMessage(request, sender, sendResponse) {
         "decrypt" : [decrypt, msg.json],
         "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, sendResponse],
         "encrypt_for" : [encrypt_for, msg.username],
-        "get_friends" : [getSingleUsers]
+        "get_friends" : [getSingleUsers],
+        "will_encrypt" : [setEncrypt, msg.will_encrypt, sendResponse],
     }
 
     if (action in ACTION_MAP){
@@ -75,9 +76,9 @@ function executeMessage(request, sender, sendResponse) {
     } 
 }
 
-function encrypt_for(username) {
+function encrypt_for(usernames) {
     var user_meta = loadLocalStore('user_meta');
-    user_meta.encrypt_for = username;
+    user_meta.encrypt_for = usernames;
     writeLocalStorage('user_meta', user_meta);
 }
 
