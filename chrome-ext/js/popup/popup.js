@@ -57,7 +57,7 @@ function getWillEncrypt() {
     sendMessage({
         "action" : "get_will_encrypt",
     }, function(res){
-        $(".will_encrypt").prop('checked', JSON.parse(res));
+        $(".will_encrypt").prop('checked', JSON.parse(res).res);
     });
 }
 

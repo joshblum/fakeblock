@@ -24,8 +24,8 @@
     ], 
     "description": "Fakeblock", 
     "icons": {
-        "128": "img/lock-128.png"
-        //"48": "img/lock-48.png"
+        "128": "img/snake2.png",
+        "48": "img/snake2.png"
     },
     "homepage_url": "http://fakeblock.herokuapp.com/*",
     "manifest_version": 2,
