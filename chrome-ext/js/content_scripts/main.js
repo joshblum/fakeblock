@@ -1,31 +1,31 @@
 //attaches event listeners and handles passing messages
 
-$(document).ready(function() {
-    decryptFakeblocks();
+// $(document).ready(function() {
+//     // decryptFakeblocks();
 
-    /****** automatically try to decrypt DOM whenever it changes ******************************************************/
-    var intervalID = setInterval(function(){
-        decryptFakeblocks();
-    },5000);
+//     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
+//     // var intervalID = setInterval(function(){
+//     //     decryptFakeblocks();
+//     // },5000);
 
-//    $(document).bind('DOMNodeInserted', function(e) {
-//        decryptFakeblocks();
-//    });
-//
-//    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-//
-//    var observer = new MutationObserver(function(mutations, observer) {
-//        // fired when a mutation occurs
-//        decryptFakeblocks();
-//    });
-//
-//// define what element should be observed by the observer
-//// and what types of mutations trigger the callback
-//    observer.observe(document, {
-//        subtree: true,
-//        attributes: false
-//    });
-});
+// //    $(document).bind('DOMNodeInserted', function(e) {
+// //        decryptFakeblocks();
+// //    });
+// //
+// //    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+// //
+// //    var observer = new MutationObserver(function(mutations, observer) {
+// //        // fired when a mutation occurs
+// //        decryptFakeblocks();
+// //    });
+// //
+// //// define what element should be observed by the observer
+// //// and what types of mutations trigger the callback
+// //    observer.observe(document, {
+// //        subtree: true,
+// //        attributes: false
+// //    });
+// });
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
