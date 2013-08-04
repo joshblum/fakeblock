@@ -13,7 +13,8 @@ $(function() {
 	        </div>');
 	        userInput.data('username', friend);
 	        userInput.data('fullname', friends.friend.name);
-	        userInputs.append(userInput);
+	        userInputs.push(userInput);
+	        $('body').append(userInput);
 		}
 	});
 
@@ -21,3 +22,4 @@ $(function() {
         $(this).css('background-color', "red");
     });
 });
+	
