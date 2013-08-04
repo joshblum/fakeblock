@@ -26,3 +26,18 @@ function genKeys() {
         "pub_key" :  pub_key,
     }
 }
+
+//convert json_parsed_key into an RSA object
+//returns deserlized RSA obj
+function deserializePrivKey(json_parsed_key) {
+    var priv_key = new RSAKey();
+    for (k1 in json_parsed_key) {
+        var nbi = new BigInteger();
+        var val = json_parsed_key[k1];
+        for (k2 in val){
+            nbi[k2] = val[k2];
+        }
+        priv_key[k1] = nbi;
+    }
+    return priv_key
+}
