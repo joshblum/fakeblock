@@ -61,6 +61,8 @@ function makeOverlays() {
             $(this).data('checkedOverlay', true);
             return;
         }
+        console.log(encryptClasses[0])
+        console.log(textareaUsernameGetters[encryptClasses[0]]($(this)))
         $(this).data('checkedOverlay', true);
         $(this).data('usernames', textareaUsernameGetters[encryptClasses[0]]($(this)) );
 
