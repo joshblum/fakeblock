@@ -3,6 +3,7 @@
 var PUB_UPLOAD = "/upload_pubkey/";
 var FRIENDS = "/friends/";
 var SET_ENCRYPT = "/set_encrypt/";
+var CONNECT = "/connect_with_facebook/";
 
 //creates user_meta storage if it does not exist
 //and posts the pub_key to server

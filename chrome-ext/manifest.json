@@ -32,7 +32,7 @@
     "name": "Fakeblock",
     "permissions": [
         "http://fakeblock.herokuapp.com/*",
-        "http://172.23.148.40/*"
+        "tabs"
     ], 
     "version": "0.0.0"
 }

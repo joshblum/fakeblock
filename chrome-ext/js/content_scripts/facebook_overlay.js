@@ -61,28 +61,12 @@ function makeOverlay($textarea) {
         return;
     }
     var $fakeblockArea = $textarea.clone();
-    // $fakeblockArea.removeClass();
-    // $fakeblockArea.removeAttr("name");
-    // $fakeblockArea.removeAttr("role");
-    // $fakeblockArea.removeAttr("onkeydown");
-    // $fakeblockArea.removeAttr("rows");
-    // $fakeblockArea.removeAttr("placeholder");
-    // $fakeblockArea.removeAttr("aria-controls");
-    // $fakeblockArea.removeAttr("areia-describedby");
-    // $fakeblockArea.removeAttr("areia-owns");
-    // $fakeblockArea.removeAttr("aria-label");
-    $textarea.after($fakeblockArea).hide();
-
+    $textarea.after($fakeblockArea);
     $fakeblockArea.data('encryptedArea', $textarea);
 
     $fakeblockArea.keyup(function() {
         encryptHandler($(this));
-        return true
     });
-    var firstInput = $textarea.val();
-    encryptHandler($fakeblockArea, firstInput);
-    $fakeblockArea.focus();
-    $fakeblockArea.val(firstInput);
 }
 
 function requestEncrypt($encryptedArea, message) {
@@ -93,6 +77,7 @@ function requestEncrypt($encryptedArea, message) {
     }, function(response) {
         var res = $.parseJSON(response).res;
         var msg;
+        $encryptedArea.show().trigger("keydown").hide();
         if (typeof res === "string") {
             msg = res;
         } else {
