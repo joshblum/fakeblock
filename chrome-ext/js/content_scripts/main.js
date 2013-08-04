@@ -3,28 +3,36 @@
 $(document).ready(function() {
     decryptFakeblocks();
 
-    /****** automatically try to decrypt DOM whenever it changes ******************************************************/
+    /****** automatically try to replaceFakeblockWithDecryptedText DOM whenever it changes ******************************************************/
+    var intervalID = setInterval(function(){
+        decryptFakeblocks();
+    },5000);
 
-//     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-
-//     var observer = new MutationObserver(function(mutations, observer) {
-//         // fired when a mutation occurs
-//         decryptFakeblocks();
-//     });
-
-// // define what element should be observed by the observer
-// // and what types of mutations trigger the callback
-//     observer.observe(document, {
-//         subtree: true,
-//         attributes: false
-//     });
+//    $(document).bind('DOMNodeInserted', function(e) {
+//        decryptFakeblocks();
+//    });
+//
+//    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+//
+//    var observer = new MutationObserver(function(mutations, observer) {
+//        // fired when a mutation occurs
+//        decryptFakeblocks();
+//    });
+//
+//// define what element should be observed by the observer
+//// and what types of mutations trigger the callback
+//    observer.observe(document, {
+//        subtree: true,
+//        attributes: false
+//    });
 });
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
 // selects all divs that contain text with fakeblock.. and do not have any children
 function getDivsContainingFakeBlock() {
-    var divs = $(":contains('|fakeblock|'):not(:has(*))");
+//    var divs = $("p:contains('|fakeblock|'):not(:has(*))").not("script");
+    var divs = $("p:contains('|fakeblock|')");
     // filter out divs which are being encrypted
     $.each(do_encrypt_selectors, function() {
         divs = divs.not($(this));
@@ -52,7 +60,8 @@ function getFakeblockObjectsFromPage() {
     var divs = getDivsContainingFakeBlock();
     var all_fakeblocks = [];
     divs.each(function() {
-        var match_objects = getFakeBlocksFromText($(this).text());
+        var div = $(this);
+        var match_objects = getFakeBlocksFromText(div.text());
         $.each(match_objects, function() {
             try {
                 var match_object = $(this);
@@ -73,24 +82,27 @@ function getFakeblockObjectsFromPage() {
     return all_fakeblocks;
 }
 
-// decrypt and replace all faceblocks for a user
+// replaceFakeblockWithDecryptedText and replace all faceblocks for a user
 function decryptFakeblocks() {
     var fakeblocks = getFakeblockObjectsFromPage();
     $.each(fakeblocks, function() {
         var fakeblock = $(this)[0];
         var to_replace = fakeblock['whole_match'];
         var unparsed_json = fakeblock['unparsed_json'];
-        // send to back to decrypt and replace to_replace with decrypted_text
-        decrypt(to_replace, unparsed_json);
+        var parsed_json = fakeblock['parsed_json'];
+        // send to back to replaceFakeblockWithDecryptedText and replace to_replace with decrypted_text
+        replaceFakeblockWithDecryptedText(to_replace, parsed_json);
     });
 }
 
 // backend decrypts fakeblock unparsed_json into decrypted_text
-function decrypt(to_replace, json) {
+function replaceFakeblockWithDecryptedText(to_replace, json) {
+    console.log("sent");
     sendMessage({
         "action" : "decrypt",
         "json" : json
     }, function(response) {
+        debugger
         var decrypted_text = $.parseJSON(response).res;
         if (decrypted_text != "") {
             var all_html = $("body").html();
