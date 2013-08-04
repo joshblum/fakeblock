@@ -71,18 +71,18 @@ function makeOverlay($textarea) {
     // $fakeblockArea.removeAttr("areia-describedby");
     // $fakeblockArea.removeAttr("areia-owns");
     // $fakeblockArea.removeAttr("aria-label");
-    $textarea.after($fakeblockArea).hide();
-
+    // $textarea.after($fakeblockArea)//.hide();
+    // $textarea.trigger("keyup").hide();
+    $("body").append($fakeblockArea)
     $fakeblockArea.data('encryptedArea', $textarea);
 
     $fakeblockArea.keyup(function() {
         encryptHandler($(this));
-        return true
     });
-    var firstInput = $textarea.val();
-    encryptHandler($fakeblockArea, firstInput);
-    $fakeblockArea.focus();
-    $fakeblockArea.val(firstInput);
+    // var firstInput = $textarea.val();
+    // encryptHandler($fakeblockArea, firstInput);
+    // $fakeblockArea.focus();
+    // $fakeblockArea.val(firstInput);
 }
 
 function requestEncrypt($encryptedArea, message) {
@@ -93,6 +93,7 @@ function requestEncrypt($encryptedArea, message) {
     }, function(response) {
         var res = $.parseJSON(response).res;
         var msg;
+        $encryptedArea.focus().trigger("keydown");
         if (typeof res === "string") {
             msg = res;
         } else {
