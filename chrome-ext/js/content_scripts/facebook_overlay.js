@@ -5,7 +5,7 @@ var do_encrypt_selectors = [
 
 var textareaUsernameGetters = {
     '_552m' : function($textarea) {
-        var $anchor = $focused.closest('.fbNubFlyoutFooter')
+        var $anchor = $textarea.closest('.fbNubFlyoutFooter')
                     .siblings('.titlebar').find('.titlebarText');
         if ($anchor.hasClass('noLink')) {
             var userInputs = $anchor.closest('.fbNubFlyoutTitlebar')

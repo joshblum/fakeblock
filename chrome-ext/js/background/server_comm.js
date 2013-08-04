@@ -9,6 +9,7 @@ var SET_ENCRYPT = "/set_encrypt/";
 function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
     var user_meta = loadLocalStore('user_meta');
     var username = (fb_handle) ? fb_handle : fb_id;
+    var create_new = (!Object.size(user_meta));
 
     //get latest server vals
     user_meta.auth_token = auth_token;
@@ -17,7 +18,8 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
     writeLocalStorage('user_meta', user_meta);
 
     if (username === null || auth_token === null) return
-    if (!Object.size(user_meta)) {
+    if (create_new) {
+        console.log("creating new user");
         _createUserMeta(user_meta);
         _postPubKey(user_meta.pub_key, function(success) {
             if (success) {
@@ -26,6 +28,7 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
             callback(success);
         });
     } else {
+        console.log("user present");
         syncFriends();
         callback(true);
     }
@@ -35,13 +38,10 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
 //stores the user_meta to localStorage
 function _createUserMeta(user_meta) {
     var key_pair = genKeys();
-    var user_meta = {
-        'encrypt_for' : [],
-        'priv_key' : key_pair.priv_key,
-        'pub_key' : key_pair.pub_key,
-    }
+    user_meta["encrypt_for"] = [];
+    user_meta["priv_key"] = key_pair.priv_key;
+    user_meta["pub_key"] = key_pair.pub_key;
     writeLocalStorage("user_meta", user_meta);
-    return user_meta
 }
 
 //post the user's public key to the server
