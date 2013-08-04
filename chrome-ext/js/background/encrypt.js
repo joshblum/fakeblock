@@ -8,9 +8,9 @@
 //output ::= fakeblock_obj
 //fakeblock_obj ::= def in common.js
 function encrypt(plaintext, encrypt_for) {
+    // console.log(arguments);
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
-    console.log(arguments);
     if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === [])) {
         return plaintext
     }
@@ -43,7 +43,7 @@ function encrypt(plaintext, encrypt_for) {
         "users" : users,
         "cipher_text" : cipher_text,
     }
-    console.log(res)
+    // console.log(res)
     return res
 }
 

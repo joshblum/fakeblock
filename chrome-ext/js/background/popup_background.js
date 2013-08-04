@@ -1,6 +1,7 @@
 function getSingleUsers() {
-	var user_meta = loadLocalStore(user_meta)
-	if (!user_meta) {
+	var user_meta = loadLocalStore("user_meta");
+	if (!Object.size(user_meta)) {
+		openLink(buildUrl(CONNECT));	
 		//maybe we should know if user_meta isn't set yet? dunno, ask josh
 		return []
 	}

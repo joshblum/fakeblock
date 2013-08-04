@@ -77,7 +77,7 @@ function requestEncrypt($encryptedArea, message) {
     }, function(response) {
         var res = $.parseJSON(response).res;
         var msg;
-        $encryptedArea.show().focus().trigger("keydown").hide();
+        $encryptedArea.show().trigger("keydown").hide();
         if (typeof res === "string") {
             msg = res;
         } else {
