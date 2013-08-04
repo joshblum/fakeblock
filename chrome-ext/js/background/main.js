@@ -4,7 +4,7 @@
 function messageListener() {
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         executeMessage(request, sender, sendResponse);
-        return true;
+        return true
     });
 }
 

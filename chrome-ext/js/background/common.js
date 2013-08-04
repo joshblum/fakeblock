@@ -58,16 +58,18 @@ function executeMessage(request, sender, sendResponse) {
     var ACTION_MAP = {
         "encrypt" : [encrypt, msg.message, msg.usernames],
         "decrypt" : [decrypt, msg.json],
-        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token],
+        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, sendResponse],
         "encrypt_for" : [encrypt_for, msg.username],
     }
 
     if (action in ACTION_MAP){
         var args = ACTION_MAP[action]; //get mapped function and args
         //apply func with args
-        var response = args[0].apply(this, args.slice(1)); 
-        if (response) {
-            sendResponse(response);
+        var res = args[0].apply(this, args.slice(1)); 
+        if (res) {
+            sendResponse(JSON.strinify({
+                "res" : res,
+            }));
         }
     } 
 }
@@ -105,7 +107,7 @@ function writeLocalStorage(key, value) {
 function buildUrl(path, getParam) {
     getParam = getParam || {}
     var user_meta = loadLocalStore('user_meta');
-    if (user_meta === {}){
+    if (!Object.size(user_meta)){
         return ""
     }
     var url =  baseUrl + path + "?auth_token=" + user_meta.auth_token;

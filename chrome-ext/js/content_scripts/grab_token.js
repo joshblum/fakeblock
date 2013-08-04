@@ -13,7 +13,9 @@ $(document).ready(function(){
             "auth_token" : auth_token,
             "fb_id" : fb_id,
             "fb_handle" : fb_handle,
-        }, function(){});
+        }, function(res){
+            console.log(res);
+        });
     }
 
 });

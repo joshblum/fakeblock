@@ -8,27 +8,29 @@ var FRIENDS = "/friends/";
 function login(fb_id, fb_handle, auth_token, callback){
     var user_meta = loadLocalStore('user_meta');
     var username = (fb_handle) ? fb_handle : fb_id;
-    if (user_meta === {}) {
-        user_meta = _createUserMeta(username);
+    if (!Object.size(user_meta)) {
+        user_meta = _createUserMeta(username, auth_token);
         _postPubKey(user_meta.pub_key, function(success){
             callback(success) 
         });
     } else {
+        user_meta.auth_token = auth_token;
         callback(true)
     }
-    user_meta.auth_token = auth_token;
     writeLocalStorage('user_meta', user_meta);
+    syncFriends();
 }
 
 //generates a pub/priv RSA key pair for a user
 //stores the user_meta to localStorage
-function _createUserMeta(username) {
-    priv_key, pub_key = genKeys();
+function _createUserMeta(username, auth_token) {
+    var key_pair = genKeys();
     var user_meta = {
         'username' : username,
         'encrypt_for' : "",
-        'priv_key' : priv_key,
-        'pub_key' : pub_key,
+        'priv_key' : key_pair.priv_key,
+        'pub_key' : key_pair.pub_key,
+        'auth_token' : auth_token,
     }
     writeLocalStorage("user_meta", user_meta);
     return user_meta
@@ -63,17 +65,18 @@ function _postPubKey(pub_key, callback) {
 // }
 function syncFriends() {
     var user_meta = loadLocalStore('user_meta');
-    if (user_meta === {}){
+    if (!Object.size(user_meta)){
         return
     }
     var url = buildUrl(FRIENDS)
     $.get(url, function(friend_data){
         var user_map = loadLocalStore("user_map");
-        $.each(friend_data.friends, function(i, user_id){
-            var user_data = friend_data.friends[user_id];
+        var count = 0;
+        $.each(friend_data.friends, function(user_id, user_data){
             var username = (user_data.fb_handle) ? user_data.fb_handle : user_id;
             user_map[username] = user_data;
-            if (i === Object.size(friend_data.friends)) {
+            count ++;
+            if (count === Object.size(friend_data.friends)) {
                 writeLocalStorage("user_map", user_map)
             }
         });

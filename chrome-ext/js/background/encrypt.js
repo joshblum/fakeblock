@@ -49,10 +49,10 @@ function encrypt(plaintext, encrypt_for) {
 //for the given user
 //if the user does not exist returns undefined, {}
 function _getUserData(username, shared_secret, user_map) {
-    if (!username in user_map) {
-        return {}
-    }
+    if (!(username in user_map)) return {}
+        
     var user_data = user_map[username];
+    if (!user_data.pub_keys.length) return {}
 
     return genEncryptedMeta(user_data.pub_keys, shared_secret)
 }

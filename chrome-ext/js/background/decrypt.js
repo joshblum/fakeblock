@@ -2,7 +2,7 @@
 //or an empty string if decryption fails.
 function decrypt(fakeblock) {
     var user_meta = loadLocalStore('user_meta');
-    if (user_meta === {}){
+    if (!Object.size(user_meta)){
         return ""
     }
 
