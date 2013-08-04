@@ -44,9 +44,9 @@ function encrypt(plaintext, encrypt_for, callback) {
         "cipher_text" : cipher_text,
     }
     // console.log(res)
-    callback(encodeString(JSON.stringify({
-        "res" : res,
-    })));
+    callback(JSON.stringify({
+        "res" : encodeString(JSON.stringify(res)),
+    }));
 }
 
 //returns the shared secret and 
