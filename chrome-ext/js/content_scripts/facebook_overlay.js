@@ -51,7 +51,7 @@ function makeOverlays() {
         $(this).data('usernames', textareaUsernameGetters[encryptClasses[0]]($(this)) );
 
         //need a function to check if will_encrypt for usernames
-        makeOverlay($(this);
+        makeOverlay($(this));
 
     });
 }
