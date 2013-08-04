@@ -5,13 +5,14 @@ function getSingleUsers() {
 		//maybe we should know if user_meta isn't set yet? dunno, ask josh
 		return []
 	}
-	var selfname = user_meta.username
+	var selfname = user_meta.username;
     var user_map = loadLocalStore('user_map');
-	delete user_map.selfname;
 	var users = [];
-	for (user in user_map) {
+	for (username in user_map) {
+		if (username === selfname) continue
 		users.push({
-			user : user_map[user].name,
+			fullname : user_map[username].name,
+			username : username,
 		});
 	}
 	return users;
