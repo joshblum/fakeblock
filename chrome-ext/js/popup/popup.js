@@ -4,20 +4,24 @@ $(function() {
 	sendMessage({
 		"action" : "get_friends",
 	}, function(friends) {
-		for (friend in friends) {
-			var userInput = $('<div class="contact">
-	            <input class="select-contact" type="checkbox"/>
-	            <div class="contact-name">
-	            ' + friends.friend.name + '
-	            </div>
-	        </div>');
-	        userInput.data('username', friend);
-	        userInput.data('fullname', friends.friend.name);
-	        userInputs.push(userInput);
-	        $('body').append(userInput);
-		}
-	});
+		alert('hello world');
+		$.each(friends, function(index, friendObj) {
+			var username = Object.keys(friendObj)[0];
 
+			var userInput = $('<div class="contact">'+
+	            '<input class="select-contact" type="checkbox"/>'+
+	            '<div class="contact-name">'+
+	            friendObj.username +
+	            '</div>' +
+	        '</div>');
+	        userInput.data('username', username);
+	        userInput.data('fullname', friendObj.username);
+	        userInputs.push(userInput);
+	        alert(userInput);
+
+		});
+	});
+	alert('hi');
     $(".contact").click(function() {
         $(this).css('background-color', "red");
     });
