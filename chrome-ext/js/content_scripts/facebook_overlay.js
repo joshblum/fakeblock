@@ -39,35 +39,24 @@ $(function() {
 		if (will_encrypt($(this).data('usernames'))) {
 			makeAndFocusOverlay($(this), evt);
 		}
-	})
+	});
 
 	function makeAndFocusOverlay($textarea, evt) {
-		if ($textarea.data('unencryptedArea')) {
+		if (!$textarea.is(':visible')) {
 			return;
 		}
-		var $fakeblockArea = $textarea; //make an overlay here. DEMO: for now return original text area
-		$textarea.data('unencryptedArea', $fakeblockArea);//DEMO: remove this later
+		var $fakeblockArea = $textarea.clone();
+		$textarea.after($fakeblockArea).hide();
+
 		$fakeblockArea.data('encryptedArea', $textarea);
-		$fakeblockArea.data('usernames', $textarea.data('usernames'));
 
-		$fakeblockArea.keyup(function(e) {
-			encryptHandler($(this), e);classes
+		$fakeblockArea.keyup(function() {
+			encryptHandler($(this));
 		});
-		encryptHandler($fakeblockArea, evt, $textarea.val());//DEMO: remove last parameter for demo
-
+		var firstInput = $textarea.val();
+		encryptHandler($fakeblockArea, firstInput);
 		$fakeblockArea.focus();
-
-		return $fakeblockArea;
-	}
-
-
-	function checkFakeBlock($textarea) {
-		//this will be a regex to check if there's already fakeblock tags/json object set up in textarea
-		if (!dummyCheck) {
-			dummyCheck = true;
-			return false;
-		}
-		return dummyCheck;
+		$fakeblockArea.val(firstInput);
 	}
 
 	function will_encrypt(usernames) {
@@ -79,11 +68,15 @@ $(function() {
 		return $.parseJSON($textarea.val().split('|')[2]);
 	}
 
-	function requestEncrypt($encryptedArea, message, usernames) {
-		chrome.runtime.sendMessage({
+	function requestEncrypt($encryptedArea, message) {
+		//use this to test while extension not running
+		$encryptedArea.val("|fakeblock|" + JSON.stringify({'ciphertext' : message }) + "|endfakeblock|");
+		return;
+
+		sendMessage({
 			"action" : "encrypt",
 			"message" : message,
-			"usernames" : usernames			
+			"usernames" : $encryptedArea.data('usernames')
 		}, function(encrypted) {
   			$encryptedArea.val("|fakeblock|" + 
 				JSON.stringify(encrypted) + 
@@ -92,23 +85,12 @@ $(function() {
 		});
 	}
 
-	function encryptHandler($unencryptedArea, evt, demoText) {
-		// var message = $unencryptedArea.val());
-		//DEMO: just use above function call once we add overlay
-		var fakeblockMatches = getFakeBlocksFromText($unencryptedArea.val());
-		if (fakeblockMatches.length > 0) {
-			var fakeblockJson = $.parseJSON(fakeblockMatches[0][1]);
-			var message = fakeblockJson.ciphertext + $unencryptedArea.val().split('|')[4];
-		}
-		else {
-			var message = $unencryptedArea.data('unencryptedArea').val();
-		}
+	function encryptHandler($unencryptedArea, message) {
+		var message = (message) ? message : $unencryptedArea.val();
 
 		//send message to encrypt to josh
 		encrypted = requestEncrypt($unencryptedArea.data('encryptedArea'), 
-			message, $unencryptedArea.data('usernames'));
-
-
+			message);
 	}
 
 });

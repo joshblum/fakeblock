@@ -21,5 +21,8 @@ function randString(length) {
 function genKeys() { 
     var priv_key = cryptico.generateRSAKey(randString(), bitlength);
     var pub_key = cryptico.publicKeyString(priv_key);
-    return priv_key, pub_key
+    return {
+        "priv_key" : priv_key,
+        "pub_key" :  pub_key,
+    }
 }

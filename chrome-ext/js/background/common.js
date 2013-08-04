@@ -20,6 +20,7 @@
 //  "priv_key" : "",
 //  "username" : "",
 //  "encrypt_for" : "",
+//  "auth_token" : "",
 // }
 
 // user_map ::=
@@ -44,17 +45,41 @@
 
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
-var baseUrl = "http://localhost:5000";
+var baseUrl = "http://localhost:8000";
 // var baseUrl = "http://fakeblock.herokuapp.com";
 var SENTINAL = "fakeblock";
 
-//returns a JSON object of the key or empty dict
-function loadLocalStore(key) {
-    var localString = localStorage.getItem(key);
-    // catch undefined case
-    localString = (localString) ? localString : "{}"; 
-    return JSON.parse(localString);
+/*
+    helper to execute messages between content and background script
+*/
+function executeMessage(request, sender, sendResponse) {
+    var msg = JSON.parse(request)
+    var action = msg.action;
+    var ACTION_MAP = {
+        "encrypt" : [encrypt, msg.message, msg.usernames],
+        "decrypt" : [decrypt, msg.json],
+        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, sendResponse],
+        "encrypt_for" : [encrypt_for, msg.username],
+    }
+
+    if (action in ACTION_MAP){
+        var args = ACTION_MAP[action]; //get mapped function and args
+        //apply func with args
+        var res = args[0].apply(this, args.slice(1)); 
+        if (res) {
+            sendResponse(JSON.strinify({
+                "res" : res,
+            }));
+        }
+    } 
 }
+
+function encrypt_for(username) {
+    var user_meta = loadLocalStore('user_meta');
+    user_meta.encrypt_for = username;
+    writeLocalStorage('user_meta', user_meta);
+}
+
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {
     var size = 0, key;
@@ -63,3 +88,34 @@ Object.size = function(obj) {
     }
     return size;
 };
+
+//returns a JSON object of the key or empty dict
+function loadLocalStore(key) {
+    var localString = localStorage.getItem(key);
+    // catch undefined case
+    localString = (localString) ? localString : "{}"; 
+    return JSON.parse(localString);
+}
+
+//writes to localStorage
+function writeLocalStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+//helper function to build a url
+//adds the auth_token to every request
+function buildUrl(path, getParam) {
+    getParam = getParam || {}
+    var user_meta = loadLocalStore('user_meta');
+    if (!Object.size(user_meta)){
+        return ""
+    }
+    var url =  baseUrl + path + "?auth_token=" + user_meta.auth_token;
+    if (getParam === {}) {
+        return url
+    }
+    $.each(getParam, function(key, val){
+        url += "&" + key + "=" + val
+    });
+    return url
+}
