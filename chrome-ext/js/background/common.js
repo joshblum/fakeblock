@@ -56,8 +56,8 @@ function executeMessage(request, sender, sendResponse) {
     var msg = JSON.parse(request)
     var action = msg.action;
     var ACTION_MAP = {
-        "encrypt" : [encrypt, msg.message, msg.usernames],
-        "decrypt" : [decrypt, msg.json],
+        "encrypt" : [perform_encrypt, msg.message, msg.usernames],
+        "decrypt" : [perform_decrypt, msg.json],
         "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, sendResponse],
         "encrypt_for" : [encrypt_for, msg.username],
     }
