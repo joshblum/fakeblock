@@ -1,6 +1,13 @@
 
 $(document).ready(function() {
     $(".contact").click(function() {
-        $(this).css('background-color', "red");
+        if ($(this).hasClass("clicked")) {
+            $(this).removeClass("clicked");
+            $(this).find("input").prop('checked', false);
+        }
+        else {
+            $(this).addClass("clicked");
+            $(this).find("input").prop('checked', true);
+        }
     });
 });
