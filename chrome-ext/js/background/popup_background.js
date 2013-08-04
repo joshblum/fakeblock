@@ -1,6 +1,4 @@
 function getSingleUsers() {
-	return [{ 'stephanie' : 'swanggg'}]
-
 	var user_meta = loadLocalStore(user_meta)
 	if (!user_meta) {
 		//maybe we should know if user_meta isn't set yet? dunno, ask josh
