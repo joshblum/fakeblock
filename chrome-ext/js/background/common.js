@@ -58,9 +58,8 @@ function executeMessage(request, sender, sendResponse) {
     var ACTION_MAP = {
         "encrypt" : [encrypt, msg.message, msg.usernames],
         "decrypt" : [decrypt, msg.json],
-        "login" : [login, msg.username],
+        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token],
         "encrypt_for" : [encrypt_for, msg.username],
-        "set_auth_token" : [set_auth_token, msg.token],
     }
 
     if (action in ACTION_MAP){
@@ -76,13 +75,7 @@ function executeMessage(request, sender, sendResponse) {
 function encrypt_for(username) {
     var user_meta = loadLocalStore('user_meta');
     user_meta.encrypt_for = username;
-    localStorage.setItem('user_meta', user_meta);
-}
-
-function set_auth_token(auth_token) {
-    var user_meta = loadLocalStore('user_meta');
-    user_meta.auth_token = auth_token;
-    localStorage.setItem('user_meta', user_meta);
+    writeLocalStorage('user_meta', user_meta);
 }
 
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
@@ -100,6 +93,11 @@ function loadLocalStore(key) {
     // catch undefined case
     localString = (localString) ? localString : "{}"; 
     return JSON.parse(localString);
+}
+
+//writes to localStorage
+function writeLocalStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
 }
 
 //helper function to build a url

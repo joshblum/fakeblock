@@ -2,7 +2,7 @@
 //calling backend functions
 
 function messageListener() {
-    chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         executeMessage(request, sender, sendResponse);
         return true;
     });

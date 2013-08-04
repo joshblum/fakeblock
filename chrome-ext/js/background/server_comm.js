@@ -5,8 +5,9 @@ var FRIENDS = "/friends/";
 
 //creates user_meta storage if it does not exist
 //and posts the pub_key to server
-function login(username, callback){
+function login(fb_id, fb_handle, auth_token, callback){
     var user_meta = loadLocalStore('user_meta');
+    var username = (fb_handle) ? fb_handle : fb_id;
     if (user_meta === {}) {
         user_meta = _createUserMeta(username);
         _postPubKey(user_meta.pub_key, function(success){
@@ -15,6 +16,8 @@ function login(username, callback){
     } else {
         callback(true)
     }
+    user_meta.auth_token = auth_token;
+    writeLocalStorage('user_meta', user_meta);
 }
 
 //generates a pub/priv RSA key pair for a user
@@ -27,7 +30,7 @@ function _createUserMeta(username) {
         'priv_key' : priv_key,
         'pub_key' : pub_key,
     }
-    localStorage.setItem("user_meta", user_meta);
+    writeLocalStorage("user_meta", user_meta);
     return user_meta
 }
 
@@ -71,7 +74,7 @@ function syncFriends() {
             var username = (user_data.fb_handle) ? user_data.fb_handle : user_id;
             user_map[username] = user_data;
             if (i === Object.size(friend_data.friends)) {
-                localStorage.setItem("user_map", user_map)
+                writeLocalStorage("user_map", user_map)
             }
         });
     });
