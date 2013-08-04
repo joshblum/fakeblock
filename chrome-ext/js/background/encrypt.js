@@ -8,6 +8,7 @@
 //output ::= fakeblock_obj
 //fakeblock_obj ::= def in common.js
 function encrypt(plaintext, encrypt_for) {
+    debugger
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
     if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === "")) {
@@ -49,6 +50,7 @@ function encrypt(plaintext, encrypt_for) {
 //for the given user
 //if the user does not exist returns undefined, {}
 function _getUserData(username, shared_secret, user_map) {
+    debugger
     if (!(username in user_map)) return {}
         
     var user_data = user_map[username];
