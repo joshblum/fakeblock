@@ -100,6 +100,7 @@ function syncFriends() {
 
 //update whether a user will_encrypt or not
 function setEncrypt(will_encrypt, callback) {
+    console.log(will_encrypt)
     var user_meta = loadLocalStore('user_meta');
     if (!Object.size(user_meta)){
         return
