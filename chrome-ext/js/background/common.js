@@ -20,6 +20,7 @@
 //  "priv_key" : "",
 //  "username" : "",
 //  "encrypt_for" : "",
+//  "auth_token" : "",
 // }
 
 // user_map ::=
@@ -55,6 +56,43 @@ function loadLocalStore(key) {
     localString = (localString) ? localString : "{}"; 
     return JSON.parse(localString);
 }
+
+/*
+    helper to execute messages between content and background script
+*/
+function executeMessage(request, sender, sendResponse) {
+    var msg = JSON.parse(request)
+    var action = msg.action;
+    var ACTION_MAP = {
+        "encrypt" : [encrypt, msg.message, msg.usernames],
+        "decrypt" : [decrypt, msg.json],
+        "login" : [login, msg.username],
+        "encrypt_for" : [encrypt_for, msg.username],
+        "set_auth_token" : [set_auth_token, msg.token],
+    }
+
+    if (action in ACTION_MAP){
+        var args = ACTION_MAP[action]; //get mapped function and args
+        //apply func with args
+        var response = args[0].apply(this, args.slice(1)); 
+        if (response) {
+            sendResponse(response);
+        }
+    } 
+}
+
+function encrypt_for(username) {
+    var user_meta = loadLocalStore('user_meta');
+    user_meta.encrypt_for = username;
+    localStorage.setItem('user_meta', user_meta);
+}
+
+function set_auth_token(auth_token) {
+    var user_meta = loadLocalStore('user_meta');
+    user_meta.auth_token = auth_token;
+    localStorage.setItem('user_meta', user_meta);
+}
+
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {
     var size = 0, key;

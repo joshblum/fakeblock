@@ -59,6 +59,10 @@ function _postPubKey(pub_key, callback) {
 //      }
 // }
 function syncFriends() {
+    var user_meta = loadLocalStore('user_meta');
+    if (user_meta === {}){
+        return
+    }
     var url = baseUrl + FRIENDS;
     $.get(url, function(friend_data){
         var user_map = loadLocalStore("user_map");
