@@ -1,7 +1,5 @@
 $(function() {
 	var dummyCheck = false;
-	var myUsername = 'blah';
-	var globalFakeblockMode = true;
 	var textareaUsernameGetters = {
 		'_552m' : function($textarea) {
 			var friendUrl = $focused.closest('.fbNubFlyoutFooter')
@@ -16,7 +14,7 @@ $(function() {
 		
 	$('textarea').focus(function() {
 		var classes = $(this).attr('class').split(' ');
-		encryptClasses = classes.filter(function(elm) {
+		var encryptClasses = classes.filter(function(elm) {
 			return elm in textareaUsernameGetters;
 		});
 		if (encryptClasses.length == 0) {
@@ -39,17 +37,18 @@ $(function() {
 	})
 
 	function makeAndFocusOverlay($textarea, evt) {
-		if ($textarea.data('encryptedArea')) {
+		if ($textarea.data('unencryptedArea')) {
 			return;
 		}
 		var $fakeblockArea = $textarea; //make an overlay here. DEMO: for now return original text area
-		$textarea.data('encryptedArea', $fakeblockArea);
-		$fakeblockArea.data('unencryptedArea', $textarea);
+		$textarea.data('unencryptedArea', $fakeblockArea);//DEMO: remove this later
+		$fakeblockArea.data('encryptedArea', $textarea);
+		$fakeblockArea.data('usernames', $textarea.data('usernames'));
 
 		$fakeblockArea.keyup(function(e) {
-			encryptHandler($(this), e);
+			encryptHandler($(this), e);classes
 		});
-		encryptHandler($fakeblockArea, evt);
+		encryptHandler($fakeblockArea, evt, $textarea.val());//DEMO: remove last parameter for demo
 
 		$fakeblockArea.focus();
 
@@ -66,19 +65,6 @@ $(function() {
 		return dummyCheck;
 	}
 
-	function createFakeBlock($unencryptedArea) {
-		var fakeblock = {
-			'users' : {
-				'myUsername' : {}
-			},
-			'ciphertext' : $unencryptedArea.val()
-		};
-		$unencryptedArea.data('usernames').map(function(user) {
-			fakeblock.users.user = {};
-		});
-		return fakeblock;
-	}
-
 	function will_encrypt(usernames) {
 		return true;
 	}
@@ -87,35 +73,36 @@ $(function() {
 		//dummy function
 		return $.parseJSON($textarea.val().split('|')[2]);
 	}
-	function encrypt(ciphertext, usernames) {
-		//dummy function
-		return {
-			'users' : {},
-			'ciphertext' : ciphertext
-		}
+
+	function requestEncrypt($encryptedArea, message, usernames) {
+		chrome.runtime.sendMessage({
+			"action" : "encrypt",
+			"message" : message,
+			"usernames" : usernames			
+		}, function(encrypted) {
+  			$encryptedArea.val("|fakeblock|" + 
+				JSON.stringify(encrypted) + 
+				"|endfakeblock|"
+			);
+		});
 	}
-	function encryptHandler($encryptedArea, evt) {
 
-		var fakeblock;
-		if (!checkFakeBlock($encryptedArea)) {
-			//create new fakeblock from original unencrypted area
-			fakeblock = createFakeBlock($encryptedArea.data('unencryptedArea'));
-		} else {
-			//need json object from max
-			fakeblock = getFakeBlock($encryptedArea);
-			fakeblock.ciphertext = fakeblock.ciphertext + String.fromCharCode(evt.which);
+	function encryptHandler($unencryptedArea, evt, demoText) {
+		// var message = $unencryptedArea.val());
+		//DEMO: just use above function call once we add overlay
+		var fakeblockMatches = getFakeBlocksFromText($unencryptedArea.val());
+		if (fakeblockMatches.length > 0) {
+			var fakeblockJson = $.parseJSON(fakeblockMatches[0][1]);
+			var message = fakeblockJson.ciphertext + $unencryptedArea.val().split('|')[4];
+		}
+		else {
+			var message = $unencryptedArea.data('unencryptedArea').val();
 		}
 
-		var usernames = [];
-		for (user in fakeblock.users) {
-			usernames.push(user);
-		}
 		//send message to encrypt to josh
-		encrypted = encrypt(fakeblock.ciphertext, usernames);
-		$encryptedArea.data('unencryptedArea').val('|fakeblock|' + 
-			JSON.stringify(encrypted) + 
-			'|endfakeblock|'
-		);
+		encrypted = requestEncrypt($unencryptedArea.data('encryptedArea'), 
+			message, $unencryptedArea.data('usernames'));
+
 
 	}
 
