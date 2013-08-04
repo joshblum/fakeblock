@@ -67,11 +67,9 @@ function executeMessage(request, sender, sendResponse) {
         var args = ACTION_MAP[action]; //get mapped function and args
         //apply func with args
         var res = args[0].apply(this, args.slice(1)); 
-        if (res) {
-            sendResponse(JSON.stringify({
-                "res" : res,
-            }));
-        }
+        sendResponse(JSON.stringify({
+            "res" : res,
+        }));
     } 
 }
 
