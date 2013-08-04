@@ -67,7 +67,6 @@ $(function() {
     }, function(response) {
         friends = $.parseJSON(response).res;
         $.each(friends, function(index, friendObj) {
-            console.log(friendObj)
             var username = friendObj.username
             var fullname = friendObj.fullname
             var userInput = $('<div class="contact">'+
@@ -87,7 +86,7 @@ $(function() {
             bindContactClickFunction(div);
         });
 
-    });
+    })
     $(".will_encrypt").click(function() {
         sendWillEncrypt();
     });
