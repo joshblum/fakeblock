@@ -77,6 +77,6 @@ function genEncryptedMeta(pub_keys, shared_secret) {
 
     return {
         "e_sentinals" : e_sentinals,
-        "e_shared_secrets" : e_shared_secrets,
+        "e_shared_secrets" : e_shared_secrets
     }
 }

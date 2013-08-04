@@ -46,7 +46,9 @@ function getEncryptFor() {
         });
         res = JSON.parse(res)
         $.each(res.res, function(i, user){
-            $("#" + user).prop('checked', true);
+            var $usr = $("#" + user);
+            $usr.prop('checked', true);
+            $usr.parent().addClass("clicked");
         });
     });
 }
@@ -65,18 +67,20 @@ $(function() {
     }, function(response) {
         friends = $.parseJSON(response).res;
         $.each(friends, function(index, friendObj) {
-            var username = Object.keys(friendObj)[0];
-
+            console.log(friendObj)
+            var username = friendObj.username
+            var fullname = friendObj.fullname
             var userInput = $('<div class="contact">'+
                 '<input id="'+username+'"class="select-contact" type="checkbox"/>'+
                 '<div class="contact-name">'+
-                friendObj[username] +
+                fullname +
                 '</div>' +
                 '</div>');
-            console.log(userInput)
             userInput.data('username', username);
-            userInput.data('fullname', friendObj[username]);
+            userInput.data('fullname', fullname);
             userInputs.push(userInput);
+            getWillEncrypt();
+            getEncryptFor();
         });
         $.each(userInputs, function(index, div) {
             $(".contacts").append(div);
@@ -84,8 +88,6 @@ $(function() {
         });
 
     });
-    getWillEncrypt();
-    getEncryptFor();
     $(".will_encrypt").click(function() {
         sendWillEncrypt();
     });
