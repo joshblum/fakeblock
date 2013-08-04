@@ -3,7 +3,7 @@
 $(document).ready(function() {
     decryptFakeblocks();
 
-    /****** automatically try to replaceFakeblockWithDecryptedText DOM whenever it changes ******************************************************/
+    /****** automatically try to decrypt DOM whenever it changes ******************************************************/
     var intervalID = setInterval(function(){
         decryptFakeblocks();
     },5000);
@@ -82,7 +82,7 @@ function getFakeblockObjectsFromPage() {
     return all_fakeblocks;
 }
 
-// replaceFakeblockWithDecryptedText and replace all faceblocks for a user
+// decrypt and replace all faceblocks for a user
 function decryptFakeblocks() {
     var fakeblocks = getFakeblockObjectsFromPage();
     $.each(fakeblocks, function() {
@@ -90,7 +90,7 @@ function decryptFakeblocks() {
         var to_replace = fakeblock['whole_match'];
         var unparsed_json = fakeblock['unparsed_json'];
         var parsed_json = fakeblock['parsed_json'];
-        // send to back to replaceFakeblockWithDecryptedText and replace to_replace with decrypted_text
+        // send to back to decrypt and replace to_replace with decrypted_text
         replaceFakeblockWithDecryptedText(to_replace, parsed_json);
     });
 }
