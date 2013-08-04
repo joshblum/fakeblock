@@ -31,7 +31,15 @@ var textareaUsernameGetters = {
 
 $(function() {
     makeOverlays();
+    $('#u_0_x').click(function() {
+    	replyHandler();
+    });
 });
+
+function replyHandler() {
+	$encryptedArea = $($('textarea')[0]);
+	$encryptedArea.focus().trigger('keydown');
+}
 
 function makeOverlays() {
     $('textarea').each(function() {
@@ -57,19 +65,24 @@ function makeOverlays() {
 }
 
 function makeOverlay($textarea) {
-    if (!$textarea.is(':visible')) {
-        return;
-    }
+    // if (!$textarea.is(':visible')) {
+    //     return;
+    // }
     var $fakeblockArea = $textarea.clone();
     $textarea.after($fakeblockArea);
+    // $textarea.hide();
     $fakeblockArea.data('encryptedArea', $textarea);
 
     $fakeblockArea.keyup(function() {
         encryptHandler($(this));
     });
+    $textarea.focus(function() {
+    	$fakeblockArea.focus()
+    });
 }
 
-function requestEncrypt($encryptedArea, message) {
+function requestEncrypt($unencryptedArea, message) {
+	var $encryptedArea = $unencryptedArea.data('encryptedArea');
     sendMessage({
         "action" : "encrypt",
         "message" : message,
@@ -77,7 +90,6 @@ function requestEncrypt($encryptedArea, message) {
     }, function(response) {
         var res = $.parseJSON(response).res;
         var msg;
-        $encryptedArea.show().trigger("keydown").hide();
         if (typeof res === "string") {
             msg = res;
         } else {
@@ -85,17 +97,16 @@ function requestEncrypt($encryptedArea, message) {
                 JSON.stringify(res) + 
                 "|endfakeblock|"
         }
-        $encryptedArea.val(msg);
+        $encryptedArea.show().focus().trigger("keydown").val(msg);
+        $unencryptedArea.focus();
     });
 }
 
-function encryptHandler($unencryptedArea, message) {
-    // debugger
-    var message = (message) ? message : $unencryptedArea.val();
+function encryptHandler($unencryptedArea) {
+	debugger
+    var message = $unencryptedArea.val();
 
-    //send message to encrypt to josh
-    encrypted = requestEncrypt($unencryptedArea.data('encryptedArea'), 
-        message);
+    requestEncrypt($unencryptedArea, message);
 }
 
 function getURLParameter(url, name) {
