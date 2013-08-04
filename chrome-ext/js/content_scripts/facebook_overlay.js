@@ -42,6 +42,9 @@ $(function() {
 
 function replyHandler() {
     $('.lastEdited').val('').focus();    
+    setTimeout(function() {
+    	$('.lastEdited').data('encryptedArea').val('');
+    }, 10);
 }
 
 function makeOverlays() {
