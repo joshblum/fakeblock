@@ -7,7 +7,7 @@
 //where to find pub_keys
 //output ::= fakeblock_obj
 //fakeblock_obj ::= def in common.js
-function encrypt(plaintext, encrypt_for) {
+function encrypt(plaintext, encrypt_for, callback) {
     // console.log(arguments);
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
@@ -41,10 +41,12 @@ function encrypt(plaintext, encrypt_for) {
     
     var res = {
         "users" : users,
-        "cipher_text" : encodeString(cipher_text),
+        "cipher_text" : cipher_text,
     }
     // console.log(res)
-    return res
+    callback(encodeString(JSON.stringify({
+        "res" : res,
+    })));
 }
 
 //returns the shared secret and 
