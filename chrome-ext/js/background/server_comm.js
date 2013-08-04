@@ -39,7 +39,7 @@ function _createUserMeta(username, auth_token) {
 //post the user's public key to the server
 //returns a bool of success
 function _postPubKey(pub_key, callback) {
-    var url = buildUrl(PUB_UPLOAD, {'key' : pub_key})
+    var url = buildUrl(PUB_UPLOAD, {'key' : encodeURIComponent(pub_key)})
     $.get(url, function(){
         callback(true); //success
     }).fail(function() {
