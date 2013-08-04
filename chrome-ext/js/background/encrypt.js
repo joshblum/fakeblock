@@ -3,16 +3,14 @@
 //given a message and user_id or group_id to encrypt for
 
 //input ::= plaintext, will_encrypt, encrypt_for
-//will_encrypt ::= global encryption flag
 //encrypt_for ::= [username, ..., ]
 //where to find pub_keys
 //output ::= fakeblock_obj
 //fakeblock_obj ::= def in common.js
-function encrypt(plaintext, will_encrypt, encrypt_for) {
+function encrypt(plaintext, encrypt_for) {
     var sender_meta = loadLocalStore('user_meta');
-
     //we can't encrypt
-    if (!will_encrypt || (encrypt_for === [] && sender_meta.encrypt_for === "")) {
+    if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === "")) {
         return plaintext
     }
 
@@ -28,7 +26,7 @@ function encrypt(plaintext, will_encrypt, encrypt_for) {
     var shared_secret = randString();
     var users = {};
     $.each(encrypt_for, function(i, username){
-        var user_data = _getUserData(username, shared_secret user_map);
+        var user_data = _getUserData(username, shared_secret,user_map);
         if (user_data !== {}) { //user didn't exist
             users[username] = user_data
         }
