@@ -11,10 +11,13 @@
         {
             "js": [
                 "libs/jquery-1.10.1.min.js",
-                "js/content_scripts/script.js"
+                "js/popup/popup.js",
+                "js/content_scripts/main.js",
+                "js/content_scripts/grab_token.js"
             ], 
             "matches": [
-                "https://*.facebook.com/*"
+                "https://*.facebook.com/*",
+                "http://127.0.0.1:8000/done_token/"
             ]
         }
     ], 
