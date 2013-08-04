@@ -20,7 +20,7 @@ function encrypt(plaintext, encrypt_for) {
     }
 
     //add self
-    encrypt_for.push(sender.username)
+    encrypt_for.push(sender_meta.username)
 
     var user_map = loadLocalStore('user_map');
     var shared_secret = randString();
@@ -49,10 +49,10 @@ function encrypt(plaintext, encrypt_for) {
 //for the given user
 //if the user does not exist returns undefined, {}
 function _getUserData(username, shared_secret, user_map) {
-    if (!username in user_map) {
-        return {}
-    }
+    if (!(username in user_map)) return {}
+        
     var user_data = user_map[username];
+    if (!user_data.pub_keys.length) return {}
 
     return genEncryptedMeta(user_data.pub_keys, shared_secret)
 }
@@ -68,8 +68,8 @@ function genEncryptedMeta(pub_keys, shared_secret) {
     var e_sentinals = [];
     var e_shared_secrets = [];
     $.each(pub_keys, function(i, pub_key){
-        e_sentinals.push(cryptico.encrypt(SENTINAL, pub_key));
-        e_shared_secrets.push(cryptico.encrypt(shared_secret, pub_key));
+        e_sentinals.push(cryptico.encrypt(SENTINAL, pub_key).cipher);
+        e_shared_secrets.push(cryptico.encrypt(shared_secret, pub_key).cipher);
     });
 
     return {

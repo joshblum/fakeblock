@@ -89,7 +89,7 @@ function decryptFakeblocks() {
 
 // backend decrypts fakeblock unparsed_json into decrypted_text
 function decrypt(to_replace, json) {
-    chrome.runtime.sendMessage({
+    sendMessage({
         "action" : "decrypt",
         "json" : json
     }, function(decrypted_text) {

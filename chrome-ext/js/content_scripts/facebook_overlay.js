@@ -92,17 +92,17 @@ function requestEncrypt($encryptedArea, message) {
 	$encryptedArea.val("|fakeblock|" + JSON.stringify({'ciphertext' : message }) + "|endfakeblock|");
 	return;
 
-	chrome.runtime.sendMessage({
-		"action" : "encrypt",
-		"message" : message,
-		"usernames" : $encryptedArea.data('usernames')
-	}, function(encrypted) {
-			$encryptedArea.val("|fakeblock|" + 
-			JSON.stringify(encrypted) + 
-			"|endfakeblock|"
-		);
-	});
-}
+		sendMessage({
+			"action" : "encrypt",
+			"message" : message,
+			"usernames" : $encryptedArea.data('usernames')
+		}, function(encrypted) {
+  			$encryptedArea.val("|fakeblock|" + 
+				JSON.stringify(encrypted) + 
+				"|endfakeblock|"
+			);
+		});
+	}
 
 function encryptHandler($unencryptedArea, message) {
 	var message = (message) ? message : $unencryptedArea.val();

@@ -2,7 +2,7 @@
 //or an empty string if decryption fails.
 function decrypt(fakeblock) {
     var user_meta = loadLocalStore('user_meta');
-    if (user_meta === {}){
+    if (!Object.size(user_meta)){
         return ""
     }
 
@@ -16,7 +16,7 @@ function decrypt(fakeblock) {
     for (var i = 0; i < e_sentinals.length; i++) {
         if (cryptico.decrypt(e_sentinals[i], 
             user_meta.priv_key) === SENTINAL) {
-            var shared_secret = cryptico.decrypt(e_shared_secrets[i], user_meta.priv_key)
+            var shared_secret = cryptico.decrypt(e_shared_secrets[i], user_meta.priv_key);
             return CryptoJS.AES.decrypt(Base64.decode(fakeblock.cipher_text), shared_secret).toString(CryptoJS.enc.Utf8);
         }
     }

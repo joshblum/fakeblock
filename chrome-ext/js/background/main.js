@@ -2,13 +2,13 @@
 //calling backend functions
 
 function messageListener() {
-    chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         executeMessage(request, sender, sendResponse);
-        return true;
+        return true
     });
 }
 
 $(document).ready(function() {
     syncFriends()
-    // messageListener();
+    messageListener();
 });
