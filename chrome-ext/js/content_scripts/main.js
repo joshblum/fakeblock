@@ -48,11 +48,12 @@ function getFakeblockObjectsFromPage() {
         var match_objects = getFakeBlocksFromText(div.text());
         $.each(match_objects, function() {
             try {
+                debugger
                 var match_object = $(this);
                 var whole_match = match_object[0];
                 var byte_str = match_object[1];
                 var unparsed_json = decodeByteString(byte_str);
-                var parsed_json = $.parseJSON(unparsed_json);
+                var parsed_json = JSON.parse(unparsed_json);
                 var fakeblock_obj = {
                     'whole_match':whole_match,
                     'unparsed_json':unparsed_json,
@@ -60,7 +61,7 @@ function getFakeblockObjectsFromPage() {
                 };
                 all_fakeblocks.push(fakeblock_obj);
             } catch (ex) {
-
+                console.log(ex);
             }
         });
     });
@@ -105,19 +106,4 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
 
 
 
-// byte decoding
-function byteArrayToString(array) {
-    var result = "";
-    for (var i = 0; i < array.length; i++) {
-        var int = parseInt(array[i]);
-        result += String.fromCharCode(int);
-    }
-    return result;
-}
-
-// comma separated byte array
-function decodeByteString(csb) {
-    var b_array = csb.split(".");
-    return byteArrayToString(b_array);
-}
 
