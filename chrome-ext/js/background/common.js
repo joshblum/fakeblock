@@ -60,6 +60,7 @@ function executeMessage(request, sender, sendResponse) {
         "decrypt" : [perform_decrypt, msg.json],
         "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, sendResponse],
         "encrypt_for" : [encrypt_for, msg.username],
+        "get_friends" : [getSingleUsers]
     }
 
     if (action in ACTION_MAP){
@@ -67,7 +68,7 @@ function executeMessage(request, sender, sendResponse) {
         //apply func with args
         var res = args[0].apply(this, args.slice(1)); 
         if (res) {
-            sendResponse(JSON.strinify({
+            sendResponse(JSON.stringify({
                 "res" : res,
             }));
         }
