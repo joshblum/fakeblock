@@ -12,7 +12,7 @@ function login(fb_id, fb_handle, auth_token, callback){
         user_meta = _createUserMeta(username, auth_token);
         _postPubKey(user_meta.pub_key, function(success){
             syncFriends();
-            callback(success) 
+            callback(success);
         });
     } else {
         user_meta.auth_token = auth_token;
@@ -74,7 +74,7 @@ function syncFriends() {
         var user_map = loadLocalStore("user_map");
         var count = 0;
 
-        if (!Object.size(friend_data)) return
+        if (!Object.size(friend_data.friends)) return
         
         $.each(friend_data.friends, function(user_id, user_data){
             var username = (user_data.fb_handle) ? user_data.fb_handle : user_id;
