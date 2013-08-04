@@ -53,9 +53,7 @@ function makeOverlays() {
 		$(this).data('usernames', textareaUsernameGetters[encryptClasses[0]]($(this)) );
 
 		//need a function to check if will_encrypt for usernames
-		if (will_encrypt($(this).data('usernames'))) {
-			makeOverlay($(this));
-		}
+		makeOverlay($(this));
 
 	});
 }
@@ -78,10 +76,6 @@ function makeOverlay($textarea) {
 	$fakeblockArea.val(firstInput);
 }
 
-function will_encrypt(usernames) {
-	return true;
-}
-
 function getFakeBlock($textarea) {
 	//dummy function
 	return $.parseJSON($textarea.val().split('|')[2]);
@@ -92,18 +86,22 @@ function requestEncrypt($encryptedArea, message) {
 	$encryptedArea.val("|fakeblock|" + JSON.stringify({'ciphertext' : message }) + "|endfakeblock|");
 	return;
 
-		sendMessage({
-			"action" : "encrypt",
-			"message" : message,
-			"usernames" : $encryptedArea.data('usernames')
-		}, function(response) {
-			encrypted = $.parseJSON(response).res;
+	sendMessage({
+		"action" : "encrypt",
+		"message" : message,
+		"usernames" : $encryptedArea.data('usernames')
+	}, function(response) {
+		var message = $.parseJSON(response).res.cipher_text;
+		if (typeof message === "string") {
+			$encryptedArea.val(message);
+		} else {
   			$encryptedArea.val("|fakeblock|" + 
-				JSON.stringify(encrypted) + 
+				JSON.stringify(message) + 
 				"|endfakeblock|"
 			);
-		});
-	}
+		}
+	});
+}
 
 function encryptHandler($unencryptedArea, message) {
 	var message = (message) ? message : $unencryptedArea.val();
