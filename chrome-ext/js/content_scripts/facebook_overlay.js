@@ -40,7 +40,7 @@ $(function() {
     $('input[value="Reply"]').click(function() {
         replyHandler();
     });
-    $('.emoteTogglerImg')[0].remove();
+    $($('.emoteTogglerImg')[0]).remove();
 });
 
 function replyHandler() {
