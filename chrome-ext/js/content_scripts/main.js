@@ -20,12 +20,9 @@ function getFakeBlocksFromText(text) {
     var to_return = [];
     var myRe = new RegExp("\\|fakeblock\\|(.*)\\|endfakeblock\\|", "g");
     var result = myRe.exec(text);
-    to_return.push(result);
     while (result!=null) {
+        to_return.push(result);
         result = myRe.exec(text);
-        if (result) {
-            to_return.push(result);
-        }
     }
     return to_return;
 }
