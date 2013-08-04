@@ -63,7 +63,6 @@ function getWillEncrypt() {
     sendMessage({
         "action" : "get_will_encrypt",
     }, function(res){
-
         shouldBeOn = JSON.parse(res);
 
         if (shouldBeOn){
@@ -71,7 +70,6 @@ function getWillEncrypt() {
         } else{
             box.className = "switch-animate switch-off";
         }
-        
     });
 }
 
