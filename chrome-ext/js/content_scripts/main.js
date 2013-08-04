@@ -6,10 +6,9 @@ $(document).ready(function() {
     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
     var intervalID = setInterval(function(){
         decryptFakeblocks();
-    },50);
+    }, 1000);
 
 });
-
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
@@ -106,8 +105,6 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
 
 
 
-
-
 // byte decoding
 function byteArrayToString(array) {
     var result = "";
@@ -123,6 +120,4 @@ function decodeByteString(csb) {
     var b_array = csb.split(".");
     return byteArrayToString(b_array);
 }
-
-
 
