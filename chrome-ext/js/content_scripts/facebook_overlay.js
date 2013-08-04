@@ -76,15 +76,7 @@ function makeOverlay($textarea) {
 	$fakeblockArea.val(firstInput);
 }
 
-function getFakeBlock($textarea) {
-	//dummy function
-	return $.parseJSON($textarea.val().split('|')[2]);
-}
-
 function requestEncrypt($encryptedArea, message) {
-	//use this to test while extension not running
-	$encryptedArea.val("|fakeblock|" + JSON.stringify({'ciphertext' : message }) + "|endfakeblock|");
-	return;
 
 	sendMessage({
 		"action" : "encrypt",
