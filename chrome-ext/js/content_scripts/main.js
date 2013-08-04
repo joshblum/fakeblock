@@ -6,7 +6,7 @@ $(document).ready(function() {
     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
     var intervalID = setInterval(function(){
         decryptFakeblocks();
-    }, 1000);
+    }, 500);
 
 });
 
