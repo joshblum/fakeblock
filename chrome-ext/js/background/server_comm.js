@@ -34,7 +34,7 @@ function _createUserMeta(username) {
 //post the user's public key to the server
 //returns a bool of success
 function _postPubKey(pub_key, callback) {
-    var url = baseUrl + PUB_UPLOAD + "?key=" + pub_key
+    var url = buildUrl(PUB_UPLOAD, {'key' : pub_key})
     $.get(url, function(){
         callback(true); //success
     }).fail(function(
@@ -63,7 +63,7 @@ function syncFriends() {
     if (user_meta === {}){
         return
     }
-    var url = baseUrl + FRIENDS;
+    var url = buildUrl(FRIENDS)
     $.get(url, function(friend_data){
         var user_map = loadLocalStore("user_map");
         $.each(friend_data.friends, function(i, user_id){

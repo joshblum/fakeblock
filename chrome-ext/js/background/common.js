@@ -49,14 +49,6 @@ var baseUrl = "http://localhost:5000";
 // var baseUrl = "http://fakeblock.herokuapp.com";
 var SENTINAL = "fakeblock";
 
-//returns a JSON object of the key or empty dict
-function loadLocalStore(key) {
-    var localString = localStorage.getItem(key);
-    // catch undefined case
-    localString = (localString) ? localString : "{}"; 
-    return JSON.parse(localString);
-}
-
 /*
     helper to execute messages between content and background script
 */
@@ -101,3 +93,29 @@ Object.size = function(obj) {
     }
     return size;
 };
+
+//returns a JSON object of the key or empty dict
+function loadLocalStore(key) {
+    var localString = localStorage.getItem(key);
+    // catch undefined case
+    localString = (localString) ? localString : "{}"; 
+    return JSON.parse(localString);
+}
+
+//helper function to build a url
+//adds the auth_token to every request
+function buildUrl(path, getParam) {
+    getParam = getParam || {}
+    var user_meta = loadLocalStore('user_meta');
+    if (user_meta === {}){
+        return ""
+    }
+    var url =  baseUrl + path + "?auth_token=" + user_meta.auth_token;
+    if (getParam === {}) {
+        return url
+    }
+    $.each(getParam, function(key, val){
+        url += "&" + key + "=" + val
+    });
+    return url
+}
