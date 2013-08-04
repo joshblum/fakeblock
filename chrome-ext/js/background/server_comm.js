@@ -16,6 +16,7 @@ function login(fb_id, fb_handle, auth_token, callback){
         });
     } else {
         user_meta.auth_token = auth_token;
+        user_meta.username = username;
         syncFriends();
         callback(true)
     }
