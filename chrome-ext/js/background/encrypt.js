@@ -38,10 +38,10 @@ function encrypt(plaintext, encrypt_for) {
     }
 
     var cipher_text = Base64.encode(CryptoJS.AES.encrypt(plaintext, shared_secret).toString());
-    
+
     var res = {
         "users" : users,
-        "cipher_text" : encodeString(cipher_text),
+        "cipher_text" : cipher_text
     }
     // console.log(res)
     return res
