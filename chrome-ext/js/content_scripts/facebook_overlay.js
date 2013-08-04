@@ -30,6 +30,7 @@ var textareaUsernameGetters = {
 }
 
 $(function() {
+    $($('textarea')[0]);.focus().trigger('keydown');
     makeOverlays();
     $('#u_0_x').click(function() {
     	replyHandler();
@@ -90,6 +91,7 @@ function requestEncrypt($unencryptedArea, message) {
     }, function(response) {
         var res = $.parseJSON(response).res;
         var msg;
+        $encryptedArea.show().focus().trigger("keydown");
         if (typeof res === "string") {
             msg = res;
         } else {
@@ -97,13 +99,12 @@ function requestEncrypt($unencryptedArea, message) {
                 JSON.stringify(res) + 
                 "|endfakeblock|"
         }
-        $encryptedArea.show().focus().trigger("keydown").val(msg);
+        $encryptedArea.val(msg);
         $unencryptedArea.focus();
     });
 }
 
 function encryptHandler($unencryptedArea) {
-	debugger
     var message = $unencryptedArea.val();
 
     requestEncrypt($unencryptedArea, message);

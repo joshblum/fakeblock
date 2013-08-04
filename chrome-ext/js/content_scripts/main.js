@@ -1,14 +1,14 @@
 //attaches event listeners and handles passing messages
 
- $(document).ready(function() {
-     decryptFakeblocks();
+//  $(document).ready(function() {
+//      decryptFakeblocks();
 
-     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
-     var intervalID = setInterval(function(){
-          decryptFakeblocks();
-     }, 50);
+//      // ***** automatically try to decrypt DOM whenever it changes *****************************************************
+//      var intervalID = setInterval(function(){
+//           decryptFakeblocks();
+//      }, 50);
 
-});
+// });
 
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
