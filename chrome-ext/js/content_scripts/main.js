@@ -110,9 +110,9 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
         var decrypted_text = $.parseJSON(response).res;
         if (decrypted_text != "") {
             $.each(ps_containing_fakeblocks, function(i,e) {
-                var all_html = e.text();
+                var all_html = $(this).text();
                 var new_html = all_html.replace(to_replace, decrypted_text);
-                e.text(new_html);
+                $(this).text(new_html);
             });
         }
     });
