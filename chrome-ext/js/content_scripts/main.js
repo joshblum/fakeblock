@@ -10,7 +10,6 @@ $(document).ready(function() {
 
 });
 
-
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
 // selects all divs that contain text with fakeblock.. and do not have any children
