@@ -21,8 +21,8 @@ var textareaUsernameGetters = {
         return textareaUsernameGetters.fromAnchor($anchor);
     },
     'fromAnchor' : function($anchor) {
-        var user_id = getURLParameter($anchor.attr('href'), 'id')
-        if (user_id) return user_id;
+        var user_id = getURLParameter($anchor.attr('href'), 'id');
+        if (user_id !== "null") return user_id;
 
         var friendUrl = $anchor.attr('href').split('/');
         return [friendUrl[friendUrl.length - 1]];
@@ -96,6 +96,7 @@ function requestEncrypt($encryptedArea, message) {
 }
 
 function encryptHandler($unencryptedArea, message) {
+    // debugger
     var message = (message) ? message : $unencryptedArea.val();
 
     //send message to encrypt to josh
