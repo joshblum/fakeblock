@@ -45,7 +45,7 @@
 
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
-// var baseUrl = "http://172.23.148.40";
+// var baseUrl = "http://127.0.0.1";
 var baseUrl = "http://fakeblock.herokuapp.com";
 var SENTINAL = "fakeblock";
 
@@ -56,8 +56,8 @@ function executeMessage(request, sender, sendResponse) {
     var msg = JSON.parse(request)
     var action = msg.action;
     var ACTION_MAP = {
-        "encrypt" : [perform_encrypt, msg.message, msg.usernames],
-        "decrypt" : [perform_decrypt, msg.json],
+        "encrypt" : [encrypt, msg.message, msg.usernames],
+        "decrypt" : [decrypt, msg.json],
         "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, sendResponse],
         "encrypt_for" : [encrypt_for, msg.username],
         "get_friends" : [getSingleUsers]

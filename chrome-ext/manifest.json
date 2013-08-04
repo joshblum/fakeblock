@@ -29,7 +29,7 @@
         "128": "img/lock-128.png"
         //"48": "img/lock-48.png"
     }, 
-    "manifest_version": 2, 
+    "manifest_version": 2,
     "name": "Fakeblock", 
     "permissions": [
         "http://fakeblock.herokuapp.com/*", 

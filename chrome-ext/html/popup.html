@@ -10,6 +10,8 @@
      <script type="text/javascript" src="../libs/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="../js/content_scripts/common.js"></script>
     <script type="text/javascript" src="../js/popup/popup.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/bootstrap-switch.css"/>
+    <script type="text/javascript" src="libs/jquery.switch.js"></script>
 </head>
 
 <body>
@@ -20,16 +22,29 @@
         ENCRYPT
     </div>
 
+    <div class="switch switch-small" data-on="warning" data-off="info" data-on-label="All" data-off-label="Some">
+        <input type="checkbox">
+    </div>
+
     <style>
         div.contact {
             padding-left:10px;
             padding-top:10px;
             padding-bottom:10px;
+            padding-right:10px;
             float:left;
-            width:100%;
+            width:92%;
         }
         div.contact:hover {
             background-color:lightblue;
+            cursor:pointer;
+        }
+        div.contact.clicked {
+            background-color:darkgray;
+        }
+        div.contact.clicked:hover {
+            background-color:lightblue;
+            cursor:pointer;
         }
         .contact-name {
             float:left;

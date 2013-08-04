@@ -4,7 +4,7 @@ $(function() {
 	sendMessage({
 		"action" : "get_friends",
 	}, function(friends) {
-		alert('hello world');
+		alert(friends);
 		$.each(friends, function(index, friendObj) {
 			var username = Object.keys(friendObj)[0];
 
@@ -23,7 +23,14 @@ $(function() {
 	});
 	alert('hi');
     $(".contact").click(function() {
-        $(this).css('background-color', "red");
+        if ($(this).hasClass("clicked")) {
+            $(this).removeClass("clicked");
+            $(this).find("input").prop('checked', false);
+        }
+        else {
+            $(this).addClass("clicked");
+            $(this).find("input").prop('checked', true);
+        }
     });
 });
 	
