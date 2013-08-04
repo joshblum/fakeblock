@@ -11,7 +11,7 @@ function encrypt(plaintext, encrypt_for) {
     // console.log(arguments);
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
-    if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === [])) {
+    if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === []) || !sender_meta.will_encrypt) {
         return plaintext
     }
 
