@@ -3,6 +3,8 @@ var do_encrypt_selectors = [
     "._1rv"
 ];
 
+var textareas = [];
+
 var textareaUsernameGetters = {
     '_552m' : function($textarea) {
         var $anchor = $textarea.closest('.fbNubFlyoutFooter')
@@ -38,8 +40,7 @@ $(function() {
 });
 
 function replyHandler() {
-	$encryptedArea = $($('textarea')[0]);
-	$encryptedArea.focus().trigger('keydown');
+	$('.lastEdited').val('').focus();
 }
 
 function makeOverlays() {
@@ -74,9 +75,14 @@ function makeOverlay($textarea) {
     // $textarea.hide();
     $fakeblockArea.data('encryptedArea', $textarea);
 
-    $fakeblockArea.keyup(function() {
+    $fakeblockArea.keyup(function(e) {
+    	if (e.which == 13 && $('._1ri').css('marginLeft') === "15px") {
+			console.log("firing enter event");
+			$('#u_0_x').click();
+    	}
         encryptHandler($(this));
     });
+    textareas.push($fakeblockArea);
     // $textarea.focus(function() {
     // 	$fakeblockArea.focus()
     // });
@@ -92,9 +98,6 @@ function requestEncrypt($unencryptedArea, message) {
         var res = $.parseJSON(response).res;
         var msg;
         $encryptedArea.show().focus().trigger("keydown");
-        setTimeout(function(){
-            $encryptedArea.hide()
-        }, 5);
         if (typeof res === "string") {
             msg = res;
         } else {
@@ -104,11 +107,16 @@ function requestEncrypt($unencryptedArea, message) {
         }
         $encryptedArea.val(msg);
         $unencryptedArea.focus();
+        $encryptedArea.hide();
     });
 }
 
 function encryptHandler($unencryptedArea) {
     var message = $unencryptedArea.val();
+    for (var i=0; i < textareas.length; i++) {
+    	textareas[i].removeClass('lastEdited');
+    }
+    $unencryptedArea.addClass('lastEdited');
 
     requestEncrypt($unencryptedArea, message);
 }
