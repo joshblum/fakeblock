@@ -3,6 +3,8 @@
 $(document).ready(function() {
     decryptFakeblocks();
 
+    /****** automatically try to decrypt DOM whenever it changes ******************************************************/
+
     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
     var observer = new MutationObserver(function(mutations, observer) {
@@ -17,10 +19,6 @@ $(document).ready(function() {
         attributes: false
     });
 });
-
-
-/****** automatically try to decrypt DOM whenever it changes ***********************************************************/
-
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
