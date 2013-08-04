@@ -30,7 +30,7 @@ var textareaUsernameGetters = {
 }
 
 $(function() {
-    $($('textarea')[0]);.focus().trigger('keydown');
+    $($('textarea')[0]).focus().trigger('keydown');
     makeOverlays();
     $('#u_0_x').click(function() {
     	replyHandler();
@@ -61,7 +61,7 @@ function makeOverlays() {
 
         //need a function to check if will_encrypt for usernames
         makeOverlay($(this));
-
+        $($('textarea')[0]).hide();
     });
 }
 
@@ -77,9 +77,9 @@ function makeOverlay($textarea) {
     $fakeblockArea.keyup(function() {
         encryptHandler($(this));
     });
-    $textarea.focus(function() {
-    	$fakeblockArea.focus()
-    });
+    // $textarea.focus(function() {
+    // 	$fakeblockArea.focus()
+    // });
 }
 
 function requestEncrypt($unencryptedArea, message) {
@@ -92,6 +92,9 @@ function requestEncrypt($unencryptedArea, message) {
         var res = $.parseJSON(response).res;
         var msg;
         $encryptedArea.show().focus().trigger("keydown");
+        setTimeout(function(){
+            $encryptedArea.hide()
+        }, 5);
         if (typeof res === "string") {
             msg = res;
         } else {
