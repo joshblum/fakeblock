@@ -34,20 +34,17 @@ var textareaUsernameGetters = {
 $(function() {
     $($('textarea')[0]).focus().trigger('keydown');
     makeOverlays();
-    $('#u_0_x').click(function() {
+    $('input[value="Reply"]').click(function() {
         replyHandler();
-    });
-    $('#u_0_z').click(function() {
-    	replyHandler();
     });
     $('.emoteTogglerImg')[0].remove();
 });
 
 function replyHandler() {
-    setTimeout(function(){
-        $('.lastEdited').val('').focus();    
+    $('.lastEdited').val('').focus();    
+    setTimeout(function() {
+    	$('.lastEdited').data('encryptedArea').val('');
     }, 10);
-	
 }
 
 function makeOverlays() {
@@ -84,11 +81,7 @@ function makeOverlay($textarea) {
 
     $fakeblockArea.keyup(function(e) {
     	if (e.which == 13 && $('._1ri').css('marginLeft') === "15px") {
-			console.log("firing enter event");
-            setTimeout(function(){
-                $('#u_0_x').click();
-                $('#u_0_z').click();
-            }, 5);
+			$('input[value="Reply"]').click();
     	}
         encryptHandler($(this));
     });
