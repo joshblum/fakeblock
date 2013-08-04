@@ -1,12 +1,12 @@
 //attaches event listeners and handles passing messages
 
- $(document).ready(function() {
-     decryptFakeblocks();
+$(document).ready(function() {
+    decryptFakeblocks();
 
-     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
-     var intervalID = setInterval(function(){
-          decryptFakeblocks();
-     },50);
+    // ***** automatically try to decrypt DOM whenever it changes *****************************************************
+    var intervalID = setInterval(function(){
+        decryptFakeblocks();
+    },50);
 
 });
 
@@ -51,7 +51,8 @@ function getFakeblockObjectsFromPage() {
             try {
                 var match_object = $(this);
                 var whole_match = match_object[0];
-                var unparsed_json = match_object[1];
+                var byte_str = match_object[1];
+                var unparsed_json = decodeByteString(byte_str);
                 var parsed_json = $.parseJSON(unparsed_json);
                 var fakeblock_obj = {
                     'whole_match':whole_match,
@@ -103,6 +104,25 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
     });
 }
 
+
+
+
+
+// byte decoding
+function byteArrayToString(array) {
+    var result = "";
+    for (var i = 0; i < array.length; i++) {
+        var int = parseInt(array[i]);
+        result += String.fromCharCode(int);
+    }
+    return result;
+}
+
+// comma separated byte array
+function decodeByteString(csb) {
+    var b_array = csb.split(".");
+    return byteArrayToString(b_array);
+}
 
 
 
