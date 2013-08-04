@@ -2,34 +2,41 @@
 //returning the result
 //given a message and user_id or group_id to encrypt for
 
-var encryptMap = {
-    'user_id' : _encryptForUser,
-    'group_id' : _encryptForGroup,
-}
-
-//input ::= plaintext, will_encrypt, encrypt_for, encrypt_type
+//input ::= plaintext, will_encrypt, encrypt_for
 //will_encrypt ::= global encryption flag
-//encrypt_for ::= user_id or group_id to encrypt for 
-//encrypt_type ::= either "user_id" or "group_id" to specify
+//encrypt_for ::= [username, ..., ]
 //where to find pub_keys
 //output ::= fakeblock_obj
 //fakeblock_obj ::= def in common.js
-function encrypt(plaintext, will_encrypt, encrypt_for, encrypt_type) {
-    var encryptForFunc = encryptMap[encrypt_type];
-    if (!will_encrypt || encrypt_for === null || encryptForFunc === undefined) {
+function encrypt(plaintext, will_encrypt, encrypt_for) {
+    var sender_meta = loadLocalStore('user_meta');
+
+    //we can't encrypt
+    if (!will_encrypt || (encrypt_for === [] && sender_meta.encrypt_for === "")) {
         return plaintext
     }
+
+    //default to stored username
+    if (encrypt_for === []){
+        encrypt_for = [sender_meta.encrypt_for];
+    }
+
+    //add self
+    encrypt_for.push(sender.username)
 
     var user_map = loadLocalStore('user_map');
-    var shared_secret, users = encryptForFunc(encrypt_for, user_map);
+    var shared_secret = randString();
+    var users = {};
+    $.each(encrypt_for, function(i, username){
+        var user_data = _getUserData(username, shared_secret user_map);
+        if (user_data !== {}) { //user didn't exist
+            users[username] = user_data
+        }
+    });
 
-    if (shared_secret === undefined) { // unable to encrypt
+    if (users <= 1) { //only found own data
         return plaintext
     }
-    
-    var sender_username = loadLocalStore('user_meta').username;
-    var _, sender_data = _getUserData(sender_username, user_map);
-    users[sender_username] = sender_data;
 
     var cipher_text = Base64.encode(CryptoJS.AES.encrypt(plaintext, shared_secret).toString());
     
@@ -39,56 +46,36 @@ function encrypt(plaintext, will_encrypt, encrypt_for, encrypt_type) {
     }
 }
 
-//returns a the shared_secret and json dictionary to be used by the fakeblock object
-function _encryptForUser(user_id, user_map) {
-    var shared_secret, recip_data = _getUserData(user_id, user_map);
-
-    return shared_secret, {
-            user_id : recip_data
-        }
-}
-
-//give a group id build a fakeblock user dict
-//returns the group shared secret
-function _encryptForGroup(group_id, user_map) {
-    var group_map = loadLocalStore("group_map");
-    var group_data;
-
-    if (!group_id in group_map) {
-        //todo, create group function
-        group_data = createGroup(group_id)
-    } else {
-        group_data = group_map[group_id];
-    }
-
-    var users = {}
-    var valid = false //at least one friend is found
-    
-    $.each(group_data.usernames, function(i, username){
-        var _, user_data = _getUserData(username, user_map)
-        if (user_data !== {}) {
-            valid = true;
-        }
-        users[username] = user_data 
-    });
-
-    if (!valid) return undefined, {}
-    return group_data.shared_secret, users
-}
-
 //returns the shared secret and 
 //dict of encrypted sentinals/shared_secrets
 //for the given user
 //if the user does not exist returns undefined, {}
-function _getUserData(username, user_map) {
-    
+function _getUserData(username, shared_secret, user_map) {
     if (!username in user_map) {
-        return undefined, {}
+        return {}
     }
-    
     var user_data = user_map[username];
-    return user_data.shared_secret, {
-            "e_sentinals" : user_data.e_sentinals,
-            "e_shared_secrets" : user_data.e_shared_secrets,
-        }
+
+    return genEncryptedMeta(user_data.pub_keys, shared_secret)
+}
+
+//encrypts the shared secret and sentinal for each
+//public key provided in the user_data dict
+//returns a dictioary:
+// {
+//         e_shared_secrets : [,,,],
+//         e_sentinals : [,,,],
+// }
+function genEncryptedMeta(pub_keys, shared_secret) {
+    var e_sentinals = [];
+    var e_shared_secrets = [];
+    $.each(pub_keys, function(i, pub_key){
+        e_sentinals.push(cryptico.encrypt(SENTINAL, pub_key));
+        e_shared_secrets.push(cryptico.encrypt(shared_secret, pub_key));
+    });
+
+    return {
+        "e_sentinals" : e_sentinals,
+        "e_shared_secrets" : e_shared_secrets,
+    }
 }

@@ -19,15 +19,16 @@
 //  "pub_key" : "",
 //  "priv_key" : "",
 //  "username" : "",
+//  "encrypt_for" : "",
 // }
 
 // user_map ::=
 // {
 //     "username" :  {
 //         pub_key : [,,,],
+//         shared_secret : "",
 //         e_shared_secrets : [,,,],
 //         e_sentinals : [,,,],
-//         shared_secret : "",
 //     },
 //     ...
 // }
