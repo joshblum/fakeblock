@@ -17,7 +17,25 @@ function encodeString(str) {
     for (var i = 0; i < str.length; i++) {
         var c = String(b_array[i]);
         to_return += c;
-        to_return += ".";
+        if (i < str.length-1) {
+            to_return += "*";
+        }
     }
     return to_return;
+}
+
+// byte decoding
+function byteArrayToString(array) {
+    var result = "";
+    for (var i = 0; i < array.length; i++) {
+        var int = parseInt(array[i]);
+        result += String.fromCharCode(int);
+    }
+    return result;
+}
+
+// comma separated byte array
+function decodeByteString(csb) {
+    var b_array = csb.split("*");
+    return byteArrayToString(b_array);
 }

@@ -104,9 +104,10 @@ function requestEncrypt($unencryptedArea, message) {
         if (typeof res === "string") {
             msg = res;
         } else {
+            var json_encoded = JSON.stringify(res);
             msg = "|fakeblock|" + 
-                JSON.stringify(res) + 
-                "|endfakeblock|"
+                encodeString(json_encoded) +
+                "|endfakeblock|";
         }
         $encryptedArea.val(msg);
         $unencryptedArea.focus();

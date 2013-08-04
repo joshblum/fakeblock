@@ -6,7 +6,7 @@ $(document).ready(function() {
     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
     var intervalID = setInterval(function(){
         decryptFakeblocks();
-    }, 1000);
+    }, 500);
 
 });
 
@@ -15,8 +15,8 @@ $(document).ready(function() {
 // selects all divs that contain text with fakeblock.. and do not have any children
 function getDivsContainingFakeBlock() {
 //    var divs = $("p:contains('|fakeblock|'):not(:has(*))").not("script");
-//    var divs = $("p, span").not(":has(*)").filter(":contains('|fakeblock|')");
-    var divs = $("p:contains('|fakeblock|')");
+    var divs = $("p, span").not(":has(*)").filter(":contains('|fakeblock|')");
+//    var divs = $("p:contains('|fakeblock|')");
     // filter out divs which are being encrypted
     $.each(do_encrypt_selectors, function() {
         divs = divs.not($(this));
@@ -52,7 +52,7 @@ function getFakeblockObjectsFromPage() {
                 var whole_match = match_object[0];
                 var byte_str = match_object[1];
                 var unparsed_json = decodeByteString(byte_str);
-                var parsed_json = $.parseJSON(unparsed_json);
+                var parsed_json = JSON.parse(unparsed_json);
                 var fakeblock_obj = {
                     'whole_match':whole_match,
                     'unparsed_json':unparsed_json,
@@ -60,7 +60,7 @@ function getFakeblockObjectsFromPage() {
                 };
                 all_fakeblocks.push(fakeblock_obj);
             } catch (ex) {
-
+                console.log(ex);
             }
         });
     });
@@ -105,19 +105,4 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
 
 
 
-// byte decoding
-function byteArrayToString(array) {
-    var result = "";
-    for (var i = 0; i < array.length; i++) {
-        var int = parseInt(array[i]);
-        result += String.fromCharCode(int);
-    }
-    return result;
-}
-
-// comma separated byte array
-function decodeByteString(csb) {
-    var b_array = csb.split(".");
-    return byteArrayToString(b_array);
-}
 

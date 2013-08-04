@@ -1,5 +1,11 @@
 var userInputs = [];
 
+box = $(".switch-animate")[0]
+
+function hasClass( elem, klass ) {
+     return (" " + elem.className + " " ).indexOf( " "+klass+" " ) > -1;
+}
+
 function bindContactClickFunction(div) {
     div.click(function() {
         if ($(this).hasClass("clicked")) {
@@ -15,7 +21,7 @@ function bindContactClickFunction(div) {
 }
 
 function sendWillEncrypt() {
-    var will_encrypt = $(".will_encrypt").prop("checked");
+    var will_encrypt = hasClass(box,"switch-on");
     sendMessage({
         "action" : "will_encrypt",
         "will_encrypt" : will_encrypt
@@ -57,7 +63,13 @@ function getWillEncrypt() {
     sendMessage({
         "action" : "get_will_encrypt",
     }, function(res){
-        $(".will_encrypt").prop('checked', JSON.parse(res).res);
+        shouldBeOn = JSON.parse(res);
+
+        if (shouldBeOn){
+            box.className = "switch-animate switch-on";
+        } else{
+            box.className = "switch-animate switch-off";
+        }
     });
 }
 
@@ -88,7 +100,7 @@ $(function() {
         });
 
     });
-    $(".will_encrypt").click(function() {
+    $(".switch-animate")[0].click(function() {
         sendWillEncrypt();
     });
     $(".contact").click(function(){
