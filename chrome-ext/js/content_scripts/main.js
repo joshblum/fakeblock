@@ -6,25 +6,8 @@ $(document).ready(function() {
      // ***** automatically try to decrypt DOM whenever it changes *****************************************************
      var intervalID = setInterval(function(){
           decryptFakeblocks();
-     },5000);
+     },50);
 
-//    $(document).bind('DOMNodeInserted', function(e) {
-//        decryptFakeblocks();
-//    });
-//
-//    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-//
-//    var observer = new MutationObserver(function(mutations, observer) {
-//        // fired when a mutation occurs
-//        decryptFakeblocks();
-//    });
-//
-//// define what element should be observed by the observer
-//// and what types of mutations trigger the callback
-//    observer.observe(document, {
-//        subtree: true,
-//        attributes: false
-//    });
 });
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
@@ -32,6 +15,7 @@ $(document).ready(function() {
 // selects all divs that contain text with fakeblock.. and do not have any children
 function getDivsContainingFakeBlock() {
 //    var divs = $("p:contains('|fakeblock|'):not(:has(*))").not("script");
+//    var divs = $("p, span").not(":has(*)").filter(":contains('|fakeblock|')");
     var divs = $("p:contains('|fakeblock|')");
     // filter out divs which are being encrypted
     $.each(do_encrypt_selectors, function() {
