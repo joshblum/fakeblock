@@ -99,7 +99,7 @@ function requestEncrypt($unencryptedArea, message) {
             msg = res;
         } else {
             msg = "|fakeblock|" + 
-                JSON.stringify(res) + 
+                encodeString(JSON.stringify(res)) + 
                 "|endfakeblock|"
         }
         $encryptedArea.val(msg);
