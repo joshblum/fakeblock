@@ -37,9 +37,9 @@ function _postPubKey(pub_key, callback) {
     var url = buildUrl(PUB_UPLOAD, {'key' : pub_key})
     $.get(url, function(){
         callback(true); //success
-    }).fail(function(
+    }).fail(function() {
         callback(false); //failure
-    ));
+    });
 }
 
 //calls the server to request user list
