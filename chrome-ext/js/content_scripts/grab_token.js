@@ -15,7 +15,7 @@ $(document).ready(function(){
             "fb_id" : fb_id,
             "fb_handle" : fb_handle,
             "will_encrypt" : will_encrypt,
-        }, function(res){});
+        }, function(res){console.log(res)});
     }
 
 });
