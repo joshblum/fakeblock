@@ -19,7 +19,8 @@
             ], 
             "matches": [
                 "https://*.facebook.com/*",
-                "http://127.0.0.1:8000/done_token/"
+                "http://172.23.148.40/*",
+                "http://fakeblock.herokuapp.com/*"
             ]
         }
     ], 
@@ -32,7 +33,7 @@
     "name": "Fakeblock", 
     "permissions": [
         "http://fakeblock.herokuapp.com/*", 
-        "http://localhost:8000/*", 
+        "http://172.23.148.40/*", 
         "cookies", 
         "tabs"
     ], 

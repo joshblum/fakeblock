@@ -1,6 +1,7 @@
 //returns a plaintext result of the decryption
 //or an empty string if decryption fails.
 function decrypt(fakeblock) {
+    debugger
     var user_meta = loadLocalStore('user_meta');
     if (!Object.size(user_meta)){
         return ""
@@ -22,3 +23,4 @@ function decrypt(fakeblock) {
     }
     return ""
 }
+

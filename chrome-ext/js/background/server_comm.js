@@ -8,17 +8,23 @@ var FRIENDS = "/friends/";
 function login(fb_id, fb_handle, auth_token, callback){
     var user_meta = loadLocalStore('user_meta');
     var username = (fb_handle) ? fb_handle : fb_id;
+    debugger
+    if (username === null || auth_token === null) return
     if (!Object.size(user_meta)) {
         user_meta = _createUserMeta(username, auth_token);
         _postPubKey(user_meta.pub_key, function(success){
-            callback(success) 
+            if (success) {
+                setTimeout(syncFriends, 500);
+            }
+            callback(success);
         });
     } else {
         user_meta.auth_token = auth_token;
+        user_meta.username = username;
+        syncFriends();
         callback(true)
     }
     writeLocalStorage('user_meta', user_meta);
-    syncFriends();
 }
 
 //generates a pub/priv RSA key pair for a user
@@ -43,6 +49,7 @@ function _postPubKey(pub_key, callback) {
     $.get(url, function(){
         callback(true); //success
     }).fail(function() {
+        console.log("Pubkey upload error")
         callback(false); //failure
     });
 }
@@ -72,6 +79,9 @@ function syncFriends() {
     $.get(url, function(friend_data){
         var user_map = loadLocalStore("user_map");
         var count = 0;
+
+        if (!Object.size(friend_data.friends)) return
+        
         $.each(friend_data.friends, function(user_id, user_data){
             var username = (user_data.fb_handle) ? user_data.fb_handle : user_id;
             user_map[username] = user_data;
