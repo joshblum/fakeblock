@@ -10,8 +10,9 @@
      <script type="text/javascript" src="../libs/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="../js/content_scripts/common.js"></script>
     <script type="text/javascript" src="../js/popup/popup.js"></script>
-    <link type="text/css" rel="stylesheet" href="css/bootstrap-switch.css"/>
-    <script type="text/javascript" src="libs/jquery.switch.js"></script>
+    <link type="text/css" rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="../css/bootstrap-responsive.min.css" />
+    <link type="text/css" rel="stylesheet" href="../css/bootstrap-switch.css"/>
 </head>
 
 <body>
@@ -19,14 +20,26 @@
 <div class="popup-wrapper" style="width:300px;">
 
     <div class="encrypt-button">
-        ENCRYPT
+        CLICK TO ENCRYPT
     </div>
 
-    <div class="switch switch-small" data-on="warning" data-off="info" data-on-label="All" data-off-label="Some">
-        <input type="checkbox">
-    </div>
+    <!--<div class="switch switch-small" data-on="warning" data-off="info" data-on-label="All" data-off-label="Some">-->
+    <!--<input type="checkbox">-->
+    <!--</div>-->
+
+    <input type="checkbox" class="will_encrypt"/>
 
     <style>
+        input.will_encrypt {
+            margin-left:20px;
+            float: left;
+            margin-top: 14px;
+        }
+        div.encrypt-button {
+            float:left;
+            margin-top:11px;
+        }
+
         div.contact {
             padding-left:10px;
             padding-top:10px;
@@ -36,14 +49,14 @@
             width:92%;
         }
         div.contact:hover {
-            background-color:lightblue;
+            background-color:lightgray;
             cursor:pointer;
         }
         div.contact.clicked {
-            background-color:darkgray;
+            background-color: lightgray;
         }
         div.contact.clicked:hover {
-            background-color:lightblue;
+            background-color:lightgray;
             cursor:pointer;
         }
         .contact-name {
@@ -54,26 +67,15 @@
             margin-right:20px;
         }
         .contacts {
-            padding:10px;background-color: #dedede;margin-top:10px;
+            padding:10px;background-color: #f4f4f4;margin-top:10px;
             margin-bottom:20px;
             float:left;
+            border-radius:17px;
+            width:92%;
         }
     </style>
 
-    <div class="contacts" style="">
-        <div class="contact">
-            <input class="select-contact" type="checkbox"/>
-            <div class="contact-name">
-                Max Fowler
-            </div>
-        </div>
-        <div class="contact">
-            <input class="select-contact" type="checkbox"/>
-            <div class="contact-name">
-                Rachel Haberstroh
-            </div>
-        </div>
-
+    <div class="contacts">
     </div>
 </div>
 
