@@ -39,7 +39,7 @@ $(function() {
 		if (will_encrypt($(this).data('usernames'))) {
 			makeAndFocusOverlay($(this), evt);
 		}
-	})
+	});
 
 	function makeAndFocusOverlay($textarea, evt) {
 		if (!$textarea.is(':visible')) {
@@ -91,8 +91,6 @@ $(function() {
 		//send message to encrypt to josh
 		encrypted = requestEncrypt($unencryptedArea.data('encryptedArea'), 
 			message);
-
-
 	}
 
 });
