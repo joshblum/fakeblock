@@ -7,7 +7,7 @@ function decrypt(fakeblock) {
     }
 
     var encrypted_data = fakeblock.users[user_meta.username];
-    if (encrypted_data === null) {
+    if (encrypted_data === undefined) {
         return ""
     }
 

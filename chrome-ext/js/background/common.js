@@ -19,15 +19,16 @@
 //  "pub_key" : "",
 //  "priv_key" : "",
 //  "username" : "",
+//  "encrypt_for" : "",
 // }
 
 // user_map ::=
 // {
 //     "username" :  {
-//         pub_key : [,,,],
-//         e_shared_secrets : [,,,],
-//         e_sentinals : [,,,],
-//         shared_secret : "",
+//         "pub_keys" : [,,,],
+//         "fb_handle" : "",
+//         "fb_id" : "",
+//         "name" : "",
 //     },
 //     ...
 // }
@@ -54,3 +55,11 @@ function loadLocalStore(key) {
     localString = (localString) ? localString : "{}"; 
     return JSON.parse(localString);
 }
+//http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};

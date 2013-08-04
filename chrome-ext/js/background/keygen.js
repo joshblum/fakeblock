@@ -19,10 +19,7 @@ function randString(length) {
 //generates and returns a public/private key pair
 //for a user
 function genKeys() { 
-    var RSAkey = cryptico.generateRSAKey(randString(), bitlength);
-    var pub_key = cryptico.publicKeyString(RSAkey);
-    return {
-        'priv_key' : RSAkey,
-        'pub_key' : pub_key,
-    }
+    var priv_key = cryptico.generateRSAKey(randString(), bitlength);
+    var pub_key = cryptico.publicKeyString(priv_key);
+    return priv_key, pub_key
 }
