@@ -10,7 +10,7 @@ function getSingleUsers() {
 	var users = [];
 	for (user in user_map) {
 		users.push({
-			user : user_map.user.name
+			user : user_map[user].name,
 		});
 	}
 	return users;
