@@ -10,6 +10,7 @@
 function encrypt(plaintext, encrypt_for) {
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
+    console.log(arguments);
     if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === [])) {
         return plaintext
     }
@@ -38,10 +39,12 @@ function encrypt(plaintext, encrypt_for) {
 
     var cipher_text = Base64.encode(CryptoJS.AES.encrypt(plaintext, shared_secret).toString());
     
-    return {
+    var res = {
         "users" : users,
         "cipher_text" : cipher_text,
     }
+    console.log(res)
+    return res
 }
 
 //returns the shared secret and 
