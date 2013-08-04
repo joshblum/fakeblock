@@ -58,7 +58,7 @@ function executeMessage(request, sender, sendResponse) {
     var ACTION_MAP = {
         "encrypt" : [encrypt, msg.message, msg.usernames],
         "decrypt" : [decrypt, msg.json],
-        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, sendResponse],
+        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, msg.will_encrypt, sendResponse],
         "encrypt_for" : [encrypt_for, msg.username],
         "get_friends" : [getSingleUsers],
         "will_encrypt" : [setEncrypt, msg.will_encrypt, sendResponse],
@@ -67,10 +67,12 @@ function executeMessage(request, sender, sendResponse) {
     if (action in ACTION_MAP){
         var args = ACTION_MAP[action]; //get mapped function and args
         //apply func with args
-        var res = args[0].apply(this, args.slice(1)); 
-        sendResponse(JSON.stringify({
-            "res" : res,
-        }));
+        var res = args[0].apply(this, args.slice(1));
+        if (args[args.length-1] != sendResponse) {
+            sendResponse(JSON.stringify({
+                "res" : res,
+            }));
+        }
     } 
 }
 

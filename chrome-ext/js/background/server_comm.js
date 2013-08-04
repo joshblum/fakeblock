@@ -14,10 +14,11 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
     user_meta.auth_token = auth_token;
     user_meta.username = username;
     user_meta.will_encrypt = will_encrypt;
+    writeLocalStorage('user_meta', user_meta);
 
     if (username === null || auth_token === null) return
     if (!Object.size(user_meta)) {
-        user_meta = _createUserMeta(user_meta);
+        _createUserMeta(user_meta);
         _postPubKey(user_meta.pub_key, function(success) {
             if (success) {
                 setTimeout(syncFriends, 500);
@@ -26,9 +27,8 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
         });
     } else {
         syncFriends();
-        callback(true)
+        callback(true);
     }
-    writeLocalStorage('user_meta', user_meta);
 }
 
 //generates a pub/priv RSA key pair for a user
