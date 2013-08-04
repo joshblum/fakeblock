@@ -10,5 +10,5 @@ function messageListener() {
 
 $(document).ready(function() {
     syncFriends()
-    // messageListener();
+    messageListener();
 });

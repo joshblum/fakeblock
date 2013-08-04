@@ -73,7 +73,7 @@ $(function() {
 		$encryptedArea.val("|fakeblock|" + JSON.stringify({'ciphertext' : message }) + "|endfakeblock|");
 		return;
 
-		chrome.runtime.sendMessage({
+		sendMessage({
 			"action" : "encrypt",
 			"message" : message,
 			"usernames" : $encryptedArea.data('usernames')

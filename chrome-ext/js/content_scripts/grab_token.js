@@ -6,7 +6,7 @@ $(document).ready(function(){
     token = $("#plugin-token").val();
     if (token != ""){
         console.log(token)
-        chrome.runtime.sendMessage({
+        sendMessage({
             "action" : "set_auth_token",
             "token" : token,
         });
