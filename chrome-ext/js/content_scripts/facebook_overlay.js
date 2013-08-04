@@ -1,3 +1,8 @@
+var do_encrypt_selectors = [
+   "._552m",
+    "._1rv"
+];
+
 $(function() {
 	var dummyCheck = false;
 	var myUsername = 'blah';

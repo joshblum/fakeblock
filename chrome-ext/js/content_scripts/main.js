@@ -1,7 +1,7 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-    decryptFakeblocksForUser('alfred');
+    decryptFakeblocks();
 });
 
 
@@ -9,7 +9,12 @@ $(document).ready(function() {
 
 // selects all divs that contain text with fakeblock.. and do not have any children
 function getDivsContainingFakeBlock() {
-    return $(":contains('|fakeblock|'):not(:has(*))");
+    var divs = $(":contains('|fakeblock|'):not(:has(*))");
+    // filter out divs which are being encrypted
+    $.each(do_encrypt_selectors, function() {
+        divs = divs.not($(this));
+    });
+    return divs;
 }
 
 
@@ -54,29 +59,14 @@ function getFakeblockObjectsFromPage() {
     return all_fakeblocks;
 }
 
-// get all fakeblocks which can be decrypted by username
-function getFakeblockObjectsForUser(username) {
-    var all_fakeblocks = getFakeblockObjectsFromPage();
-    var user_faceblocks = [];
-    $.each(all_fakeblocks, function() {
-        var fakeblock = $(this)[0];
-        var json = fakeblock['parsed_json'];
-        var users = json['users'];
-        if (username in users) {
-            user_faceblocks.push(fakeblock);
-        }
-    });
-    return user_faceblocks;
-}
-
 
 // decrypt and replace all faceblocks for a user
-function decryptFakeblocksForUser(username) {
-    var user_fakeblocks = getFakeblockObjectsForUser(username);
-    $.each(user_fakeblocks, function() {
+function decryptFakeblocks() {
+    var fakeblocks = getFakeblockObjectsFromPage();
+    $.each(fakeblocks, function() {
         var fakeblock = $(this)[0];
         var to_replace = fakeblock['whole_match'];
-        var unparsed_json = jakeblock['unparsed_json'];
+        var unparsed_json = fakeblock['unparsed_json'];
         // send to back to decrypt and replace to_replace with decrypted_text
         decrypt(to_replace, unparsed_json);
     });
@@ -88,9 +78,11 @@ function decrypt(to_replace, json) {
         "action" : "decrypt",
         "json" : json
     }, function(decrypted_text) {
-        var all_html = $("body").html();
-        var new_html = all_html.replace(to_replace, decrypted_text);
-        $("body").html(new_html);
+        if (decrypted_text != "") {
+            var all_html = $("body").html();
+            var new_html = all_html.replace(to_replace, decrypted_text);
+            $("body").html(new_html);
+        }
     });
 }
 
