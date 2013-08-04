@@ -33,6 +33,15 @@ function encrypt(plaintext, encrypt_for) {
         }
     });
 
+    if (users <= 1) { //try defaults
+        $.each(sender_meta.encrypt_for, function(i, username){
+            var user_data = _getUserData(username, shared_secret,user_map);
+            if (Object.size(user_data)) { //user exists
+                users[username] = user_data
+            }
+        });
+    }
+
     if (users <= 1) { //only found own data
         return plaintext
     }
