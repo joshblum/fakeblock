@@ -72,21 +72,28 @@ function getFakeblockObjectsForUser(username) {
 
 // decrypt and replace all faceblocks for a user
 function decryptFakeblocksForUser(username) {
-    var user_faceblocks = getFakeblockObjectsForUser(username);
-    $.each(user_faceblocks, function() {
-        var faceblock = $(this)[0];
-        var decrypted_text = decrypt(faceblock['unparsed_json']);
-        var to_replace = faceblock['whole_match'];
-        // replace to_replace with decrypted_text
+    var user_fakeblocks = getFakeblockObjectsForUser(username);
+    $.each(user_fakeblocks, function() {
+        var fakeblock = $(this)[0];
+        var to_replace = fakeblock['whole_match'];
+        var unparsed_json = jakeblock['unparsed_json'];
+        // send to back to decrypt and replace to_replace with decrypted_text
+        decrypt(to_replace, unparsed_json);
+    });
+}
+
+// backend decrypts fakeblock unparsed_json into decrypted_text
+function decrypt(to_replace, json) {
+    chrome.runtime.sendMessage({
+        "action" : "decrypt",
+        "json" : json
+    }, function(decrypted_text) {
         var all_html = $("body").html();
         var new_html = all_html.replace(to_replace, decrypted_text);
         $("body").html(new_html);
     });
 }
 
-// backend decrypts fakeblock unparsed_json into decrypted_text
-function decrypt(fakeblock_json) {
-    return "decrypted bitch!";
-}
+
 
 
