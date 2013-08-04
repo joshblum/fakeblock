@@ -11,14 +11,15 @@ function login(fb_id, fb_handle, auth_token, callback){
     if (!Object.size(user_meta)) {
         user_meta = _createUserMeta(username, auth_token);
         _postPubKey(user_meta.pub_key, function(success){
+            syncFriends();
             callback(success) 
         });
     } else {
         user_meta.auth_token = auth_token;
+        syncFriends();
         callback(true)
     }
     writeLocalStorage('user_meta', user_meta);
-    syncFriends();
 }
 
 //generates a pub/priv RSA key pair for a user
@@ -72,6 +73,9 @@ function syncFriends() {
     $.get(url, function(friend_data){
         var user_map = loadLocalStore("user_map");
         var count = 0;
+
+        if (!Object.size(friend_data)) return
+        
         $.each(friend_data.friends, function(user_id, user_data){
             var username = (user_data.fb_handle) ? user_data.fb_handle : user_id;
             user_map[username] = user_data;
