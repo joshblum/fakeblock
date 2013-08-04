@@ -32,9 +32,6 @@ var textareaUsernameGetters = {
 }
 
 $(function() {
-    if (document.domain !== "facebook.com"){
-        return
-    } 
     $($('textarea')[0]).focus().trigger('keydown');
     makeOverlays();
     $('input[value="Reply"]').click(function() {
@@ -45,9 +42,6 @@ $(function() {
 
 function replyHandler() {
     $('.lastEdited').val('').focus();    
-    setTimeout(function() {
-    	$('.lastEdited').data('encryptedArea').val('');
-    }, 10);
 }
 
 function makeOverlays() {
@@ -64,8 +58,6 @@ function makeOverlays() {
             $(this).data('checkedOverlay', true);
             return;
         }
-        console.log(encryptClasses[0])
-        console.log(textareaUsernameGetters[encryptClasses[0]]($(this)))
         $(this).data('checkedOverlay', true);
         $(this).data('usernames', textareaUsernameGetters[encryptClasses[0]]($(this)) );
 
@@ -85,19 +77,19 @@ function makeOverlay($textarea) {
     $fakeblockArea.data('encryptedArea', $textarea);
 
     $fakeblockArea.keyup(function(e) {
-    	if (e.which == 13 && $('._1ri').css('marginLeft') === "15px") {
-			$('input[value="Reply"]').click();
-    	}
+        if (e.which == 13 && $('._1ri').css('marginLeft') === "15px") {
+            $('input[value="Reply"]').click();
+        }
         encryptHandler($(this));
     });
     textareas.push($fakeblockArea);
     // $textarea.focus(function() {
-    // 	$fakeblockArea.focus()
+    //  $fakeblockArea.focus()
     // });
 }
 
 function requestEncrypt($unencryptedArea, message) {
-	var $encryptedArea = $unencryptedArea.data('encryptedArea');
+    var $encryptedArea = $unencryptedArea.data('encryptedArea');
     sendMessage({
         "action" : "encrypt",
         "message" : message,
@@ -123,7 +115,7 @@ function requestEncrypt($unencryptedArea, message) {
 function encryptHandler($unencryptedArea) {
     var message = $unencryptedArea.val();
     for (var i=0; i < textareas.length; i++) {
-    	textareas[i].removeClass('lastEdited');
+        textareas[i].removeClass('lastEdited');
     }
     $unencryptedArea.addClass('lastEdited');
 
