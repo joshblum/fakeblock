@@ -2,7 +2,24 @@
 
 $(document).ready(function() {
     decryptFakeblocks();
+
+    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+    var observer = new MutationObserver(function(mutations, observer) {
+        // fired when a mutation occurs
+        decryptFakeblocks();
+    });
+
+// define what element should be observed by the observer
+// and what types of mutations trigger the callback
+    observer.observe(document, {
+        subtree: true,
+        attributes: false
+    });
 });
+
+
+/****** automatically try to decrypt DOM whenever it changes ***********************************************************/
 
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
@@ -16,7 +33,6 @@ function getDivsContainingFakeBlock() {
     });
     return divs;
 }
-
 
 // returns array of match objects,
 // match_object[0] = whole match
@@ -58,7 +74,6 @@ function getFakeblockObjectsFromPage() {
     });
     return all_fakeblocks;
 }
-
 
 // decrypt and replace all faceblocks for a user
 function decryptFakeblocks() {
