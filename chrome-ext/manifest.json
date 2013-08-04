@@ -18,7 +18,6 @@
             ], 
             "matches": [
                 "https://*.facebook.com/*",
-                "http://172.23.148.40/*",
                 "http://fakeblock.herokuapp.com/*"
             ]
         }

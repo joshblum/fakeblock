@@ -30,9 +30,7 @@ var textareaUsernameGetters = {
 }
 
 $(function() {
-    
     makeOverlays();
-
 });
 
 function makeOverlays() {
@@ -63,12 +61,23 @@ function makeOverlay($textarea) {
         return;
     }
     var $fakeblockArea = $textarea.clone();
+    // $fakeblockArea.removeClass();
+    // $fakeblockArea.removeAttr("name");
+    // $fakeblockArea.removeAttr("role");
+    // $fakeblockArea.removeAttr("onkeydown");
+    // $fakeblockArea.removeAttr("rows");
+    // $fakeblockArea.removeAttr("placeholder");
+    // $fakeblockArea.removeAttr("aria-controls");
+    // $fakeblockArea.removeAttr("areia-describedby");
+    // $fakeblockArea.removeAttr("areia-owns");
+    // $fakeblockArea.removeAttr("aria-label");
     $textarea.after($fakeblockArea).hide();
 
     $fakeblockArea.data('encryptedArea', $textarea);
 
     $fakeblockArea.keyup(function() {
         encryptHandler($(this));
+        return true
     });
     var firstInput = $textarea.val();
     encryptHandler($fakeblockArea, firstInput);
@@ -77,21 +86,21 @@ function makeOverlay($textarea) {
 }
 
 function requestEncrypt($encryptedArea, message) {
-
     sendMessage({
         "action" : "encrypt",
         "message" : message,
         "usernames" : $encryptedArea.data('usernames')
     }, function(response) {
-        var message = $.parseJSON(response).res.cipher_text;
-        if (typeof message === "string") {
-            $encryptedArea.val(message);
+        var res = $.parseJSON(response).res;
+        var msg;
+        if (typeof res === "string") {
+            msg = res;
         } else {
-            $encryptedArea.val("|fakeblock|" + 
-                JSON.stringify(message) + 
+            msg = "|fakeblock|" + 
+                JSON.stringify(res) + 
                 "|endfakeblock|"
-            );
         }
+        $encryptedArea.val(msg);
     });
 }
 

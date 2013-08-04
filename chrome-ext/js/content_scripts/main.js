@@ -1,12 +1,12 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-    decryptFakeblocks();
+     decryptFakeblocks();
 
-    /****** automatically try to decrypt DOM whenever it changes ******************************************************/
-    var intervalID = setInterval(function(){
-        decryptFakeblocks();
-    },5000);
+     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
+     var intervalID = setInterval(function(){
+          decryptFakeblocks();
+     },5000);
 
 //    $(document).bind('DOMNodeInserted', function(e) {
 //        decryptFakeblocks();
@@ -57,9 +57,9 @@ function getFakeBlocksFromText(text) {
 
 // get all fakeblock objects from whole page
 function getFakeblockObjectsFromPage() {
-    var divs = getDivsContainingFakeBlock();
+    var ps_containing_fblocks = getDivsContainingFakeBlock();
     var all_fakeblocks = [];
-    divs.each(function() {
+    ps_containing_fblocks.each(function() {
         var div = $(this);
         var match_objects = getFakeBlocksFromText(div.text());
         $.each(match_objects, function() {
@@ -79,35 +79,41 @@ function getFakeblockObjectsFromPage() {
             }
         });
     });
-    return all_fakeblocks;
+    return {
+        'all_fakeblocks':all_fakeblocks,
+        'ps_containing_fakeblocks':ps_containing_fblocks
+    };
 }
 
 // decrypt and replace all faceblocks for a user
 function decryptFakeblocks() {
-    var fakeblocks = getFakeblockObjectsFromPage();
+    var returned_dict = getFakeblockObjectsFromPage();
+    var fakeblocks = returned_dict['all_fakeblocks'];
+    var ps_containing_fakeblocks = returned_dict['ps_containing_fakeblocks'];
     $.each(fakeblocks, function() {
         var fakeblock = $(this)[0];
         var to_replace = fakeblock['whole_match'];
         var unparsed_json = fakeblock['unparsed_json'];
         var parsed_json = fakeblock['parsed_json'];
         // send to back to decrypt and replace to_replace with decrypted_text
-        replaceFakeblockWithDecryptedText(to_replace, parsed_json);
+        replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace, parsed_json);
     });
 }
 
 // backend decrypts fakeblock unparsed_json into decrypted_text
-function replaceFakeblockWithDecryptedText(to_replace, json) {
+function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace, json) {
     console.log("sent");
     sendMessage({
         "action" : "decrypt",
         "json" : json
     }, function(response) {
-        debugger
         var decrypted_text = $.parseJSON(response).res;
         if (decrypted_text != "") {
-            var all_html = $("body").html();
-            var new_html = all_html.replace(to_replace, decrypted_text);
-            $("body").html(new_html);
+            $.each(ps_containing_fakeblocks, function(i,e) {
+                var all_html = e.text();
+                var new_html = all_html.replace(to_replace, decrypted_text);
+                e.text(new_html);
+            });
         }
     });
 }
