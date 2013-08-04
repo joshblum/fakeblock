@@ -15,8 +15,8 @@ $(document).ready(function() {
 // selects all divs that contain text with fakeblock.. and do not have any children
 function getDivsContainingFakeBlock() {
 //    var divs = $("p:contains('|fakeblock|'):not(:has(*))").not("script");
-//    var divs = $("p, span").not(":has(*)").filter(":contains('|fakeblock|')");
-    var divs = $("p:contains('|fakeblock|')");
+    var divs = $("p, span").not(":has(*)").filter(":contains('|fakeblock|')");
+//    var divs = $("p:contains('|fakeblock|')");
     // filter out divs which are being encrypted
     $.each(do_encrypt_selectors, function() {
         divs = divs.not($(this));
@@ -48,7 +48,6 @@ function getFakeblockObjectsFromPage() {
         var match_objects = getFakeBlocksFromText(div.text());
         $.each(match_objects, function() {
             try {
-                debugger
                 var match_object = $(this);
                 var whole_match = match_object[0];
                 var byte_str = match_object[1];

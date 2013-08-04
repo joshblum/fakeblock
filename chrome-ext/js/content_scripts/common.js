@@ -18,7 +18,7 @@ function encodeString(str) {
         var c = String(b_array[i]);
         to_return += c;
         if (i < str.length-1) {
-            to_return += ".";
+            to_return += "*";
         }
     }
     return to_return;
@@ -36,6 +36,6 @@ function byteArrayToString(array) {
 
 // comma separated byte array
 function decodeByteString(csb) {
-    var b_array = csb.split(".");
+    var b_array = csb.split("*");
     return byteArrayToString(b_array);
 }
