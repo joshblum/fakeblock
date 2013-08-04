@@ -3,21 +3,20 @@ var userInputs = [];
 $(function() {
 	sendMessage({
 		"action" : "get_friends",
-	}, function(friends) {
-		alert(friends);
+	}, function(response) {
+		friends = $.parseJSON(response).res;
 		$.each(friends, function(index, friendObj) {
 			var username = Object.keys(friendObj)[0];
 
 			var userInput = $('<div class="contact">'+
 	            '<input class="select-contact" type="checkbox"/>'+
 	            '<div class="contact-name">'+
-	            friendObj.username +
+	            friendObj[username] +
 	            '</div>' +
 	        '</div>');
 	        userInput.data('username', username);
-	        userInput.data('fullname', friendObj.username);
+	        userInput.data('fullname', friendObj[username]);
 	        userInputs.push(userInput);
-	        alert(userInput);
 
 		});
 	});

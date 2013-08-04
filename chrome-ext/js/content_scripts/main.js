@@ -90,7 +90,8 @@ function decrypt(to_replace, json) {
     sendMessage({
         "action" : "decrypt",
         "json" : json
-    }, function(decrypted_text) {
+    }, function(response) {
+        var decrypted_text = $.parseJSON(response).res;
         if (decrypted_text != "") {
             var all_html = $("body").html();
             var new_html = all_html.replace(to_replace, decrypted_text);

@@ -96,7 +96,8 @@ function requestEncrypt($encryptedArea, message) {
 			"action" : "encrypt",
 			"message" : message,
 			"usernames" : $encryptedArea.data('usernames')
-		}, function(encrypted) {
+		}, function(response) {
+			encrypted = $.parseJSON(response).res;
   			$encryptedArea.val("|fakeblock|" + 
 				JSON.stringify(encrypted) + 
 				"|endfakeblock|"
