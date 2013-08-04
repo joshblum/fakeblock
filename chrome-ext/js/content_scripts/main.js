@@ -99,7 +99,3 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
         }
     });
 }
-
-
-
-
