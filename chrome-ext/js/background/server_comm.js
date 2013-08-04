@@ -9,6 +9,7 @@ function login(fb_id, fb_handle, auth_token, callback){
     var user_meta = loadLocalStore('user_meta');
     var username = (fb_handle) ? fb_handle : fb_id;
     debugger
+    if (username === null || auth_token === null) return
     if (!Object.size(user_meta)) {
         user_meta = _createUserMeta(username, auth_token);
         _postPubKey(user_meta.pub_key, function(success){
