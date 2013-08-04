@@ -3,24 +3,22 @@
 $(document).ready(function() {
     decryptFakeblocks();
 
-//     MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+    /****** automatically try to decrypt DOM whenever it changes ******************************************************/
 
-//     var observer = new MutationObserver(function(mutations, observer) {
-//         // fired when a mutation occurs
-//         decryptFakeblocks();
-//     });
+    MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
-// // define what element should be observed by the observer
-// // and what types of mutations trigger the callback
-//     observer.observe(document, {
-//         subtree: true,
-//         attributes: false
-//     });
+    var observer = new MutationObserver(function(mutations, observer) {
+        // fired when a mutation occurs
+        decryptFakeblocks();
+    });
+
+// define what element should be observed by the observer
+// and what types of mutations trigger the callback
+    observer.observe(document, {
+        subtree: true,
+        attributes: false
+    });
 });
-
-
-/****** automatically try to decrypt DOM whenever it changes ***********************************************************/
-
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 

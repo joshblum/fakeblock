@@ -28,7 +28,7 @@ function encrypt(plaintext, encrypt_for) {
     var users = {};
     $.each(encrypt_for, function(i, username){
         var user_data = _getUserData(username, shared_secret,user_map);
-        if (user_data !== {}) { //user didn't exist
+        if (Object.size(user_data)) { //user exists
             users[username] = user_data
         }
     });
