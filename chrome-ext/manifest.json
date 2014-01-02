@@ -11,6 +11,7 @@
         {
             "js": [
                 "libs/jquery-1.10.1.min.js",
+                "libs/gmail.min.js",
                 "js/content_scripts/common.js",
                 "js/content_scripts/facebook_overlay.js",
                 "js/content_scripts/main.js",
