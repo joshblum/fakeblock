@@ -7,7 +7,7 @@
 //where to find pub_keys
 //output ::= fakeblock_obj
 //fakeblock_obj ::= def in common.js
-function encrypt(plaintext, encrypt_for) {
+function old_encrypt(plaintext, encrypt_for, which_network) {
     // console.log(arguments);
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
@@ -21,7 +21,7 @@ function encrypt(plaintext, encrypt_for) {
     }
 
     //add self
-    encrypt_for.push(sender_meta.username)
+    encrypt_for.push(sender_meta.username);
 
     var user_map = loadLocalStore('user_map');
     var shared_secret = randString();
@@ -52,6 +52,24 @@ function encrypt(plaintext, encrypt_for) {
         "users" : users,
         "cipher_text" : cipher_text
     }
+    // console.log(res)
+    return res
+}
+
+function encrypt(plaintext, encrypt_for, which_network) {
+    var res = {
+        "users" : encrypt_for,
+        "cipher_text" : "&&& default cypher text for ya &&&"
+    };
+    // console.log(res)
+    return res
+}
+
+// returns boolean based on whether or not all usernames are parseltongue users
+function canEncryptFor(usernames, which_network) {
+    var res = {
+        "can_encrypt" : true
+    };
     // console.log(res)
     return res
 }

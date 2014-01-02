@@ -53,10 +53,12 @@ var SENTINAL = "fakeblock";
     helper to execute messages between content and background script
 */
 function executeMessage(request, sender, sendResponse) {
-    var msg = JSON.parse(request)
+    var msg = JSON.parse(request);
     var action = msg.action;
     var ACTION_MAP = {
-        "encrypt" : [encrypt, msg.message, msg.usernames],
+        "encrypt" : [encrypt, msg.message, msg.usernames, msg.which_network],
+        "can_encrypt_for" : [canEncryptFor, msg.usernames, msg.which_network],
+        // below are old
         "decrypt" : [decrypt, msg.json],
         "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, msg.will_encrypt, sendResponse],
         "encrypt_for" : [encryptFor, msg.usernames],
@@ -64,7 +66,7 @@ function executeMessage(request, sender, sendResponse) {
         "will_encrypt" : [setEncrypt, msg.will_encrypt, sendResponse],
         "get_encrypt_for" : [getEncryptFor],
         "get_will_encrypt" : [getWillEncrypt],
-    }
+    };
 
     if (action in ACTION_MAP){
         var args = ACTION_MAP[action]; //get mapped function and args

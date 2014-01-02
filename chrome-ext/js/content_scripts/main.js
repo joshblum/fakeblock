@@ -1,9 +1,13 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-    if (document.domain !== "facebook.com"){
+    debugger;
+    if (['facebook.com', 'mail.google.com'].indexOf(document.domain) == -1){
+        alert("parseltongue not activated on this domain.");
         return
-    } 
+    }
+
+    alert("parseltongue active!");
     decryptFakeblocks();
 
     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
