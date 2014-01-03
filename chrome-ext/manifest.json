@@ -14,7 +14,7 @@
                 "libs/jquery-1.10.2.min.map",
                 "js/content_scripts/common.js",
                 "js/content_scripts/gmail_overlay.js",
-                // "js/content_scripts/main.js",
+                "js/content_scripts/main.js",
                 "js/content_scripts/grab_token.js"
             ], 
             "matches": [

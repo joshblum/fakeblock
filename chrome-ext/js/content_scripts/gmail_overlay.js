@@ -26,29 +26,28 @@ $(function() {
 
     $(document).on('DOMNodeInserted', function(e) {
         for (var i in emailWindowSelectors) {
-            var $email = $(e.target).closest(emailWindowSelectors[i]);
-            if ($email.length > 0) {
-                if (! $email.hasClass('hasOverlay')) {
-                    makeOverlay($email, textareaSelectors[i]);
+            var $emailWindow = $(e.target).closest(emailWindowSelectors[i]);
+            var $textarea = textareaSelectors.reduce(function(prev, selector) {
+                return prev.concat($(e.target).find(selector).toArray());
+            }, []);
+
+            if ($emailWindow.length > 0 && $textarea.length > 0) {
+                if (! $emailWindow.hasClass('hasOverlay')) {
+                    makeOverlay($emailWindow);
                 }
                 break;
             }
         }
+        usernameHandler(e.target);
     });
 
-    // $(document).on('DOMNodeRemoved', function(e) {
-    //     if (e.target.tagName === "TEXTAREA") {
-    //         //unfortunately nonspecific to the textarea that actually got removed from the page
-    //         for (var selector in usernameGetters) {
-    //             $(selector).each(function(usernameField) {
-    //                 updateUsernames($(usernameField), selector);
-    //             })
-    //         }
-    //     }
-    // });
+    $(document).on('DOMNodeRemoved', function(e) {
+        usernameHandler(e.target);
+    })
+
 });
 
-function makeOverlay($email, selector) {
+function makeOverlay($email) {
 
     for (var i in textareaSelectors) {
         //ehhh this just sets the textarea to the first element inside the email whose class matches...maybe not the best
@@ -57,9 +56,11 @@ function makeOverlay($email, selector) {
             break;
         }
     }
+
     var $unencryptedArea = $textarea.clone();
-    $textarea.after($unencryptedArea);
-    $textarea.hide();
+    $textarea.before($unencryptedArea);
+    // $textarea.after($unencryptedArea);
+    // $textarea.hide();
     $unencryptedArea.data('encryptedArea', $textarea);
 
     for (var selector in usernameGetters) {
@@ -73,7 +74,7 @@ function makeOverlay($email, selector) {
     
     //what should happen if fail to find username field? for now, set doEncrypt to false I guess :/
     if ($unencryptedArea.data('doEncrypt') === undefined) {
-        $unencrypted.data('doEncrypt', false);
+        $unencryptedArea.data('doEncrypt', false);
     }
 
     $unencryptedArea.keyup(function(e) {
@@ -112,7 +113,7 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
     }, function(response) {
         var res = $.parseJSON(response).res;
         if (res !== $unencryptedArea.data('doEncrypt')) {
-            //will have to encrypt or decrypt the current message if state changed
+            //TODO: will have to encrypt or decrypt the current message if state changed
         }
         $unencryptedArea.data('doEncrypt', res.can_encrypt);
     });
@@ -130,6 +131,18 @@ function encryptHandler($unencryptedArea) {
 
 }
 
+function usernameHandler(emailSpan) {
+    if ('email' in emailSpan.attributes) {
+        $usernameField = $(emailSpan).parent();
+        matchedSelectors = Object.keys(usernameGetters).filter(function(klass) {
+            return $usernameField.hasClass(klass.split('.')[1]);
+        });
+        //defaulting to the first selector that matches for now...
+        //TODO: think about actually accounting for multiple matched selectors, if we should at all
+        updateUsernames($usernameField, matchedSelectors[0]);
+    }
+}
+
 function updateUsernames($usernameField, selector, $unencryptedArea) {
     var usernames = usernameGetters[selector]($usernameField);
 
@@ -141,7 +154,5 @@ function updateUsernames($usernameField, selector, $unencryptedArea) {
     }
 
     $unencryptedArea.data('usernames', usernames);
-    var doEncrypt = requestCanEncryptFor(usernames);
-    //TODO: must decrypt or encrypt if doEncrypt has changed
-    $unencryptedArea.data('doEncrypt', doEncrypt);
+    requestCanEncryptFor($unencryptedArea, usernames);
 }
