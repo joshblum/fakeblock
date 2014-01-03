@@ -12,13 +12,13 @@
             "js": [
                 "libs/jquery-1.10.2.min.js",
                 "libs/jquery-1.10.2.min.map",
-                "libs/gmail.min.js",
                 "js/content_scripts/common.js",
-                "js/content_scripts/facebook_overlay.js",
-                "js/content_scripts/main.js",
+                "js/content_scripts/gmail_overlay.js",
+                // "js/content_scripts/main.js",
                 "js/content_scripts/grab_token.js"
             ], 
             "matches": [
+                "https://mail.google.com/*",
                 "https://*.facebook.com/*",
                 "http://*.reddit.com/*",
                 "http://fakeblock.herokuapp.com/*"
