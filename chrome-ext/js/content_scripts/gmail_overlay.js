@@ -58,8 +58,7 @@ function makeOverlay($email) {
     }
 
     var $unencryptedArea = $textarea.clone();
-    $textarea.before($unencryptedArea);
-    // $textarea.after($unencryptedArea);
+    $textarea.after($unencryptedArea);
     // $textarea.hide();
     $unencryptedArea.data('encryptedArea', $textarea);
 
