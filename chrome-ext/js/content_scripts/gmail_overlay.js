@@ -1,3 +1,4 @@
+var hasOverlay = false;
 var doEncryptDomains = [
     "facebook.com",
     "mail.google.com"
@@ -26,13 +27,25 @@ $(function() {
 
     $(document).on('DOMNodeInserted', function(e) {
         for (var i in emailWindowSelectors) {
-            var $emailWindow = $(e.target).closest(emailWindowSelectors[i]);
-            var $textarea = textareaSelectors.reduce(function(prev, selector) {
-                return prev.concat($(e.target).find(selector).toArray());
-            }, []);
+            // var $emailWindow = $(e.target).closest(emailWindowSelectors[i]);
+            // var $textarea = textareaSelectors.reduce(function(prev, selector) {
+            //     return prev.concat($(e.target).find(selector).toArray());
+            // }, []);
 
-            if ($emailWindow.length > 0 && $textarea.length > 0) {
-                if (! $emailWindow.hasClass('hasOverlay')) {
+            // var $textarea = $('.a07').find('.a09')
+            var $emailWindow = $('.I5')
+            //this is so hacky...
+            // var ina07 = false;
+            try {
+                var ina07 = $('.Am').parent().hasClass('aO7');         
+            } catch(err) {
+                var ina07 = false;
+            }
+
+            // if ($emailWindow.length > 0 && $textarea.length > 0) {
+            if ($emailWindow.length > 0 && ina07) {
+                // if (! $emailWindow.hasClass('hasOverlay')) {
+                if (! hasOverlay) {
                     makeOverlay($emailWindow);
                 }
                 break;
@@ -79,8 +92,8 @@ function makeOverlay($email) {
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
     });
-
-    $email.addClass('hasOverlay');
+    hasOverlay = true;
+    // $email.addClass('hasOverlay');
 }
 
 function requestEncrypt($encryptedArea, message, usernames) {
@@ -152,6 +165,9 @@ function updateUsernames($usernameField, selector, $unencryptedArea) {
         $unencryptedArea = $usernameField.data('unencryptedArea');
     }
 
+    if (! $unencryptedArea) {
+        return;
+    }
     $unencryptedArea.data('usernames', usernames);
     requestCanEncryptFor($unencryptedArea, usernames);
 }
