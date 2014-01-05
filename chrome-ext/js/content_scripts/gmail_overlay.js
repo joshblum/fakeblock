@@ -1,22 +1,16 @@
-var hasOverlay = false;
 var doEncryptDomains = [
     "facebook.com",
     "mail.google.com"
 ];
-var emailWindowSelectors = [
-    '.I5'
-];
-var textareaSelectors = [
-    '.Am'
-];
+var EMAIL_WINDOW_SELECTOR = '.I5';
+var TEXTAREA_SELECTOR = '.Am';
+var USERNAME_FIELD_SELECTOR = '.oL';
 
-var usernameGetters = {
-    '.oL' : function($usernameField) {
-        var emailSpans = $usernameField.children().toArray();
-        return emailSpans.map(function(emailSpan) {
-            return $(emailSpan).attr('email');
-        });
-    }
+function usernameGetter($usernameField) {
+    var emailSpans = $usernameField.children().toArray();
+    return emailSpans.map(function(emailSpan) {
+        return $(emailSpan).attr('email');
+    });
 }
 
 $(function() {
@@ -26,77 +20,141 @@ $(function() {
     }
 
     $(document).on('DOMNodeInserted', function(e) {
-        for (var i in emailWindowSelectors) {
-            // var $emailWindow = $(e.target).closest(emailWindowSelectors[i]);
-            // var $textarea = textareaSelectors.reduce(function(prev, selector) {
-            //     return prev.concat($(e.target).find(selector).toArray());
-            // }, []);
+        //don't allow the appended unencrypted textarea insert event to propagate
+        if ($(e.target).attr('role') === 'textbox') {
+            return;
+        }
 
-            // var $textarea = $('.a07').find('.a09')
-            var $emailWindow = $('.I5')
-            //this is so hacky...
-            // var ina07 = false;
-            try {
-                var ina07 = $('.Am').parent().hasClass('aO7');         
-            } catch(err) {
-                var ina07 = false;
-            }
+        //gmail makes the first matching textarea found into the compose textarea
+        //move the unencrypted textarea after the encrypted textarea
+        if ($('.aO7').children('.Am').length == 1) {
+            $('.aO7').append($('.parseltongue-unencrypted'));
+        }
 
-            // if ($emailWindow.length > 0 && $textarea.length > 0) {
-            if ($emailWindow.length > 0 && ina07) {
-                // if (! $emailWindow.hasClass('hasOverlay')) {
-                if (! hasOverlay) {
-                    makeOverlay($emailWindow);
-                }
-                break;
+        //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
+        var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
+        if (overlayable.length > 0) {
+            var $emailWindow = $(e.target).closest(EMAIL_WINDOW_SELECTOR);
+            if (! $emailWindow.hasClass('hasOverlay')) {
+                makeOverlay($emailWindow);
             }
         }
+        
+        //update usernames if (possibly) a new username has been added
         usernameHandler(e.target);
     });
 
     $(document).on('DOMNodeRemoved', function(e) {
         usernameHandler(e.target);
-    })
-
+    });
 });
 
 function makeOverlay($email) {
+    /* given the top-level email window, make an overlay for it */
 
-    for (var i in textareaSelectors) {
-        //ehhh this just sets the textarea to the first element inside the email whose class matches...maybe not the best
-        $textarea = $email.find(textareaSelectors[i]);
-        if ($textarea.length > 0) {
-            break;
-        }
-    }
+    var $textarea = $email.find(TEXTAREA_SELECTOR);
+    var $unencryptedArea = makeOverlayHtml($textarea);
 
-    var $unencryptedArea = $textarea.clone();
     $textarea.after($unencryptedArea);
-    // $textarea.hide();
-    $unencryptedArea.data('encryptedArea', $textarea);
+    $textarea.hide();
 
-    for (var selector in usernameGetters) {
-        $usernameField = $email.find(selector);
-        if ($usernameField.length > 0) {
-            //do initial call to get addresses and decide whether or not to encrypt
-            updateUsernames($usernameField, selector, $unencryptedArea);
-            break;
-        }
+    //username field probably(?) hasn't loaded yet, but need to associate this unencrypted area and the username field 
+    $usernameField = $email.find(USERNAME_FIELD_SELECTOR);
+    if ($usernameField.length > 0) {
+        $usernameField.data('unencryptedArea', $unencryptedArea);
+        //this initial call may not be necessary since usernames probably haven't loaded yet
+        updateUsernames($usernameField);
     }
     
-    //what should happen if fail to find username field? for now, set doEncrypt to false I guess :/
-    if ($unencryptedArea.data('doEncrypt') === undefined) {
-        $unencryptedArea.data('doEncrypt', false);
-    }
+    //if can't find a username field yet, default to not encrypting...username field should load later anyway
+    $unencryptedArea.data('doEncrypt', false);
 
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
     });
-    hasOverlay = true;
-    // $email.addClass('hasOverlay');
+    $email.addClass('hasOverlay');
+}
+
+function makeOverlayHtml($textarea) {
+    /* lots of shit here to make the overlay look like the original */
+
+    var $unencryptedArea = $textarea.clone();
+    var unencrypted_id = $unencryptedArea.prop('id') + '_unencrypted';
+    $unencryptedArea.attr({
+        id : unencrypted_id, 
+        role : 'textbox',
+        contenteditable : true
+    });
+
+    $unencryptedArea.click(function(evt) {
+        evt.stopPropagation();
+    }).focus(function(evt) {
+        evt.stopPropagation();
+    });
+
+    $unencryptedArea.css({
+        'min-height' : '85px',
+        'direction' : 'ltr'
+    });
+    $unencryptedArea.addClass('Al LW-avf parseltongue-unencrypted');
+
+    $unencryptedArea.data('encryptedArea', $textarea);
+
+    return $unencryptedArea;
+}
+
+function encryptHandler($unencryptedArea) {
+    /* 
+    handler for keyup in an unencrypted area 
+    uses doEncrypt in unencrypted area's data to check if should update with ciphertext or plaintext
+    */
+    var $encryptedArea = $unencryptedArea.data('encryptedArea');
+    var message = $unencryptedArea.text();
+    var usernames = $unencryptedArea.data('usernames');
+    if ($unencryptedArea.data('doEncrypt')) {
+        requestEncrypt($encryptedArea, message, usernames);
+    } else {
+        $encryptedArea.text(message);
+    }
+
+}
+
+function usernameHandler(emailSpan) {
+    /*
+    handler for an email address getting added or removed from the addressees
+    updates the usernames list for the appropriate unencrypted textarea 
+    */
+    if ('email' in emailSpan.attributes) {
+        $usernameField = $(emailSpan).parent();
+        var usernameFieldClass = USERNAME_FIELD_SELECTOR.split('.')[1]
+        if ($usernameField.hasClass(usernameFieldClass)) {
+            updateUsernames($usernameField);
+        }
+    }
+}
+
+function updateUsernames($usernameField) {
+    /*
+    call to check if the usernames are all still valid parseltongue users
+    if yes/no, update the doEncrypt field of the corresponding unencrypted textarea
+    */
+
+    //check if username field has been associated with a textarea yet
+    var $unencryptedArea = $usernameField.data('unencryptedArea');
+    if (! $unencryptedArea) {
+        return;
+    }
+
+    var usernames = usernameGetter($usernameField);
+    $unencryptedArea.data('usernames', usernames);
+    requestCanEncryptFor($unencryptedArea, usernames);
 }
 
 function requestEncrypt($encryptedArea, message, usernames) {
+    /*
+    send message to back asking for the encrypted message
+    updates the textarea with the ciphertext
+    */
     sendMessage({
         "action" : "encrypt",
         "message" : message,
@@ -118,6 +176,10 @@ function requestEncrypt($encryptedArea, message, usernames) {
 }
 
 function requestCanEncryptFor($unencryptedArea, usernames) {
+    /*
+    send message to back asking if the usernames can be encrypted for (are valid parseltongue users)
+    if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
+    */
     sendMessage({
         "action" : "can_encrypt_for",
         "usernames" : usernames,
@@ -129,45 +191,4 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
         }
         $unencryptedArea.data('doEncrypt', res.can_encrypt);
     });
-}
-
-function encryptHandler($unencryptedArea) {
-    var $encryptedArea = $unencryptedArea.data('encryptedArea');
-    var message = $unencryptedArea.text();
-    var usernames = $unencryptedArea.data('usernames');
-    if ($unencryptedArea.data('doEncrypt')) {
-        requestEncrypt($encryptedArea, message, usernames);
-    } else {
-        $encryptedArea.text(message);
-    }
-
-}
-
-function usernameHandler(emailSpan) {
-    if ('email' in emailSpan.attributes) {
-        $usernameField = $(emailSpan).parent();
-        matchedSelectors = Object.keys(usernameGetters).filter(function(klass) {
-            return $usernameField.hasClass(klass.split('.')[1]);
-        });
-        //defaulting to the first selector that matches for now...
-        //TODO: think about actually accounting for multiple matched selectors, if we should at all
-        updateUsernames($usernameField, matchedSelectors[0]);
-    }
-}
-
-function updateUsernames($usernameField, selector, $unencryptedArea) {
-    var usernames = usernameGetters[selector]($usernameField);
-
-    //give username field a reference to the unencrypted area so it can update usernames on change event
-    if ($unencryptedArea) {
-        $usernameField.data('unencryptedArea', $unencryptedArea);
-    } else {
-        $unencryptedArea = $usernameField.data('unencryptedArea');
-    }
-
-    if (! $unencryptedArea) {
-        return;
-    }
-    $unencryptedArea.data('usernames', usernames);
-    requestCanEncryptFor($unencryptedArea, usernames);
 }
