@@ -123,7 +123,7 @@ $(document).ready(function()
                 if (error == '') {
                     // post successful login
                     // .. try to pull private key from server
-                    var encrypted_private_key = getEncryptedPrivateKey();
+                    var encrypted_private_key = getPriKeyFromServer();
                     // .. if no private key found, generate keys and redirect to initialize
                     if (encrypted_private_key == null) {
                         debugger;
@@ -131,7 +131,7 @@ $(document).ready(function()
                     }
                     // else a private key was found, so write it to local storage, and redirect to gmail
                     else {
-                        savePrivateKey(encrypted_private_key);
+                        recoverPriKey(encrypted_private_key);
                         redirectToGmail();
                     }
                 }
@@ -162,12 +162,28 @@ function redirectToGmail() {
     window.location.replace("http://mail.google.com");
 }
 
-function getEncryptedPrivateKey() {
-    return null;
+function recoverPriKey(encrypted_pri_key, password) {
+    sendMessage({
+        "action" : "recoverPriKey",
+        "encrypted_pri_key": encrypted_pri_key,
+        "password" : password
+    }, function(response) {
+        alert("private key stored and decrypted");
+        var res = $.parseJSON(response).res;
+        // TODO: something if didn't work
+        // if it didn't work, registrations really fucked
+    });
 }
 
-function savePrivateKey(encrypted_private_key) {
-    alert("to do");
+function getPriKeyFromServer() {
+  sendMessage({
+        "action" : "getPriKeyFromServer"
+    }, function(response) {
+        alert("private key stored and decrypted");
+      // TODO: something if didn't work
+        var res = $.parseJSON(response).res;
+        return res.encrypted_pri_key;
+    });
 }
 
 function getCookie(name) {
