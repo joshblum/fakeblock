@@ -19,11 +19,14 @@ function decrypt(fakeblock) {
     for (var i = 0; i < e_sentinals.length; i++) {
         if (cryptico.decrypt(e_sentinals[i], priv_key).plaintext === SENTINAL) {
             var shared_secret = cryptico.decrypt(e_shared_secrets[i], priv_key).plaintext;
-            var decrypted = CryptoJS.AES.decrypt(Base64.decode(fakeblock.cipher_text), shared_secret);
-            var to_return = decrypted.toString(CryptoJS.enc.Utf8);
-            return to_return;
+            var decrypted = decryptAES(Base64.decode(fakeblock.cipher_text), shared_secret);
+            return decrypted;
         }
     }
     return null;
 }
 
+function decryptAES(cipher_text, secret) {
+    var decrypted = CryptoJS.AES.decrypt(cipher_text, secret);
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}

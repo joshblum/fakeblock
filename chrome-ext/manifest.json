@@ -21,8 +21,6 @@
             "matches": [
                 "http://127.0.0.1:8000/*",
                 "https://mail.google.com/*",
-                "https://*.facebook.com/*",
-                "http://*.reddit.com/*",
                 "http://fakeblock.herokuapp.com/*",
                 "http://*.getparseltongue.com/*",
                 "http://*.parseltongueextension.com/*",
