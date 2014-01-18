@@ -44,7 +44,7 @@ function old_encrypt(plaintext, encrypt_for, which_network) {
         return plaintext
     }
 
-    var cipher_text = Base64.encode(CryptoJS.AES.encrypt(plaintext, shared_secret).toString());
+    var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
 
     var res = {
         "users" : users,
@@ -117,3 +117,6 @@ function genEncryptedMeta(pub_keys, shared_secret) {
     }
 }
 
+function encryptAES(plaintext, secret) {
+    return CryptoJS.AES.encrypt(plaintext, secret).toString()
+}
