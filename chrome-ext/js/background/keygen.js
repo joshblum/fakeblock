@@ -1,4 +1,4 @@
-//lib for creating a shared secret and RSA pub/priv keys
+//lib for creating a shared secret and RSA pub/pri keys
 // The length of the RSA key, in bits.
 var bitlength = 1024;
 
@@ -29,17 +29,17 @@ function genKeys() {
 
 //convert json_parsed_key into an RSA object
 //returns deserlized RSA obj
-function deserializePrivKey(json_parsed_key) {
-    var priv_key = new RSAKey();
+function deserializePriKey(json_parsed_key) {
+    var pri_key = new RSAKey();
     for (k1 in json_parsed_key) {
         var nbi = new BigInteger();
         var val = json_parsed_key[k1];
         for (k2 in val) {
             nbi[k2] = val[k2];
         }
-        priv_key[k1] = nbi;
+        pri_key[k1] = nbi;
     }
-    return priv_key
+    return pri_key
 }
 
 // creates a pub key and a pri key for user, and encrypts the pri key
@@ -93,9 +93,9 @@ function uploadUserData() {
             "username": username,
             "pri_key": pri_key
         };
-        writeLocalStorage(user_meta);
+        writeLocalStorage("user_meta", user_meta);
         registration_data["completed"] = true;
-        writeLocalStorage(registration_data);
+        writeLocalStorage("registration", registration_data);
     }
 }
 

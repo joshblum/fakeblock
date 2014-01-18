@@ -1,29 +1,26 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-//    debugger;
+   debugger;
 
-//    decryptFakeblocks();
+   decryptFakeblocks();
 
-    // ***** automatically try to decrypt DOM whenever it changes *****************************************************
-//    var intervalID = setInterval(function(){
-//        decryptFakeblocks();
-//    }, 500);
+    /***** automatically try to decrypt DOM whenever it changes *****************************************************/
+   var intervalID = setInterval(function(){
+       decryptFakeblocks();
+   }, 500);
 
 });
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
-// selects all divs that contain text with fakeblock.. and do not have any children
+//get immediate parents of a fakeblock
 function getDivsContainingFakeBlock() {
-//    var divs = $("p:contains('|fakeblock|'):not(:has(*))").not("script");
-    var divs = $("p, span").not(":has(*)").filter(":contains('|fakeblock|')");
-//    var divs = $("p:contains('|fakeblock|')");
-    // filter out divs which are being encrypted
-    $.each(do_encrypt_selectors, function() {
-        divs = divs.not($(this));
+    return $('div:contains("<fakeblock>")').filter(function(i, elm) {
+        return $(elm).filter(':contains("</fakeblock>")').length > 0 && 
+            $(elm).children(':contains("<fakeblock>")').length == 0 &&
+            ! $(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS);
     });
-    return divs;
 }
 
 // returns array of match objects,
@@ -32,7 +29,7 @@ function getDivsContainingFakeBlock() {
 // returns empty array if there were no matches
 function getFakeBlocksFromText(text) {
     var to_return = [];
-    var myRe = new RegExp("\\|fakeblock\\|(.*)\\|endfakeblock\\|", "g");
+    var myRe = new RegExp("<fakeblock>(.*)</fakeblock>", "g");
     var result = myRe.exec(text);
     while (result!=null) {
         to_return.push(result);
@@ -89,13 +86,12 @@ function decryptFakeblocks() {
 
 // backend decrypts fakeblock unparsed_json into decrypted_text
 function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace, json) {
-    console.log("sent");
     sendMessage({
         "action" : "decrypt",
         "json" : json
     }, function(response) {
         var decrypted_text = $.parseJSON(response).res;
-        if (decrypted_text != "") {
+        if (decrypted_text != null) {
             $.each(ps_containing_fakeblocks, function(i,e) {
                 var all_html = $(this).text();
                 var new_html = all_html.replace(to_replace, decrypted_text);

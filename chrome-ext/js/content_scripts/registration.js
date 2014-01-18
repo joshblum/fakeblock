@@ -14,6 +14,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
         }
         return cookieValue;
     }
+
     function sameOrigin(url) {
         // url could be relative or scheme relative or absolute
         var host = document.location.host; // host + port
@@ -23,9 +24,10 @@ $(document).ajaxSend(function(event, xhr, settings) {
         // Allow absolute or scheme relative URLs to same origin
         return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
             (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-            // or any other URL that isn't scheme relative or absolute i.e relative.
-            !(/^(\/\/|http:|https:).*/.test(url));
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
     }
+
     function safeMethod(method) {
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
@@ -36,8 +38,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 });
 
 
-$(document).ready(function()
-{
+$(document).ready(function() {
     // debugger;
     if (onThisPage("/register/")) {
         $(".register_button").click(function(e) {
@@ -47,7 +48,7 @@ $(document).ready(function()
             var loading_gif = $(".loading-gif");
             error_div.hide();
             loading_gif.fadeIn();
-            setTimeout(function(){
+            setTimeout(function() {
                 var password_input1 = $(".register_password1");
                 var password_input2 = $(".register_password2");
                 var password1 = password_input1.val();
@@ -55,9 +56,9 @@ $(document).ready(function()
                 var email_input = $(".register_email");
                 var email_val = email_input.val();
                 var post_data = {
-                    "email":email_val,
-                    "password1":password1,
-                    "password2":password2
+                    "email": email_val,
+                    "password1": password1,
+                    "password2": password2
                 };
                 $.post("/register/", post_data, function(data) {
                     loading_gif.hide();
@@ -71,31 +72,27 @@ $(document).ready(function()
                         // upload public key
                         // upload encrypted version of private key
                         // redirect to gmail
-                    }
-                    else {
+                    } else {
                         error_div.show();
                         error_div.html(error);
                     }
                 });
-            },200);
+            }, 200);
         });
-    }
-    else if (onThisPage("/initializing/")) {
+    } else if (onThisPage("/initializing/")) {
         // check if there is a non-completed registration info in
         // local storage, and if there is, upload all the info to
         // the server
         sendMessage({
-            "action" : "upload_user_data"
+            "action": "upload_user_data"
         }, function(response) {
-            alert("user data uploaded!");
             // TODO: something about checking if data upload worked
             // if it failed as opposed to just, already had been done
             // we have a problem
             var res = $.parseJSON(response).res;
             window.location.replace("http://mail.google.com");
         });
-    }
-    else if (onThisPage("/login/")) {
+    } else if (onThisPage("/login/")) {
         // login button functionality
         $(".login_button").click(function(e) {
             e.preventDefault();
@@ -108,8 +105,8 @@ $(document).ready(function()
             var login_email_input = $(".login_email");
             var email_val = login_email_input.val();
             var post_data = {
-                "email":email_val,
-                "password":password
+                "email": email_val,
+                "password": password
             };
             $.post("/login/", post_data, function(data) {
                 loading_gif.hide();
@@ -118,8 +115,7 @@ $(document).ready(function()
                 if (error == '') {
                     // post successful login, try to pull private key, or initialize keys
                     getPriKeyFromServerOrInitializeUser(email_val, password);
-                }
-                else {
+                } else {
                     error_div.show();
                     error_div.html(error);
                 }
@@ -140,11 +136,10 @@ $(document).ready(function()
 
 function initializeUser(email, password, redirect_url) {
     sendMessage({
-        "action" : "user_initialize",
+        "action": "user_initialize",
         "username": email,
-        "password" : password
+        "password": password
     }, function(response) {
-        alert("user initialized!");
         window.location.href = redirect_url;
         var res = $.parseJSON(response).res;
         // TODO: something about checking if user_initialize worked
@@ -156,11 +151,12 @@ function redirectToGmail() {
     window.location.replace("http://mail.google.com");
 }
 
-function recoverPriKey(encrypted_pri_key, password) {
+function refreshLocalStorage(username, password, encrypted_pri_key) {
     sendMessage({
-        "action" : "recoverPriKey",
+        "action": "refreshLocalStorage",
+        "username": username,
+        "password": password,
         "encrypted_pri_key": encrypted_pri_key,
-        "password" : password
     }, function(response) {
         var res = $.parseJSON(response).res;
         // TODO: something if didn't work
@@ -169,18 +165,18 @@ function recoverPriKey(encrypted_pri_key, password) {
 }
 
 function getPriKeyFromServerOrInitializeUser(username, password) {
-  sendMessage({
-        "action" : "getPriKeyFromServer"
+    sendMessage({
+        "action": "getPriKeyFromServer"
     }, function(response) {
-      // TODO: something if didn't work
+        // TODO: something if didn't work
         var encrypted_private_key = $.parseJSON(response).res;
-         // .. if no private key found, generate keys and redirect to initialize
+        // .. if no private key found, generate keys and redirect to initialize
         if (encrypted_private_key == null) {
             initializeUser(username, password, "/initializing/");
         }
         // else a private key was found, so write it to local storage, and redirect to gmail
         else {
-            recoverPriKey(encrypted_private_key);
+            refreshLocalStorage(username, password, encrypted_private_key);
             redirectToGmail();
         }
     });

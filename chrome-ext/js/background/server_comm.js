@@ -95,7 +95,7 @@ function getPubKeysFromServer(username) {
     var cached_users = loadLocalStore('cached_users');
     var url = buildUrl(GET_PUBKEYS);
     var pub_keys;
-    return $.ajax({
+    $.ajax({
         type: "POST",
         url: url,
         data: {
@@ -107,12 +107,20 @@ function getPubKeysFromServer(username) {
             writeLocalStorage("cached_users", cached_users);
         },
         async: false
-    }).responseText.pub_keys;
+    })
+    return pub_keys;
+}
+
+function refreshLocalStorage(username, password, encrypted_pri_key) {
+    // debugger
+    writeLocalStorage("user_meta", {
+        'username': username,
+        'pri_key': recoverPriKey(encrypted_pri_key, password),
+    });
 }
 
 function recoverPriKey(encrypted_pri_key, password) {
-    var pri_key = decryptAES(encrypted_pri_key, password);
-    return deserializePrivKey(JSON.parse(pri_key));
+    return JSON.parse(decryptAES(encrypted_pri_key, password));
 }
 
 function getPriKeyFromServer() {
