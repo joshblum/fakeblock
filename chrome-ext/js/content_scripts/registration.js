@@ -112,7 +112,6 @@ $(document).ready(function()
                 "password":password
             };
             $.post("/login/", post_data, function(data) {
-                debugger;
                 loading_gif.hide();
                 var error = data['error'];
                 var message = data['message'];
@@ -124,6 +123,16 @@ $(document).ready(function()
                     error_div.show();
                     error_div.html(error);
                 }
+            });
+        });
+    }
+    if (onAnyParselTonguePage()) {
+        $(".parseltongue_logout").click(function(e) {
+            e.preventDefault();
+            sendMessage({
+                "action" : "parseltongueLogout"
+            }, function(response) {
+                window.location.href = "/logout/";
             });
         });
     }
@@ -153,7 +162,6 @@ function recoverPriKey(encrypted_pri_key, password) {
         "encrypted_pri_key": encrypted_pri_key,
         "password" : password
     }, function(response) {
-        alert("private key stored and decrypted");
         var res = $.parseJSON(response).res;
         // TODO: something if didn't work
         // if it didn't work, registrations really fucked
@@ -194,8 +202,21 @@ function getCookie(name) {
     return cookieValue;
 }
 
+var PT_DOMAINS = ["www.parseltongueextension.com", "127.0.0.1"];
 // TODO: make this better.. check domain too
 function onThisPage(page) {
     var current_url = window.location.pathname;
     return (current_url == page);
+}
+
+function onAnyParselTonguePage() {
+    var to_return = false;
+    $.each(PT_DOMAINS, function() {
+        var d = document.domain;
+        var t = this.valueOf();
+        if (d === t) {
+            to_return = true;
+        }
+    });
+    return to_return;
 }

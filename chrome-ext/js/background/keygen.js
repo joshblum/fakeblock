@@ -98,3 +98,8 @@ function uploadUserData() {
         writeLocalStorage(registration_data);
     }
 }
+
+// logout, clears localstorage !!!
+function parseltongueLogout() {
+   localStorage.clear();
+}

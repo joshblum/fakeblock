@@ -78,7 +78,8 @@ function executeMessage(request, sender, sendResponse) {
         "user_initialize": [userInitialize, msg.username, msg.password],
         "upload_user_data": [uploadUserData],
         "getPriKeyFromServer": [getPriKeyFromServer],
-        "recoverPriKey": [recoverPriKey, msg.encrypted_pri_key, msg.password]
+        "recoverPriKey": [recoverPriKey, msg.encrypted_pri_key, msg.password],
+        "parseltongueLogout": [parseltongueLogout]
     };
 
     if (action in ACTION_MAP) {
