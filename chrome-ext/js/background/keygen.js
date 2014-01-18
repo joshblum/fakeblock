@@ -55,7 +55,7 @@ function userInitialize(username, password) {
         "pub_key": key_pair.pub_key,
         "encrypted_pri_key": encrypted_pri_key,
         "username": username,
-        "completed": false,
+        "completed": false
     };
     writeLocalStorage("registration", registration);
     return registration;
@@ -70,7 +70,6 @@ function encryptPriKey(pri_key, password) {
 // if there is non-completed user data in registration in local storage,
 // then it uploads this data to the server, and sets registration to completed
 function uploadUserData() {
-    debugger;
     var registration_data = loadLocalStore("registration");
     if (!("completed" in registration_data)) {
         // they have accessed an initialize page from a different computer, or cleared local storage

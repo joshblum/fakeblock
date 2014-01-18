@@ -2,13 +2,14 @@
 //or an empty string if decryption fails.
 function decrypt(fakeblock) {
     var user_meta = loadLocalStore('user_meta');
-    if (!Object.size(user_meta)) {
-        return ""
+    if (!Object.size(user_meta)){
+        //maybe should use null instead of ""
+        return null;
     }
 
     var encrypted_data = fakeblock.users[user_meta.username];
     if (encrypted_data === undefined) {
-        return ""
+        return null;
     }
 
     var e_sentinals = encrypted_data.e_sentinals;
@@ -22,7 +23,7 @@ function decrypt(fakeblock) {
             return Base64.decode(decrypted);
         }
     }
-    return ""
+    return null;
 }
 
 function decryptAES(cipher_text, secret) {

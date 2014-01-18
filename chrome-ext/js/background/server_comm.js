@@ -139,7 +139,6 @@ function getPriKeyFromServer() {
 
 
 function uploadPubKey(username, pub_key) {
-    debugger;
     var url = buildUrl(PUB_UPLOAD);
     $.ajax({
         type: "POST",

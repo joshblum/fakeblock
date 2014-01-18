@@ -1,5 +1,4 @@
 function sendMessage(dict, callback) {
-    debugger;
     var csrf_token = getCookie('csrftoken');
     dict["csrf_token"] = csrf_token;
     chrome.runtime.sendMessage(JSON.stringify(dict), callback);
