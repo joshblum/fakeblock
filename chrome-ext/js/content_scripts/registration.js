@@ -1,5 +1,4 @@
-$(document).ready(function()
-{
+$(document).ready(function() {
     debugger;
     if (onThisPage("/register/")) {
         $(".register_button").click(function(e) {
@@ -10,9 +9,9 @@ $(document).ready(function()
             var password = password_input1.val();
             debugger;
             sendMessage({
-                "action" : "user_initialize",
+                "action": "user_initialize",
                 "username": email_val,
-                "password" : password
+                "password": password
             }, function(response) {
                 alert("user initialized!");
                 var res = $.parseJSON(response).res;
@@ -20,22 +19,21 @@ $(document).ready(function()
                 // if it didn't work, registrations really fucked
             });
         });
-    }
-    else if (onThisPage("/initializing/")) {
-            // check if there is a non-completed registration info in
-            // local storage, and if there is, upload all the info to
-            // the server
-            debugger;
-            sendMessage({
-                "action" : "upload_user_data"
-            }, function(response) {
-                alert("user data uploaded!");
-                // TODO: something about checking if data upload worked
-                // if it failed as opposed to just, already had been done
-                // we have a problem
-                var res = $.parseJSON(response).res;
-                window.location.replace("http://mail.google.com");
-            });
+    } else if (onThisPage("/initializing/")) {
+        // check if there is a non-completed registration info in
+        // local storage, and if there is, upload all the info to
+        // the server
+        debugger;
+        sendMessage({
+            "action": "upload_user_data"
+        }, function(response) {
+            alert("user data uploaded!");
+            // TODO: something about checking if data upload worked
+            // if it failed as opposed to just, already had been done
+            // we have a problem
+            var res = $.parseJSON(response).res;
+            window.location.replace("http://mail.google.com");
+        });
     }
 });
 
