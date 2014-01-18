@@ -38,7 +38,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 
 $(document).ready(function()
 {
-    debugger;
+    // debugger;
     if (onThisPage("/register/")) {
 
         $(".register_button").click(function(e) {
@@ -99,6 +99,7 @@ $(document).ready(function()
     }
     else if (onThisPage("/login/")) {
         // login button functionality
+        debugger
         $(".login_button").click(function(e) {
             e.preventDefault();
             var error_div = $(".login_error");
@@ -113,7 +114,9 @@ $(document).ready(function()
                 "email":email_val,
                 "password":password
             };
+            debugger
             $.post("/login/", post_data, function(data) {
+                debugger;
                 loading_gif.hide();
                 var error = data['error'];
                 var message = data['message'];
