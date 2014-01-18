@@ -17,7 +17,7 @@
 //user_meta ::= 
 // {
 //  "pub_key" : "",
-//  "priv_key" : "",
+//  "pri_key" : "",
 //  "username" : "",
 //  "encrypt_for" : "",
 //  "auth_token" : "",
@@ -72,13 +72,13 @@ function executeMessage(request, sender, sendResponse) {
     var msg = JSON.parse(request);
     var action = msg.action;
     var ACTION_MAP = {
-        "encrypt": [encrypt, msg.message, msg.usernames, msg.which_network],
-        "can_encrypt_for": [canEncryptFor, msg.usernames, msg.which_network],
+        "encrypt": [encrypt, msg.message, msg.usernames],
+        "can_encrypt_for": [canEncryptFor, msg.usernames],
         "decrypt": [decrypt, msg.json],
         "user_initialize": [userInitialize, msg.username, msg.password],
         "upload_user_data": [uploadUserData],
         "getPriKeyFromServer": [getPriKeyFromServer],
-        "recoverPriKey": [msg.encrypted_pri_key, msg.password],
+        "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
         // below are old
         //        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, msg.will_encrypt, sendResponse],
         //        "encrypt_for" : [encryptFor, msg.usernames],

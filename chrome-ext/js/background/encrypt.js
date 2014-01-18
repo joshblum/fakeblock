@@ -7,11 +7,11 @@
 //where to find pub_keys
 //output ::= fakeblock_obj
 //fakeblock_obj ::= def in common.js
-function old_encrypt(plaintext, encrypt_for, which_network) {
-    // console.log(arguments);
+function _encrypt(plaintext, encrypt_for) {
     var sender_meta = loadLocalStore('user_meta');
+
     //we can't encrypt
-    if (sender_meta === {} || (encrypt_for === [])) {
+    if (!Object.size(sender_meta) || (encrypt_for === [])) {
         return plaintext
     }
 
@@ -22,12 +22,13 @@ function old_encrypt(plaintext, encrypt_for, which_network) {
     var cached_users = loadLocalStore('cached_users'); // these are guys we don't have to go to the server for
     var shared_secret = randString();
     var users = {};
-    $.each(encrypt_for, function(i, username) {
+    for (i in encrypt_for) {
+        var username = encrypt_for[i];
         var user_data = _getUserData(username, shared_secret, cached_users);
         if (Object.size(user_data)) { //user exists
             users[username] = user_data
         }
-    });
+    }
     // TODO: explain to me where user_data gets used?
 
     // NO MORE DEFAULTS
@@ -40,7 +41,7 @@ function old_encrypt(plaintext, encrypt_for, which_network) {
     //        });
     //    }
 
-    if (users <= 1) { //only found own data
+    if (!Object.size(users) <= 1) { //only found own data
         return plaintext
     }
 
@@ -50,7 +51,6 @@ function old_encrypt(plaintext, encrypt_for, which_network) {
         "users": users,
         "cipher_text": cipher_text
     };
-    // console.log(res)
     return res
 }
 
@@ -79,25 +79,25 @@ function canEncryptFor(usernames, which_network) {
 //if the user does not exist returns undefined, {}
 function _getUserData(username, shared_secret, cached_users) {
     // check cache first
-    var user_data;
+    // debugger
+    var pub_keys;
     if (username in cached_users) {
-        user_data = cached_users[username];
+        pub_keys = cached_users[username];
     } else {
-        user_data = getPubKeysFromServer(username);
+        pub_keys = getPubKeysFromServer(username);
     }
 
-    if (user_data == null) {
+    if (pub_keys == null) {
         return {};
     }
+    if (!pub_keys.length) return {};
 
-    if (!user_data.pub_keys.length) return {};
-
-    return genEncryptedMeta(user_data.pub_keys, shared_secret)
+    return genEncryptedMeta(pub_keys, shared_secret)
 }
 
 //encrypts the shared secret and sentinal for each
 //public key provided in the user_data dict
-//returns a dictioary:
+//returns a dictionary:
 // {
 //         e_shared_secrets : [,,,],
 //         e_sentinals : [,,,],

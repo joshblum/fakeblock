@@ -9,6 +9,5 @@ function messageListener() {
 }
 
 $(document).ready(function() {
-    console.log("check it??");
     messageListener();
 });

@@ -131,7 +131,7 @@ $(document).ready(function()
                     }
                     // else a private key was found, so write it to local storage, and redirect to gmail
                     else {
-                        recoverPriKey(encrypted_private_key);
+                        refreshLocalStorage(username, password, encrypted_private_key);
                         redirectToGmail();
                     }
                 }
@@ -162,11 +162,12 @@ function redirectToGmail() {
     window.location.replace("http://mail.google.com");
 }
 
-function recoverPriKey(encrypted_pri_key, password) {
+function refreshLocalStorage(username, password, encrypted_pri_key) {
     sendMessage({
-        "action" : "recoverPriKey",
+        "action" : "refreshLocalStorage",
+        "username" : username,
+        "password" : password,
         "encrypted_pri_key": encrypted_pri_key,
-        "password" : password
     }, function(response) {
         alert("private key stored and decrypted");
         var res = $.parseJSON(response).res;
