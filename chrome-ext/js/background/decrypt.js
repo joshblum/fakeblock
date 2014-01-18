@@ -3,7 +3,7 @@
 function decrypt(fakeblock) {
     console.log(fakeblock.users);
     var user_meta = loadLocalStore('user_meta');
-    if (!Object.size(user_meta)){
+    if (!Object.size(user_meta)) {
         return ""
     }
 
@@ -26,7 +26,6 @@ function decrypt(fakeblock) {
 }
 
 function decryptAES(cipher_text, secret) {
-    var decrypted =  CryptoJS.AES.decrypt(cipher_text, secret);
+    var decrypted = CryptoJS.AES.decrypt(cipher_text, secret);
     return decrypted.toString(CryptoJS.enc.Utf8);
 }
-
