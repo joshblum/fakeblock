@@ -110,9 +110,8 @@ function getPubKeysFromServer(username) {
     }).responseText.pub_keys;
 }
 
-function recoverPrivKey() {
-    var password = 'test'; //TODO call get function to get password 
-    var pri_key = decryptAES(getPriKeyFromServer(), password);
+function recoverPriKey(encrypted_pri_key, password) {
+    var pri_key = decryptAES(encrypted_pri_key, password);
     return deserializePrivKey(JSON.parse(pri_key));
 }
 
