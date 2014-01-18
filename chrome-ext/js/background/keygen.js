@@ -72,9 +72,10 @@ function uploadUserData() {
     debugger;
     var registration_data = loadLocalStore("registration");
     if (!("completed" in registration_data)) {
-        // TODO: we have a problem, we don't have registration_data
+        // they have accessed an initialize page from a different computer, or cleared local storage
         // therefore we do not have their password
         // prompt them to login
+        window.location.href = "/login/";
         return
     }
     else if (registration_data["completed"]) {
