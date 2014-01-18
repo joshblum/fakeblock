@@ -3,11 +3,12 @@
 var PUB_UPLOAD = "/upload_pubkey/";
 var PRI_UPLOAD = "/upload_prikey/";
 var GET_PUBKEYS = "/get_pubkeys/";
+var GET_PRI_KEY = "/get_prikey/";
 var CONNECT = "/connect_with_facebook/";
 
 //creates user_meta storage if it does not exist
 //and posts the pub_key to server
-function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
+function login(fb_id, fb_handle, auth_token, will_encrypt, callback) {
     var user_meta = loadLocalStore('user_meta');
     var username = (fb_handle) ? fb_handle : fb_id;
     var create_new = (!Object.size(user_meta));
@@ -37,19 +38,18 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
 
 
 
-
 //post the user's public key to the server
 //returns a bool of success
 function _postPubKey(pub_key, callback) {
     var url = buildUrl(PUB_UPLOAD, {
-        'key' : encodeURIComponent(pub_key)
+        'key': encodeURIComponent(pub_key)
     });
-    $.get(url, function(){
+    $.get(url, function() {
         callback(true); //success
     }).fail(function() {
-            console.log("Pubkey upload error.");
-            callback(false); //failure
-        });
+        console.log("Pubkey upload error.");
+        callback(false); //failure
+    });
 }
 
 //calls the server to request user list
@@ -95,19 +95,41 @@ function getPubKeysFromServer(username) {
     var cached_users = loadLocalStore('cached_users');
     var url = buildUrl(GET_PUBKEYS);
     var pub_keys;
-    $.ajax({
+    return $.ajax({
         type: "POST",
         url: url,
-        data: {"email":username},
-        success: function(returned) {
-        pub_keys = returned.pub_keys;
-        cached_users[username] = pub_keys;
-        writeLocalStorage("cached_users", cached_users);
+        data: {
+            "email": username
+        },
+        success: function(res) {
+            pub_keys = res.pub_keys;
+            cached_users[username] = pub_keys;
+            writeLocalStorage("cached_users", cached_users);
+        },
+        async: false
+    }).responseText.pub_keys;
+}
+
+function recoverPrivKey() {
+    var password = 'test'; //TODO call get function to get password 
+    var pri_key = decryptAES(getPriKeyFromServer(), password);
+    return deserializePrivKey(JSON.parse(pri_key));
+}
+
+function getPriKeyFromServer() {
+    var url = buildUrl(GET_PRI_KEY);
+    var pri_key;
+    $.ajax({
+        type: "GET",
+        url: url,
+        success: function(res) {
+            pri_key = res.pri_key;
         },
         async: false
     });
-    return pub_keys;
+    return pri_key
 }
+
 
 function uploadPubKey(username, pub_key) {
     debugger;
@@ -115,12 +137,15 @@ function uploadPubKey(username, pub_key) {
     $.ajax({
         type: "POST",
         url: url,
-        data: {"username":username, "pub_key":pub_key},
-//        data:
-//        {
-//            "username":"username",
-//            "pub_key":"pub_key"
-//        },
+        data: {
+            "username": username,
+            "pub_key": pub_key
+        },
+        //        data:
+        //        {
+        //            "username":"username",
+        //            "pub_key":"pub_key"
+        //        },
         success: function(returned) {
             return true;
         },
@@ -137,8 +162,10 @@ function uploadPriKey(username, pri_key) {
     $.ajax({
         type: "POST",
         url: url,
-        data: {"username":username,
-            "pri_key":pri_key},
+        data: {
+            "username": username,
+            "pri_key": pri_key
+        },
         success: function(returned) {
             return true;
         },
