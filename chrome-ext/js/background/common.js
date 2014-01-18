@@ -76,7 +76,9 @@ function executeMessage(request, sender, sendResponse) {
         "can_encrypt_for": [canEncryptFor, msg.usernames, msg.which_network],
         "decrypt": [decrypt, msg.json],
         "user_initialize": [userInitialize, msg.username, msg.password],
-        "upload_user_data": [uploadUserData]
+        "upload_user_data": [uploadUserData],
+        "getPriKeyFromServer": [getPriKeyFromServer],
+        "recoverPriKey": [msg.encrypted_pri_key, msg.password],
         // below are old
         //        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, msg.will_encrypt, sendResponse],
         //        "encrypt_for" : [encryptFor, msg.usernames],
