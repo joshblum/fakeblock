@@ -1,19 +1,14 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-    debugger;
-    if (['facebook.com', 'mail.google.com'].indexOf(document.domain) == -1){
-        alert("parseltongue not activated on this domain.");
-        return
-    }
+//    debugger;
 
-    alert("parseltongue active!");
-    decryptFakeblocks();
+//    decryptFakeblocks();
 
     // ***** automatically try to decrypt DOM whenever it changes *****************************************************
-    var intervalID = setInterval(function(){
-        decryptFakeblocks();
-    }, 500);
+//    var intervalID = setInterval(function(){
+//        decryptFakeblocks();
+//    }, 500);
 
 });
 

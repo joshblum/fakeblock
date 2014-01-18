@@ -11,36 +11,34 @@ function old_encrypt(plaintext, encrypt_for, which_network) {
     // console.log(arguments);
     var sender_meta = loadLocalStore('user_meta');
     //we can't encrypt
-    if (sender_meta === {} || (encrypt_for === [] && sender_meta.encrypt_for === []) || !sender_meta.will_encrypt) {
+    if (sender_meta === {} || (encrypt_for === [])) {
         return plaintext
-    }
-
-    //default to stored username
-    if (encrypt_for === []){
-        encrypt_for = sender_meta.encrypt_for;
     }
 
     //add self
     encrypt_for.push(sender_meta.username);
 
-    var user_map = loadLocalStore('user_map');
+    // get user data (pub_keys), for all users in encrypt_for... we will store this in the dictionary users
+    var cached_users = loadLocalStore('cached_users'); // these are guys we don't have to go to the server for
     var shared_secret = randString();
     var users = {};
     $.each(encrypt_for, function(i, username){
-        var user_data = _getUserData(username, shared_secret,user_map);
+        var user_data = _getUserData(username, shared_secret,cached_users);
         if (Object.size(user_data)) { //user exists
             users[username] = user_data
         }
     });
+    // TODO: explain to me where user_data gets used?
 
-    if (users <= 1) { //try defaults
-        $.each(sender_meta.encrypt_for, function(i, username){
-            var user_data = _getUserData(username, shared_secret,user_map);
-            if (Object.size(user_data)) { //user exists
-                users[username] = user_data
-            }
-        });
-    }
+    // NO MORE DEFAULTS
+//    if (users <= 1) { //try defaults
+//        $.each(sender_meta.encrypt_for, function(i, username){
+//            var user_data = _getUserData(username, shared_secret,user_map);
+//            if (Object.size(user_data)) { //user exists
+//                users[username] = user_data
+//            }
+//        });
+//    }
 
     if (users <= 1) { //only found own data
         return plaintext
@@ -51,7 +49,7 @@ function old_encrypt(plaintext, encrypt_for, which_network) {
     var res = {
         "users" : users,
         "cipher_text" : cipher_text
-    }
+    };
     // console.log(res)
     return res
 }
@@ -76,13 +74,24 @@ function canEncryptFor(usernames, which_network) {
 
 //returns the shared secret and 
 //dict of encrypted sentinals/shared_secrets
+//this dict has a list of sentinals, and a corresponding list of encrypted shared secrets
 //for the given user
 //if the user does not exist returns undefined, {}
-function _getUserData(username, shared_secret, user_map) {
-    if (!(username in user_map)) return {}
+function _getUserData(username, shared_secret, cached_users) {
+    // check cache first
+    var user_data;
+    if (username in cached_users) {
+        user_data = cached_users[username];
+    }
+    else {
+        user_data = getPubKeysFromServer(username);
+    }
+
+    if (user_data == null) {
+        return {};
+    }
         
-    var user_data = user_map[username];
-    if (!user_data.pub_keys.length) return {}
+    if (!user_data.pub_keys.length) return {};
 
     return genEncryptedMeta(user_data.pub_keys, shared_secret)
 }
@@ -107,3 +116,4 @@ function genEncryptedMeta(pub_keys, shared_secret) {
         "e_shared_secrets" : e_shared_secrets
     }
 }
+

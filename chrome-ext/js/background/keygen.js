@@ -19,10 +19,10 @@ function randString(length) {
 //generates and returns a public/private key pair
 //for a user
 function genKeys() { 
-    var priv_key = cryptico.generateRSAKey(randString(), bitlength);
-    var pub_key = cryptico.publicKeyString(priv_key);
+    var pri_key = cryptico.generateRSAKey(randString(), bitlength);
+    var pub_key = cryptico.publicKeyString(pri_key);
     return {
-        "priv_key" : priv_key,
+        "pri_key" : pri_key,
         "pub_key" :  pub_key,
     }
 }
@@ -40,4 +40,62 @@ function deserializePrivKey(json_parsed_key) {
         priv_key[k1] = nbi;
     }
     return priv_key
+}
+
+// creates a pub key and a pri key for user, and encrypts the pri key
+// with the inputted password
+// and then stores all 3 to local storage
+// registration stores pub/pri/encrypted_pri_key which have not been uploaded yet
+function userInitialize(username, password) {
+    var key_pair = genKeys();
+    var encrypted_pri_key = encryptPriKey(key_pair.pri_key, password);
+    var registration = {
+        "pri_key":key_pair.pri_key,
+        "pub_key":key_pair.pub_key,
+        "encrypted_pri_key":encrypted_pri_key,
+        "username":username,
+        "completed":false
+    };
+    writeLocalStorage("registration", registration);
+}
+
+// returns a password encrypted version of a private key
+function encryptPriKey(pri_key, password) {
+    // TODO: actually encrypt this ish
+    return "encryptedprikey";
+}
+
+
+// if there is non-completed user data in registration in local storage,
+// then it uploads this data to the server, and sets registration to completed
+function uploadUserData() {
+    debugger;
+    var registration_data = loadLocalStore("registration");
+    if (!("completed" in registration_data)) {
+        // TODO: we have a problem, we don't have registration_data
+        // therefore we do not have their password
+        // prompt them to login
+        return
+    }
+    else if (registration_data["completed"]) {
+        // TODO: we have a problem, they have already uploaded their shit,
+        // ... maybe not a problem, but would like to be warned
+        return
+    }
+    else {
+        var pri_key = registration_data["pri_key"]; // TODO stringify pri_key
+        var pub_key = registration_data["pub_key"];
+        var encrypted_pri_key = registration_data["encrypted_pri_key"];
+        var username = registration_data["username"];
+        var success = uploadPubKey(username, pub_key);
+        var success2 = uploadPriKey(username, encrypted_pri_key);
+        // TODO: check if both uploads were successful
+        var user_meta = {
+            "username":username,
+            "pri_key":pri_key
+        };
+        writeLocalStorage(user_meta);
+        registration_data["completed"] = true;
+        writeLocalStorage(registration_data);
+    }
 }

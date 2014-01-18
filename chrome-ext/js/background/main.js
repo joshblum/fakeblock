@@ -9,7 +9,6 @@ function messageListener() {
 }
 
 $(document).ready(function() {
-    //syncFriends();
     console.log("check it??");
     messageListener();
 });

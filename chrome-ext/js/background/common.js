@@ -43,10 +43,26 @@
 //     ...
 // }
 
+
+///////////////////////////// NEW localStorage datastructures
+//user_meta ::=
+// {
+// "pri_key": "",
+// "username": ""
+// }
+//
+// registration ::=
+//{
+//    "pub_key": "",
+//    "pri_key": "",
+//    "encrypted_pri_key": "",
+//    "completed": bool
+//}
+
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
-// var baseUrl = "http://127.0.0.1";
-var baseUrl = "http://fakeblock.herokuapp.com";
+var baseUrl = "http://127.0.0.1:8000";
+//var baseUrl = "http://fakeblock.herokuapp.com";
 var SENTINAL = "fakeblock";
 
 /*
@@ -58,14 +74,16 @@ function executeMessage(request, sender, sendResponse) {
     var ACTION_MAP = {
         "encrypt" : [encrypt, msg.message, msg.usernames, msg.which_network],
         "can_encrypt_for" : [canEncryptFor, msg.usernames, msg.which_network],
-        // below are old
         "decrypt" : [decrypt, msg.json],
-        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, msg.will_encrypt, sendResponse],
-        "encrypt_for" : [encryptFor, msg.usernames],
-        "get_friends" : [getSingleUsers],
-        "will_encrypt" : [setEncrypt, msg.will_encrypt, sendResponse],
-        "get_encrypt_for" : [getEncryptFor],
-        "get_will_encrypt" : [getWillEncrypt],
+        "user_initialize": [userInitialize, msg.username, msg.password],
+        "upload_user_data": [uploadUserData]
+        // below are old
+//        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, msg.will_encrypt, sendResponse],
+//        "encrypt_for" : [encryptFor, msg.usernames],
+//        "get_friends" : [getSingleUsers],
+//        "will_encrypt" : [setEncrypt, msg.will_encrypt, sendResponse],
+//        "get_encrypt_for" : [getEncryptFor],
+//        "get_will_encrypt" : [getWillEncrypt],
     };
 
     if (action in ACTION_MAP){
@@ -113,7 +131,7 @@ function loadLocalStore(key) {
     return JSON.parse(localString);
 }
 
-//writes to localStorage
+//writes to localStorage... value is a dictionary
 function writeLocalStorage(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
 }
@@ -128,9 +146,9 @@ function openLink(url) {
 //helper function to build a url
 //adds the auth_token to every request
 function buildUrl(path, getParam) {
-    getParam = getParam || {}
+    getParam = getParam || {};
     var user_meta = loadLocalStore('user_meta');
-    var url = baseUrl + path
+    var url = baseUrl + path;
     if (!Object.size(user_meta)){
         return url
     }

@@ -1,8 +1,8 @@
 //houses the login and syncFriends functions
 
 var PUB_UPLOAD = "/upload_pubkey/";
-var FRIENDS = "/friends/";
-var SET_ENCRYPT = "/set_encrypt/";
+var PRI_UPLOAD = "/upload_prikey/";
+var GET_PUBKEYS = "/get_pubkeys/";
 var CONNECT = "/connect_with_facebook/";
 
 //creates user_meta storage if it does not exist
@@ -18,7 +18,7 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
     user_meta.will_encrypt = will_encrypt;
     writeLocalStorage('user_meta', user_meta);
 
-    if (username === null || auth_token === null) return
+    if (username === null || auth_token === null) return;
     if (create_new) {
         console.log("creating new user");
         _createUserMeta(user_meta);
@@ -35,15 +35,8 @@ function login(fb_id, fb_handle, auth_token, will_encrypt, callback){
     }
 }
 
-//generates a pub/priv RSA key pair for a user
-//stores the user_meta to localStorage
-function _createUserMeta(user_meta) {
-    var key_pair = genKeys();
-    user_meta["encrypt_for"] = [];
-    user_meta["priv_key"] = key_pair.priv_key;
-    user_meta["pub_key"] = key_pair.pub_key;
-    writeLocalStorage("user_meta", user_meta);
-}
+
+
 
 //post the user's public key to the server
 //returns a bool of success
@@ -54,9 +47,9 @@ function _postPubKey(pub_key, callback) {
     $.get(url, function(){
         callback(true); //success
     }).fail(function() {
-        console.log("Pubkey upload error.");
-        callback(false); //failure
-    });
+            console.log("Pubkey upload error.");
+            callback(false); //failure
+        });
 }
 
 //calls the server to request user list
@@ -75,45 +68,103 @@ function _postPubKey(pub_key, callback) {
 //        ...
 //      }
 // }
-function syncFriends() {
-    var user_meta = loadLocalStore('user_meta');
-    if (!Object.size(user_meta)){
-        return
-    }
-    var url = buildUrl(FRIENDS)
-    $.get(url, function(friend_data){
-        var user_map = loadLocalStore("user_map");
-        var count = 0;
+//function syncFriends() {
+//    var user_meta = loadLocalStore('user_meta');
+//    if (!Object.size(user_meta)){
+//        return
+//    }
+//    var url = buildUrl(FRIENDS);
+//    $.get(url, function(friend_data){
+//        var user_map = loadLocalStore("user_map");
+//        var count = 0;
+//
+//        if (!Object.size(friend_data.friends)) return;
+//
+//        $.each(friend_data.friends, function(user_id, user_data){
+//            var username = (user_data.fb_handle) ? user_data.fb_handle : user_id;
+//            user_map[username] = user_data;
+//            count ++;
+//            if (count === Object.size(friend_data.friends)) {
+//                writeLocalStorage("user_map", user_map)
+//            }
+//        });
+//    });
+//}
 
-        if (!Object.size(friend_data.friends)) return
-        
-        $.each(friend_data.friends, function(user_id, user_data){
-            var username = (user_data.fb_handle) ? user_data.fb_handle : user_id;
-            user_map[username] = user_data;
-            count ++;
-            if (count === Object.size(friend_data.friends)) {
-                writeLocalStorage("user_map", user_map)
-            }
-        });
+function getPubKeysFromServer(username) {
+    var cached_users = loadLocalStore('cached_users');
+    var url = buildUrl(GET_PUBKEYS);
+    var pub_keys;
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: {"email":username},
+        success: function(returned) {
+        pub_keys = returned.pub_keys;
+        cached_users[username] = pub_keys;
+        writeLocalStorage("cached_users", cached_users);
+        },
+        async: false
+    });
+    return pub_keys;
+}
+
+function uploadPubKey(username, pub_key) {
+    debugger;
+    var url = buildUrl(PUB_UPLOAD);
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: {"username":username, "pub_key":pub_key},
+//        data:
+//        {
+//            "username":"username",
+//            "pub_key":"pub_key"
+//        },
+        success: function(returned) {
+            return true;
+        },
+        failure: function() {
+            return false;
+        },
+        async: false
+    });
+}
+
+function uploadPriKey(username, pri_key) {
+    debugger;
+    var url = buildUrl(PRI_UPLOAD);
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: {"username":username,
+            "pri_key":pri_key},
+        success: function(returned) {
+            return true;
+        },
+        failure: function() {
+            return false;
+        },
+        async: false
     });
 }
 
 //update whether a user will_encrypt or not
-function setEncrypt(will_encrypt, callback) {
-    console.log(will_encrypt)
-    var user_meta = loadLocalStore('user_meta');
-    if (!Object.size(user_meta)){
-        return
-    }
-    user_meta.will_encrypt = will_encrypt;
-    writeLocalStorage('user_meta', user_meta);
-    var url = buildUrl(SET_ENCRYPT, {
-        'will_encrypt' : will_encrypt,
-    });
-    $.get(url, function(){
-        callback(true); //success
-    }).fail(function() {
-        console.log("setEncrypt error.");
-        callback(false); //failure
-    });
-}
+//function setEncrypt(will_encrypt, callback) {
+//    console.log(will_encrypt);
+//    var user_meta = loadLocalStore('user_meta');
+//    if (!Object.size(user_meta)){
+//        return
+//    }
+//    user_meta.will_encrypt = will_encrypt;
+//    writeLocalStorage('user_meta', user_meta);
+//    var url = buildUrl(SET_ENCRYPT, {
+//        'will_encrypt' : will_encrypt,
+//    });
+//    $.get(url, function(){
+//        callback(true); //success
+//    }).fail(function() {
+//            console.log("setEncrypt error.");
+//            callback(false); //failure
+//        });
+//}
