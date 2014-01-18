@@ -1,12 +1,14 @@
-//handles encrypting a plaintext message and
-//returning the result
-//given a message and user_id or group_id to encrypt for
+/*
+    handles encrypting a plaintext message and
+    returning the result
+    given a message and user_id or group_id to encrypt for
 
-//input ::= plaintext, will_encrypt, encrypt_for
-//encrypt_for ::= [username, ..., ]
-//where to find pub_keys
-//output ::= fakeblock_obj
-//fakeblock_obj ::= def in common.js
+    input ::= plaintext, will_encrypt, encrypt_for
+    encrypt_for ::= [username, ..., ]
+    where to find pub_keys
+    output ::= fakeblock_obj
+    fakeblock_obj ::= def in common.js
+*/
 function _encrypt(plaintext, encrypt_for) {
     var sender_meta = loadLocalStore('user_meta');
 
@@ -18,8 +20,8 @@ function _encrypt(plaintext, encrypt_for) {
     //add self
     encrypt_for.push(sender_meta.username);
 
-    // get user data (pub_keys), for all users in encrypt_for... we will store this in the dictionary users
-    var cached_users = loadLocalStore('cached_users'); // these are guys we don't have to go to the server for
+    // these are guys we don't have to go to the server for
+    var cached_users = loadLocalStore('cached_users'); 
     var shared_secret = randString();
     var users = {};
     for (i in encrypt_for) {
@@ -29,17 +31,6 @@ function _encrypt(plaintext, encrypt_for) {
             users[username] = user_data
         }
     }
-    // TODO: explain to me where user_data gets used?
-
-    // NO MORE DEFAULTS
-    //    if (users <= 1) { //try defaults
-    //        $.each(sender_meta.encrypt_for, function(i, username){
-    //            var user_data = _getUserData(username, shared_secret,user_map);
-    //            if (Object.size(user_data)) { //user exists
-    //                users[username] = user_data
-    //            }
-    //        });
-    //    }
 
     if (!Object.size(users) <= 1) { //only found own data
         return plaintext
@@ -54,32 +45,34 @@ function _encrypt(plaintext, encrypt_for) {
     return res
 }
 
-function encrypt(plaintext, encrypt_for, which_network) {
+function encrypt(plaintext, encrypt_for) {
     var res = {
         "users": encrypt_for,
         "cipher_text": "&&& default cypher text for ya &&&"
     };
-    // console.log(res)
     return res
 }
 
-// returns boolean based on whether or not all usernames are parseltongue users
-function canEncryptFor(usernames, which_network) {
+/*
+ returns boolean based on whether or not all usernames are parseltongue users
+*/
+function canEncryptFor(usernames) {
+
     var res = {
         "can_encrypt": true
     };
-    // console.log(res)
     return res
 }
 
-//returns the shared secret and 
-//dict of encrypted sentinals/shared_secrets
-//this dict has a list of sentinals, and a corresponding list of encrypted shared secrets
-//for the given user
-//if the user does not exist returns undefined, {}
+/*
+    returns the shared secret and 
+    dict of encrypted sentinals/shared_secrets
+    this dict has a list of sentinals, and a corresponding list of encrypted shared secrets
+    for the given user
+    if the user does not exist returns undefined, {}
+*/
 function _getUserData(username, shared_secret, cached_users) {
     // check cache first
-    // debugger
     var pub_keys;
     if (username in cached_users) {
         pub_keys = cached_users[username];
@@ -95,13 +88,15 @@ function _getUserData(username, shared_secret, cached_users) {
     return genEncryptedMeta(pub_keys, shared_secret)
 }
 
-//encrypts the shared secret and sentinal for each
-//public key provided in the user_data dict
-//returns a dictionary:
-// {
-//         e_shared_secrets : [,,,],
-//         e_sentinals : [,,,],
-// }
+/*
+    encrypts the shared secret and sentinal for each
+    public key provided in the user_data dict
+    returns a dictionary:
+     {
+             e_shared_secrets : [,,,],
+             e_sentinals : [,,,],
+     }
+*/
 function genEncryptedMeta(pub_keys, shared_secret) {
     var e_sentinals = [];
     var e_shared_secrets = [];
