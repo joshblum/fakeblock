@@ -91,24 +91,27 @@ function _postPubKey(pub_key, callback) {
 //    });
 //}
 
-function getPubKeysFromServer(username) {
-    var cached_users = loadLocalStore('cached_users');
+function getPubKeysFromServer(usernames) {
     var url = buildUrl(GET_PUBKEYS);
+    var data = {
+        "requested_keys" : JSON.stringify(usernames),
+    }
     var pub_keys;
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: url,
-        data: {
-            "email": username
-        },
+        data: data,
         success: function(res) {
-            pub_keys = res.pub_keys;
-            cached_users[username] = pub_keys;
+            pub_keys = res;
+            var cached_users = loadLocalStore('cached_users');
+            for (username in res) {
+                cached_users[username] = res[username];
+            }
             writeLocalStorage("cached_users", cached_users);
         },
-        async: false
+        async: false,
     })
-    return pub_keys;
+    return pub_keys
 }
 
 function refreshLocalStorage(username, password, encrypted_pri_key) {

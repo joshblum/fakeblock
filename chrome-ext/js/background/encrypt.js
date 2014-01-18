@@ -10,6 +10,7 @@
     fakeblock_obj ::= def in common.js
 */
 function _encrypt(plaintext, encrypt_for) {
+    // debugger
     var sender_meta = loadLocalStore('user_meta');
 
     //we can't encrypt
@@ -20,13 +21,13 @@ function _encrypt(plaintext, encrypt_for) {
     //add self
     encrypt_for.push(sender_meta.username);
 
-    // these are guys we don't have to go to the server for
-    var cached_users = loadLocalStore('cached_users'); 
     var shared_secret = randString();
     var users = {};
+    var cached_users = getCachedUsers(encrypt_for);
+    var username, user_data;
     for (i in encrypt_for) {
-        var username = encrypt_for[i];
-        var user_data = _getUserData(username, shared_secret, cached_users);
+        username = encrypt_for[i];
+        user_data = genEncryptedMeta(cached_users[username], shared_secret);
         if (Object.size(user_data)) { //user exists
             users[username] = user_data
         }
@@ -45,6 +46,23 @@ function _encrypt(plaintext, encrypt_for) {
     return res
 }
 
+function getCachedUsers(encrypt_for) {
+    updateCache(encrypt_for);
+    return loadLocalStore('cached_users'); 
+}
+
+//update the cache with any users we don't have
+function updateCache(encrypt_for) {
+    var cached_users = loadLocalStore('cached_users'); 
+    var uncached = [];
+    for (i in encrypt_for) {
+        if (!encrypt_for[i] in cached_users) {
+            uncached.push(encrypt_for[i]);
+        }
+    }
+    getPubKeysFromServer(uncached)
+}
+
 function encrypt(plaintext, encrypt_for) {
     var res = {
         "users": encrypt_for,
@@ -57,35 +75,20 @@ function encrypt(plaintext, encrypt_for) {
  returns boolean based on whether or not all usernames are parseltongue users
 */
 function canEncryptFor(usernames) {
+    var pub_keys = getPubKeysFromServer(usernames);
+    var can_encrypt = true;
+    
+    for (i in pub_keys) {
+        var pub_key = pub_keys[i];
+        if (!pub_key.length) {
+            can_encrypt = false;
+            break
+        }
+    }
 
-    var res = {
-        "can_encrypt": true
+    return {
+        "can_encrypt": can_encrypt,
     };
-    return res
-}
-
-/*
-    returns the shared secret and 
-    dict of encrypted sentinals/shared_secrets
-    this dict has a list of sentinals, and a corresponding list of encrypted shared secrets
-    for the given user
-    if the user does not exist returns undefined, {}
-*/
-function _getUserData(username, shared_secret, cached_users) {
-    // check cache first
-    var pub_keys;
-    if (username in cached_users) {
-        pub_keys = cached_users[username];
-    } else {
-        pub_keys = getPubKeysFromServer(username);
-    }
-
-    if (pub_keys == null) {
-        return {};
-    }
-    if (!pub_keys.length) return {};
-
-    return genEncryptedMeta(pub_keys, shared_secret)
 }
 
 /*
@@ -98,6 +101,11 @@ function _getUserData(username, shared_secret, cached_users) {
      }
 */
 function genEncryptedMeta(pub_keys, shared_secret) {
+
+    if (pub_keys == null || !pub_keys.length) {
+        return {};
+    }
+
     var e_sentinals = [];
     var e_shared_secrets = [];
     $.each(pub_keys, function(i, pub_key) {
