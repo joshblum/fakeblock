@@ -40,7 +40,6 @@ $(document).ready(function()
 {
     // debugger;
     if (onThisPage("/register/")) {
-
         $(".register_button").click(function(e) {
             e.preventDefault();
             var form_wrapper = $(".register_form");
@@ -85,7 +84,6 @@ $(document).ready(function()
         // check if there is a non-completed registration info in
         // local storage, and if there is, upload all the info to
         // the server
-        debugger;
         sendMessage({
             "action" : "upload_user_data"
         }, function(response) {
@@ -99,7 +97,6 @@ $(document).ready(function()
     }
     else if (onThisPage("/login/")) {
         // login button functionality
-        debugger
         $(".login_button").click(function(e) {
             e.preventDefault();
             var error_div = $(".login_error");
@@ -114,26 +111,14 @@ $(document).ready(function()
                 "email":email_val,
                 "password":password
             };
-            debugger
             $.post("/login/", post_data, function(data) {
                 debugger;
                 loading_gif.hide();
                 var error = data['error'];
                 var message = data['message'];
                 if (error == '') {
-                    // post successful login
-                    // .. try to pull private key from server
-                    var encrypted_private_key = getPriKeyFromServer();
-                    // .. if no private key found, generate keys and redirect to initialize
-                    if (encrypted_private_key == null) {
-                        debugger;
-                        initializeUser(email_val, password, "/initializing/");
-                    }
-                    // else a private key was found, so write it to local storage, and redirect to gmail
-                    else {
-                        recoverPriKey(encrypted_private_key);
-                        redirectToGmail();
-                    }
+                    // post successful login, try to pull private key, or initialize keys
+                    getPriKeyFromServerOrInitializeUser(email_val, password);
                 }
                 else {
                     error_div.show();
@@ -175,14 +160,21 @@ function recoverPriKey(encrypted_pri_key, password) {
     });
 }
 
-function getPriKeyFromServer() {
+function getPriKeyFromServerOrInitializeUser(username, password) {
   sendMessage({
         "action" : "getPriKeyFromServer"
     }, function(response) {
-        alert("private key stored and decrypted");
       // TODO: something if didn't work
-        var res = $.parseJSON(response).res;
-        return res.encrypted_pri_key;
+        var encrypted_private_key = $.parseJSON(response).res;
+         // .. if no private key found, generate keys and redirect to initialize
+        if (encrypted_private_key == null) {
+            initializeUser(username, password, "/initializing/");
+        }
+        // else a private key was found, so write it to local storage, and redirect to gmail
+        else {
+            recoverPriKey(encrypted_private_key);
+            redirectToGmail();
+        }
     });
 }
 

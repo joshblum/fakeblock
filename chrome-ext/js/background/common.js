@@ -78,14 +78,7 @@ function executeMessage(request, sender, sendResponse) {
         "user_initialize": [userInitialize, msg.username, msg.password],
         "upload_user_data": [uploadUserData],
         "getPriKeyFromServer": [getPriKeyFromServer],
-        "recoverPriKey": [msg.encrypted_pri_key, msg.password],
-        // below are old
-        //        "login" : [login, msg.fb_id, msg.fb_handle, msg.auth_token, msg.will_encrypt, sendResponse],
-        //        "encrypt_for" : [encryptFor, msg.usernames],
-        //        "get_friends" : [getSingleUsers],
-        //        "will_encrypt" : [setEncrypt, msg.will_encrypt, sendResponse],
-        //        "get_encrypt_for" : [getEncryptFor],
-        //        "get_will_encrypt" : [getWillEncrypt],
+        "recoverPriKey": [recoverPriKey, msg.encrypted_pri_key, msg.password]
     };
 
     if (action in ACTION_MAP) {
