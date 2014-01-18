@@ -4,12 +4,13 @@ function decrypt(fakeblock) {
     console.log(fakeblock.users);
     var user_meta = loadLocalStore('user_meta');
     if (!Object.size(user_meta)){
-        return ""
+        //maybe should use null instead of ""
+        return null;
     }
 
     var encrypted_data = fakeblock.users[user_meta.username];
     if (encrypted_data === undefined) {
-        return ""
+        return null;
     }
 
     var e_sentinals = encrypted_data.e_sentinals;
@@ -23,6 +24,6 @@ function decrypt(fakeblock) {
             return to_return;
         }
     }
-    return ""
+    return null;
 }
 
