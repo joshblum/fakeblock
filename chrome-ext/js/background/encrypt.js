@@ -54,7 +54,7 @@ function _encrypt(plaintext, encrypt_for) {
     return res
 }
 
-function encrypt(plaintext, encrypt_for, which_network) {
+function test_encrypt(plaintext, encrypt_for, which_network) {
     var res = {
         "users": encrypt_for,
         "cipher_text": "&&& default cypher text for ya &&&"

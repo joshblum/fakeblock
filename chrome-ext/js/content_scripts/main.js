@@ -3,12 +3,12 @@
 $(document).ready(function() {
    debugger;
 
-   decryptFakeblocks();
+   // decryptFakeblocks();
 
-    /***** automatically try to decrypt DOM whenever it changes *****************************************************/
-   var intervalID = setInterval(function(){
-       decryptFakeblocks();
-   }, 500);
+   /**** automatically try to decrypt DOM whenever it changes ****************************************************/
+   // var intervalID = setInterval(function(){
+   //     decryptFakeblocks();
+   // }, 500);
 
 });
 

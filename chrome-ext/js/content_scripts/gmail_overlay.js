@@ -2,8 +2,9 @@ var doEncryptDomains = [
     "facebook.com",
     "mail.google.com"
 ];
+
 var EMAIL_WINDOW_SELECTOR = '.I5';
-var TEXTAREA_SELECTOR = '.Am';
+var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var USERNAME_FIELD_SELECTOR = '.oL';
 
 function usernameGetter($usernameField) {
@@ -27,16 +28,30 @@ $(function() {
 
         //gmail makes the first matching textarea found into the compose textarea
         //move the unencrypted textarea after the encrypted textarea
-        if ($('.aO7').children('.Am').length == 1) {
+        if ($('.aO7').children(TEXTAREA_SELECTOR).length == 1) {
             $('.aO7').append($('.parseltongue-unencrypted'));
         }
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
         var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
         if (overlayable.length > 0) {
-            var $emailWindow = $(e.target).closest(EMAIL_WINDOW_SELECTOR);
-            if (! $emailWindow.hasClass('hasOverlay')) {
-                makeOverlay($emailWindow);
+            if (! overlayable.hasClass('has-overlay')) {
+                var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
+                makeOverlay($email);
+            } else if (overlayable.hasClass('pre-draft')) {
+
+                if (overlayable.data('draft') === undefined || 
+                        overlayable.data('draft') != overlayable.text()) {
+                    //draft hasn't finished loading into compose window
+                    overlayable.data('draft', overlayable.text());
+                } else {
+                    //draft finished loading into compose window
+                    overlayable.data('unencryptedArea').text(
+                        overlayable.data('draft')
+                    );
+                    overlayable.removeClass('pre-draft');
+                }
+
             }
         }
         
@@ -72,7 +87,9 @@ function makeOverlay($email) {
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
     });
-    $email.addClass('hasOverlay');
+    $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
+    $textarea.addClass('has-overlay pre-draft');
+    $textarea.data('unencryptedArea', $unencryptedArea);
 }
 
 function makeOverlayHtml($textarea) {
@@ -167,9 +184,9 @@ function requestEncrypt($encryptedArea, message, usernames) {
             msg = res;
         } else {
             var json_encoded = JSON.stringify(res);
-            msg = "|fakeblock|" + 
+            msg = "<fakeblock>" + 
                 encodeString(json_encoded) +
-                "|endfakeblock|";
+                "</fakeblock>";
         }
         $encryptedArea.text(msg);
     });

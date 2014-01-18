@@ -1,3 +1,6 @@
+//class to add to the compose email textarea so that it doesn't get decrypted before being sent
+var FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-encrypted';
+
 function sendMessage(dict, callback) {
     var csrf_token = getCookie('csrftoken');
     dict["csrf_token"] = csrf_token;

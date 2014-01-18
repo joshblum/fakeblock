@@ -61,8 +61,8 @@
 
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
-var baseUrl = "http://127.0.0.1:8000";
-//var baseUrl = "http://fakeblock.herokuapp.com";
+// var baseUrl = "http://127.0.0.1:8000";
+var baseUrl = "http://www.parseltongueextension.com";
 var SENTINAL = "fakeblock";
 
 /*
