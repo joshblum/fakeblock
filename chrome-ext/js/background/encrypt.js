@@ -58,7 +58,9 @@ function updateCache(encrypt_for) {
             uncached.push(encrypt_for[i]);
         }
     }
-    getPubKeysFromServer(uncached)
+    if (uncached.length > 0){
+        getPubKeysFromServer(uncached);
+    }
 }
 
 /*
