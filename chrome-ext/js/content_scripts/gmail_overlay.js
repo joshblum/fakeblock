@@ -17,7 +17,6 @@ function usernameGetter($usernameField) {
 }
 
 $(function() {
-    console.log('hi');
     if (doEncryptDomains.indexOf(document.domain) < 0) {
         return
     }
