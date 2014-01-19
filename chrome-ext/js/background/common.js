@@ -3,6 +3,7 @@
      {
      "pri_key": "",
      "username": ""
+     "defaultEncrypt": true,
      }
 
      registration ::=
@@ -37,6 +38,7 @@ function executeMessage(request, sender, sendResponse) {
         "parseltongueLogout": [parseltongueLogout],
         "getUserMeta": [getUserMeta],
         "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
+        "writeLocalStorage": [writeLocalStorage, "userMeta", msg.userMeta]
     };
 
     if (action in ACTION_MAP) {

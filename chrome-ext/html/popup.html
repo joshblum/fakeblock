@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <link type="text/css" rel="stylesheet" href="../css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="../css/popup.css" />
 </head>
@@ -24,8 +25,10 @@
             <div>
                 Logged in as:
                 <p> <strong class="user-name"></strong> </p>
+                
+                <label id="label-toggle-switch">Enable encryption by default?</label>
+                <input class="default-encrypt" type="checkbox" checked>
             </div>
-
             <div class="pt-links">
                 <a data-href="/settings/" href="" class="pull-left">settings</a>
                 <a data-href="/about/" href="" class="pull-left">about</a>
