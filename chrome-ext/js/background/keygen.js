@@ -89,11 +89,11 @@ function uploadUserData() {
         var success = uploadPubKey(username, pub_key);
         var success2 = uploadPriKey(username, encrypted_pri_key);
         // TODO: check if both uploads were successful
-        var user_meta = {
+        var userMeta = {
             "username": username,
             "pri_key": pri_key
         };
-        writeLocalStorage("user_meta", user_meta);
+        writeLocalStorage("userMeta", userMeta);
         registration_data["completed"] = true;
         writeLocalStorage("registration", registration_data);
     }

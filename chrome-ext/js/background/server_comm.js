@@ -17,11 +17,11 @@ function getPubKeysFromServer(usernames) {
         data: data,
         success: function(res) {
             pub_keys = res;
-            var cached_users = loadLocalStore('cached_users');
+            var cachedUsers = loadLocalStore('cachedUsers');
             for (username in res) {
-                cached_users[username] = res[username];
+                cachedUsers[username] = res[username];
             }
-            writeLocalStorage("cached_users", cached_users);
+            writeLocalStorage("cachedUsers", cachedUsers);
         },
         async: false,
     })
@@ -29,7 +29,7 @@ function getPubKeysFromServer(usernames) {
 }
 
 function refreshLocalStorage(username, password, encrypted_pri_key) {
-    writeLocalStorage("user_meta", {
+    writeLocalStorage("userMeta", {
         'username': username,
         'pri_key': recoverPriKey(encrypted_pri_key, password),
     });

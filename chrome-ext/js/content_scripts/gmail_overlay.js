@@ -2,8 +2,9 @@ var doEncryptDomains = [
     "facebook.com",
     "mail.google.com"
 ];
+
 var EMAIL_WINDOW_SELECTOR = '.I5';
-var TEXTAREA_SELECTOR = '.Am';
+var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var USERNAME_FIELD_SELECTOR = '.oL';
 var TOOLBAR_SELECT = ".n1tfz";
 var FORMAT_BUTTON_SELECT = "td.Up";
@@ -22,14 +23,22 @@ $(function() {
     }
 
     $(document).on('DOMNodeInserted', function(e) {
-        //don't allow the appended unencrypted textarea insert event to propagate
-        if ($(e.target).attr('role') === 'textbox') {
+        if ($(e.target).closest('.parseltongue-unencrypted').length > 0) {
+            //don't allow insert events for objects appended to the unencrypted area to propagate
+            return;
+        } else if ($(e.target).parent().hasClass('parseltongue-encrypted') && 
+            $(e.target).hasClass('gmail_extra')) {
+            //if an old email thread gets revealed in the original textarea
+            //append it to associated unencrypted area instead and reencrypt
+            var $unencryptedArea = $(e.target).parent().data('unencryptedArea');
+            $unencryptedArea.append($(e.target));
+            // encryptHandler($unencryptedArea);
             return;
         }
 
         //gmail makes the first matching textarea found into the compose textarea
         //move the unencrypted textarea after the encrypted textarea
-        if ($('.aO7').children('.Am').length == 1) {
+        if ($('.aO7').children(TEXTAREA_SELECTOR).length == 1) {
             $('.aO7').append($('.parseltongue-unencrypted'));
         }
 
@@ -38,9 +47,22 @@ $(function() {
         var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
 
         if (overlayable.length > 0) {
-            var $emailWindow = $(e.target).closest(EMAIL_WINDOW_SELECTOR);
-            if (! $emailWindow.hasClass('hasOverlay')) {
-                makeOverlay($emailWindow);
+            if (! overlayable.hasClass('has-overlay')) {
+                var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
+                makeOverlay($email);
+            } else if (overlayable.hasClass('pre-draft')) {
+                if (overlayable.data('draft') === overlayable.html() ||
+                    overlayable.html().indexOf('class="gmail_extra"') >= 0) {
+                    //if draft has finished loading
+                    overlayable.data('unencryptedArea').html(
+                        overlayable.data('draft')
+                    );
+                    overlayable.removeClass('pre-draft');   
+                } else {
+                    //draft hasn't finished loading into compose window
+                    overlayable.data('draft', overlayable.html());
+                }
+
             }
             if (email_toolbar.length > 0) {
                 var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
@@ -116,7 +138,9 @@ function makeOverlay($email) {
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
     });
-    $email.addClass('hasOverlay');
+    $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
+    $textarea.addClass('has-overlay pre-draft');
+    $textarea.data('unencryptedArea', $unencryptedArea);
 }
 
 function makeOverlayHtml($textarea) {
@@ -153,12 +177,12 @@ function encryptHandler($unencryptedArea) {
      uses doEncrypt in unencrypted area's data to check if should update with ciphertext or plaintext
      */
     var $encryptedArea = $unencryptedArea.data('encryptedArea');
-    var message = $unencryptedArea.text();
+    var message = $unencryptedArea.html();
     var usernames = $unencryptedArea.data('usernames');
     if ($unencryptedArea.data('doEncrypt')) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
-        $encryptedArea.text(message);
+        $encryptedArea.html(message);
     }
 
 }
@@ -211,11 +235,11 @@ function requestEncrypt($encryptedArea, message, usernames) {
             msg = res;
         } else {
             var json_encoded = JSON.stringify(res);
-            msg = "|fakeblock|" +
+            msg = FAKEBLOCK_OPEN_TAG +
                 encodeString(json_encoded) +
-                "|endfakeblock|";
+                FAKEBLOCK_CLOSE_TAG;
         }
-        $encryptedArea.text(msg);
+        $encryptedArea.html(msg);
     });
 }
 

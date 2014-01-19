@@ -1,5 +1,5 @@
 /*
-    user_meta ::=
+    userMeta ::=
      {
      "pri_key": "",
      "username": ""
@@ -16,9 +16,10 @@
 
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
-var baseUrl = "http://127.0.0.1:8000";
-//var baseUrl = "http://fakeblock.herokuapp.com";
+// var baseUrl = "http://127.0.0.1:8000";
+var baseUrl = "http://www.parseltongueextension.com";
 var SENTINAL = "fakeblock";
+var userMeta = loadLocalStore("userMeta");
 
 /*
     helper to execute messages between content and background script
@@ -34,6 +35,7 @@ function executeMessage(request, sender, sendResponse) {
         "uploadUserData": [uploadUserData],
         "getPriKeyFromServer": [getPriKeyFromServer],
         "parseltongueLogout": [parseltongueLogout],
+        "getUserMeta": [getUserMeta],
         "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
     };
 
@@ -50,19 +52,19 @@ function executeMessage(request, sender, sendResponse) {
 }
 
 function getEncryptFor() {
-    var user_meta = loadLocalStore('user_meta');
-    return user_meta.encrypt_for
+    var userMeta = loadLocalStore('userMeta');
+    return userMeta.encrypt_for
 }
 
 function getWillEncrypt() {
-    var user_meta = loadLocalStore('user_meta');
-    return user_meta.will_encrypt
+    var userMeta = loadLocalStore('userMeta');
+    return userMeta.will_encrypt
 }
 
 function encryptFor(usernames) {
-    var user_meta = loadLocalStore('user_meta');
-    user_meta.encrypt_for = usernames;
-    writeLocalStorage('user_meta', user_meta);
+    var userMeta = loadLocalStore('userMeta');
+    userMeta.encrypt_for = usernames;
+    writeLocalStorage('userMeta', userMeta);
 }
 
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
@@ -107,12 +109,12 @@ function openLink(url) {
 */
 function buildUrl(path, getParam) {
     getParam = getParam || {};
-    var user_meta = loadLocalStore('user_meta');
+    var userMeta = loadLocalStore('userMeta');
     var url = baseUrl + path;
-    if (!Object.size(user_meta)) {
+    if (!Object.size(userMeta)) {
         return url
     }
-    url = url + "?auth_token=" + user_meta.auth_token;
+    url = url + "?auth_token=" + userMeta.auth_token;
     if (getParam === {}) {
         return url
     }
@@ -120,4 +122,12 @@ function buildUrl(path, getParam) {
         url += "&" + key + "=" + val
     });
     return url
+}
+
+function getUserMeta() {
+    return loadLocalStore("userMeta");
+}
+
+function normalizeEmail(email) {
+    return email.toLowerCase();
 }
