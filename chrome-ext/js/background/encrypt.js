@@ -10,7 +10,7 @@
     fakeblock_obj ::= def in common.js
 */
 function _encrypt(plaintext, encrypt_for) {
-    // debugger
+    
     var sender_meta = loadLocalStore('user_meta');
 
     //we can't encrypt

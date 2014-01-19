@@ -84,7 +84,7 @@ $(document).ready(function() {
         // local storage, and if there is, upload all the info to
         // the server
         sendMessage({
-            "action": "upload_user_data"
+            "action": "uploadUserData"
         }, function(response) {
             // TODO: something about checking if data upload worked
             // if it failed as opposed to just, already had been done
@@ -136,7 +136,7 @@ $(document).ready(function() {
 
 function initializeUser(email, password, redirect_url) {
     sendMessage({
-        "action": "user_initialize",
+        "action": "userInitialize",
         "username": email,
         "password": password
     }, function(response) {
