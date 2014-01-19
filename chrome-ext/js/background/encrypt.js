@@ -67,6 +67,9 @@ function updateCache(encrypt_for) {
  returns boolean based on whether or not all usernames are parseltongue users
 */
 function canEncryptFor(usernames) {
+    if (usernames.length == 0 || usernames.indexOf(null) >= 0) {
+        return false;
+    }
     var pub_keys = getPubKeysFromServer(usernames);
     var can_encrypt = true;
     
