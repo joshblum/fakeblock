@@ -5,13 +5,14 @@ var doEncryptDomains = [
 
 var EMAIL_WINDOW_SELECTOR = '.I5';
 var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
-var USERNAME_FIELD_SELECTOR = '.oL';
+// var USERNAME_FIELD_SELECTOR = '.oL';
 var TOOLBAR_SELECT = ".n1tfz";
 var FORMAT_BUTTON_SELECT = ".az5";
 
 function usernameGetter($usernameField) {
-    var emailSpans = $usernameField.children().toArray();
-    return emailSpans.map(function(emailSpan) {
+    return $usernameField.find('*').filter(function(i, elm) {
+        return $(elm).attr('email') !== undefined;
+    }).toArray().map(function(emailSpan) {
         return $(emailSpan).attr('email');
     });
 }
@@ -67,7 +68,14 @@ $(function() {
                 var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
                 if (!(format_button.hasClass("yupper"))) {
                     format_button.addClass("yupper");
-                    var pt_button = '<div class="pt-buttons-wrapper"">    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">        <img class="pt_lock_img" src="http://i.imgur.com/D95KZPO.png" style="width:100%;"/>    </div>    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">        <img class="pt_lock_img" src="http://i.imgur.com/qhKbqCR.png" style="width:100%;"/>    </div></div>';
+                    var pt_button = '<div class="pt-buttons-wrapper">' +
+                    '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
+                    '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
+                    '    </div>' +
+                    '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
+                    '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
+                    '    </div>' +
+                    '</div>';
                     format_button.before(pt_button);
                     $(".pt-button").css(
                         {
@@ -108,7 +116,7 @@ $(function() {
     });
 
     $(document).on('DOMNodeRemoved', function(e) {
-        usernameHandler(e.target);
+        usernameHandler(e.target, true);
     });
 });
 
@@ -126,12 +134,12 @@ function makeOverlay($email) {
     $textarea.hide();
 
     //username field probably(?) hasn't loaded yet, but need to associate this unencrypted area and the username field 
-    $usernameField = $email.find(USERNAME_FIELD_SELECTOR);
-    if ($usernameField.length > 0) {
-        $usernameField.data('unencryptedArea', $unencryptedArea);
-        //this initial call may not be necessary since usernames probably haven't loaded yet
-        updateUsernames($usernameField);
-    }
+    // $usernameField = $email.find(USERNAME_FIELD_SELECTOR);
+    // if ($usernameField.length > 0) {
+    //     $usernameField.data('unencryptedArea', $unencryptedArea);
+    //     //this initial call may not be necessary since usernames probably haven't loaded yet
+    //     updateUsernames($usernameField);
+    // }
 
     //if can't find a username field yet, default to not encrypting...username field should load later anyway
     $unencryptedArea.data('doEncrypt', false);
@@ -180,7 +188,8 @@ function encryptHandler($unencryptedArea) {
     var $encryptedArea = $unencryptedArea.data('encryptedArea');
     var message = $unencryptedArea.html();
     var usernames = $unencryptedArea.data('usernames');
-    if ($unencryptedArea.data('doEncrypt')) {
+    var canEncryptButton = $('.pt_locked').css('display') !== 'none';
+    if ($unencryptedArea.data('doEncrypt') && canEncryptButton) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
         $encryptedArea.html(message);
@@ -188,21 +197,27 @@ function encryptHandler($unencryptedArea) {
 
 }
 
-function usernameHandler(emailSpan) {
+function usernameHandler(emailSpan, deleteEmail) {
     /*
      handler for an email address getting added or removed from the addressees
      updates the usernames list for the appropriate unencrypted textarea
      */
-    if ('email' in emailSpan.attributes) {
-        $usernameField = $(emailSpan).parent();
-        var usernameFieldClass = USERNAME_FIELD_SELECTOR.split('.')[1]
-        if ($usernameField.hasClass(usernameFieldClass)) {
-            updateUsernames($usernameField);
+    var emailSpans = $(emailSpan).children().add($(emailSpan)).filter(function(i, elm) { 
+        return $(elm).attr('email') !== undefined; 
+    });
+    //TODO: what happens if more than one email span? is this possible?
+    //TODO: normalize emails in frontend too?
+    if (emailSpans.length == 1) {
+        $usernameField = emailSpans.parent().parent();
+        var usernameToDelete = null;
+        if (deleteEmail) {
+            usernameToDelete = emailSpans.attr('email');
         }
+        updateUsernames($usernameField, usernameToDelete);
     }
 }
 
-function updateUsernames($usernameField) {
+function updateUsernames($usernameField, usernameToDelete) {
     /*
      call to check if the usernames are all still valid parseltongue users
      if yes/no, update the doEncrypt field of the corresponding unencrypted textarea
@@ -210,11 +225,16 @@ function updateUsernames($usernameField) {
 
     //check if username field has been associated with a textarea yet
     var $unencryptedArea = $usernameField.data('unencryptedArea');
-    if (! $unencryptedArea) {
-        return;
+    if ($unencryptedArea === undefined) {
+        $unencryptedArea = $usernameField.closest(EMAIL_WINDOW_SELECTOR).find('.parseltongue-unencrypted');
+        $usernameField.data('unencryptedArea', $unencryptedArea);
     }
 
     var usernames = usernameGetter($usernameField);
+    var usernameDeleteIndex = usernames.indexOf(usernameToDelete);
+    if (usernameDeleteIndex >= 0) {
+        usernames.splice(usernameDeleteIndex, 1);
+    }
     $unencryptedArea.data('usernames', usernames);
     requestCanEncryptFor($unencryptedArea, usernames);
 }
@@ -253,9 +273,13 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
         "usernames" : usernames,
     }, function(response) {
         var res = $.parseJSON(response).res;
-        if (res !== $unencryptedArea.data('doEncrypt')) {
-            //TODO: will have to encrypt or decrypt the current message if state changed
-        }
         $unencryptedArea.data('doEncrypt', res.can_encrypt);
+        var ptButtonsWrapper = $('.pt-buttons-wrapper');
+        if (res.can_encrypt) {
+            ptButtonsWrapper.show();
+        } else {
+            ptButtonsWrapper.hide();
+        }
+        encryptHandler($unencryptedArea);
     });
 }

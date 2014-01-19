@@ -34,6 +34,7 @@ function encrypt(plaintext, encrypt_for) {
     }
 
 
+
     var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
 
     var res = {
@@ -45,8 +46,7 @@ function encrypt(plaintext, encrypt_for) {
 
 function getCachedUsers(encrypt_for) {
     updateCache(encrypt_for);
-    return loadLocalStore('cachedUsers'); 
-
+    return loadLocalStore('cachedUsers');
 }
 
 //update the cache with any users we don't have
@@ -67,6 +67,9 @@ function updateCache(encrypt_for) {
  returns boolean based on whether or not all usernames are parseltongue users
 */
 function canEncryptFor(usernames) {
+    if (usernames.length == 0 || usernames.indexOf(null) >= 0) {
+        return false;
+    }
     var pub_keys = getPubKeysFromServer(usernames);
     var can_encrypt = true;
     
