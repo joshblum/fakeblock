@@ -30,14 +30,26 @@ function isLoggedIn() {
     return Object.size(userMeta) > 0;
 }
 
+function toggleSwitch(e, data) {
+    userMeta.defaultEncrypt = $(e.target).prop("checked");
+    sendMessage({
+        "action": "writeLocalStorage",
+        "userMeta": userMeta,
+    }, function(res) {
+    });
+}
+
 $(document).ready(function() {
-    window.backpage = chrome.extension.getBackgroundPage();
-    baseUrl = backpage.baseUrl;
-    $("a").click(clickHandle);
     sendMessage({
         "action": "getUserMeta",
     }, function(res) {
         userMeta = JSON.parse(res).res;
-        renderView()
+        renderView();
+        $('.default-encrypt').prop("checked", userMeta.defaultEncrypt ? "checked" : "");
     });
+
+    window.backpage = chrome.extension.getBackgroundPage();
+    baseUrl = backpage.baseUrl;
+    $("a").click(clickHandle);
+    $('.default-encrypt').click(toggleSwitch);
 });
