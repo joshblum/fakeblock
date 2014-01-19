@@ -91,7 +91,8 @@ function uploadUserData() {
         // TODO: check if both uploads were successful
         var userMeta = {
             "username": username,
-            "pri_key": pri_key
+            "pri_key": pri_key,
+            "defaultEncrpyt" : true,
         };
         writeLocalStorage("userMeta", userMeta);
         registration_data["completed"] = true;
