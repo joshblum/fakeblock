@@ -228,7 +228,6 @@ function requestEncrypt($encryptedArea, message, usernames) {
         "action" : "encrypt",
         "message" : message,
         "usernames" : usernames,
-        "which_network" : "gmail"
     }, function(response) {
         var res = $.parseJSON(response).res;
         var msg;
@@ -252,7 +251,6 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
     sendMessage({
         "action" : "canEncryptFor",
         "usernames" : usernames,
-        "which_network" : "gmail"
     }, function(response) {
         var res = $.parseJSON(response).res;
         if (res !== $unencryptedArea.data('doEncrypt')) {
