@@ -9,7 +9,7 @@
     output ::= fakeblock_obj
     fakeblock_obj ::= def in common.js
 */
-function _encrypt(plaintext, encrypt_for) {
+function encrypt(plaintext, encrypt_for) {
     
     var sender_meta = loadLocalStore('userMeta');
 
@@ -26,15 +26,11 @@ function _encrypt(plaintext, encrypt_for) {
     var cachedUsers = getCachedUsers(encrypt_for);
     var username, user_data;
     for (i in encrypt_for) {
-        username = encrypt_for[i];
+        username = normalizeEmail(encrypt_for[i]);
         user_data = genEncryptedMeta(cachedUsers[username], shared_secret);
         if (Object.size(user_data)) { //user exists
             users[username] = user_data
         }
-    }
-
-    if (!Object.size(users) <= 1) { //only found own data
-        return plaintext
     }
 
     var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
@@ -61,14 +57,6 @@ function updateCache(encrypt_for) {
         }
     }
     getPubKeysFromServer(uncached)
-}
-
-function encrypt(plaintext, encrypt_for) {
-    var res = {
-        "users": encrypt_for,
-        "cipher_text": "&&& default cypher text for ya &&&"
-    };
-    return res
 }
 
 /*

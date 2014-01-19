@@ -1,7 +1,7 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-   /**** automatically try to decrypt DOM whenever it changes ****************************************************/
+    /**** automatically try to decrypt DOM whenever it changes ****************************************************/
     $(document).on('DOMNodeInserted', function(e) {
         decryptFakeblocks($(e.target));
     });
@@ -16,8 +16,7 @@ function getDivsContainingFakeBlock($container) {
         ':contains("' + FAKEBLOCK_OPEN_TAG + '")' +
         ':contains("' + FAKEBLOCK_CLOSE_TAG + '")').filter(function(i, elm) {
         return $(elm).find(':contains("' + FAKEBLOCK_OPEN_TAG + '")').length == 0 &&
-            $(elm).find(':contains("' + FAKEBLOCK_CLOSE_TAG + '")').length == 0 &&
-            ! $(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS);
+            $(elm).find(':contains("' + FAKEBLOCK_CLOSE_TAG + '")').length == 0 && !$(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS);
     });
 }
 
@@ -33,7 +32,7 @@ function getFakeBlocksFromText(text) {
         "g"
     );
     var result = myRe.exec(text);
-    while (result!=null) {
+    while (result != null) {
         to_return.push(result);
         result = myRe.exec(text);
     }
@@ -58,9 +57,9 @@ function getFakeblockObjectsFromContainer($container) {
                 var unparsed_json = decodeByteString(byte_str);
                 var parsed_json = JSON.parse(unparsed_json);
                 var fakeblock_obj = {
-                    'whole_match':whole_match,
-                    'unparsed_json':unparsed_json,
-                    'parsed_json':parsed_json
+                    'whole_match': whole_match,
+                    'unparsed_json': unparsed_json,
+                    'parsed_json': parsed_json
                 };
                 all_fakeblocks.push(fakeblock_obj);
             } catch (ex) {
@@ -69,8 +68,8 @@ function getFakeblockObjectsFromContainer($container) {
         });
     });
     return {
-        'all_fakeblocks':all_fakeblocks,
-        'ps_containing_fakeblocks':ps_containing_fblocks
+        'all_fakeblocks': all_fakeblocks,
+        'ps_containing_fakeblocks': ps_containing_fblocks
     };
 }
 
@@ -95,12 +94,12 @@ function decryptFakeblocks($container) {
 // backend decrypts fakeblock unparsed_json into decrypted_text
 function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace, json) {
     sendMessage({
-        "action" : "decrypt",
-        "json" : json
+        "action": "decrypt",
+        "json": json
     }, function(response) {
         var decrypted_text = $.parseJSON(response).res;
         if (decrypted_text != null) {
-            $.each(ps_containing_fakeblocks, function(i,e) {
+            $.each(ps_containing_fakeblocks, function(i, e) {
                 var all_html = $(this).text();
                 var new_html = all_html.replace(to_replace, decrypted_text);
                 $(this).html(new_html);
@@ -114,7 +113,3 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
         }
     });
 }
-
-
-
-

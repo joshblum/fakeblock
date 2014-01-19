@@ -19,8 +19,7 @@ function decrypt(fakeblock) {
     for (var i = 0; i < e_sentinals.length; i++) {
         if (cryptico.decrypt(e_sentinals[i], pri_key).plaintext === SENTINAL) {
             var shared_secret = cryptico.decrypt(e_shared_secrets[i], pri_key).plaintext;
-            var decrypted = decryptAES(Base64.decode(fakeblock.cipher_text), shared_secret);
-            return Base64.decode(decrypted);
+            return decryptAES(Base64.decode(fakeblock.cipher_text), shared_secret);
         }
     }
     return null;
