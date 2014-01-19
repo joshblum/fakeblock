@@ -1,8 +1,8 @@
 var URLS = {
-    "pub_upload" : "/upload_pubkey/",
-    "pri_upload" : "/upload_prikey/",
-    "get_pubkeys" : "/get_pubkeys/",
-    "get_prikey" : "/get_prikey/",
+    "pub_upload": "/upload_pubkey/",
+    "pri_upload": "/upload_prikey/",
+    "get_pubkeys": "/get_pubkeys/",
+    "get_prikey": "/get_prikey/",
 };
 
 function getPubKeysFromServer(usernames) {
@@ -32,6 +32,7 @@ function refreshLocalStorage(username, password, encrypted_pri_key) {
     writeLocalStorage("userMeta", {
         'username': username,
         'pri_key': recoverPriKey(encrypted_pri_key, password),
+        'defaultEncrypt': true,
     });
 }
 

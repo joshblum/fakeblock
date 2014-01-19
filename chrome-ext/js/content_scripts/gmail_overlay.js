@@ -6,6 +6,8 @@ var doEncryptDomains = [
 var EMAIL_WINDOW_SELECTOR = '.I5';
 var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var USERNAME_FIELD_SELECTOR = '.oL';
+var TOOLBAR_SELECT = ".n1tfz";
+var FORMAT_BUTTON_SELECT = ".az5";
 
 function usernameGetter($usernameField) {
     var emailSpans = $usernameField.children().toArray();
@@ -15,7 +17,6 @@ function usernameGetter($usernameField) {
 }
 
 $(function() {
-    console.log('hi');
     if (doEncryptDomains.indexOf(document.domain) < 0) {
         return
     }
@@ -42,6 +43,8 @@ $(function() {
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
         var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
+        var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
+
         if (overlayable.length > 0) {
             if (! overlayable.hasClass('has-overlay')) {
                 var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
@@ -60,8 +63,46 @@ $(function() {
                 }
 
             }
+            if (email_toolbar.length > 0) {
+                var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
+                if (!(format_button.hasClass("yupper"))) {
+                    format_button.addClass("yupper");
+                    var pt_button = '<div class="pt-buttons-wrapper"">    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">        <img class="pt_lock_img" src="http://i.imgur.com/D95KZPO.png" style="width:100%;"/>    </div>    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">        <img class="pt_lock_img" src="http://i.imgur.com/qhKbqCR.png" style="width:100%;"/>    </div></div>';
+                    format_button.before(pt_button);
+                    $(".pt-button").css(
+                        {
+//                            "top":" 1px",
+                            "padding":" 10px 7px 5px 8px",
+                            "width":" 22px",
+                            "height":" 25px",
+                            "border":" 1px solid #f5f5f5",
+                            "border-top":"1px solid rgba(128, 128, 128, 0.32)",
+                            "float":"right"
+                        });
+                    $('.pt-button').hover(
+//                        function(){ $(this).css('border', '1px solid gray') },
+//                        function(){ $(this).css(
+//                            {'border':'1px solid #f5f5f5',
+//                            "border-top":"1px solid rgba(128, 128, 128, 0.32)"
+//                            }) }
+                        function(){ $(this).css('cursor', 'pointer') }
+                    );
+                    $('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
+                            $(this).hide();
+                            $(this).siblings().show();
+                        }
+                    );
+                    $('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
+                            $(this).hide();
+                            $(this).siblings().show();
+                        }
+                    );
+                    // when can_encrypt_for returns false, hide pt-buttons-wrapper
+                    // when can_encrypt_for returns true, show pt-buttons-wrapper
+                }
+            }
         }
-        
+
         //update usernames if (possibly) a new username has been added
         usernameHandler(e.target);
     });
@@ -70,6 +111,10 @@ $(function() {
         usernameHandler(e.target);
     });
 });
+
+function bindPtButtons() {
+
+}
 
 function makeOverlay($email) {
     /* given the top-level email window, make an overlay for it */
@@ -87,7 +132,7 @@ function makeOverlay($email) {
         //this initial call may not be necessary since usernames probably haven't loaded yet
         updateUsernames($usernameField);
     }
-    
+
     //if can't find a username field yet, default to not encrypting...username field should load later anyway
     $unencryptedArea.data('doEncrypt', false);
 
@@ -105,7 +150,7 @@ function makeOverlayHtml($textarea) {
     var $unencryptedArea = $textarea.clone();
     var unencrypted_id = $unencryptedArea.prop('id') + '_unencrypted';
     $unencryptedArea.attr({
-        id : unencrypted_id, 
+        id : unencrypted_id,
         role : 'textbox',
         contenteditable : true
     });
@@ -113,8 +158,8 @@ function makeOverlayHtml($textarea) {
     $unencryptedArea.click(function(evt) {
         evt.stopPropagation();
     }).focus(function(evt) {
-        evt.stopPropagation();
-    });
+            evt.stopPropagation();
+        });
 
     $unencryptedArea.css({
         'min-height' : '85px',
@@ -129,9 +174,9 @@ function makeOverlayHtml($textarea) {
 
 function encryptHandler($unencryptedArea) {
     /* 
-    handler for keyup in an unencrypted area 
-    uses doEncrypt in unencrypted area's data to check if should update with ciphertext or plaintext
-    */
+     handler for keyup in an unencrypted area
+     uses doEncrypt in unencrypted area's data to check if should update with ciphertext or plaintext
+     */
     var $encryptedArea = $unencryptedArea.data('encryptedArea');
     var message = $unencryptedArea.html();
     var usernames = $unencryptedArea.data('usernames');
@@ -145,9 +190,9 @@ function encryptHandler($unencryptedArea) {
 
 function usernameHandler(emailSpan) {
     /*
-    handler for an email address getting added or removed from the addressees
-    updates the usernames list for the appropriate unencrypted textarea 
-    */
+     handler for an email address getting added or removed from the addressees
+     updates the usernames list for the appropriate unencrypted textarea
+     */
     if ('email' in emailSpan.attributes) {
         $usernameField = $(emailSpan).parent();
         var usernameFieldClass = USERNAME_FIELD_SELECTOR.split('.')[1]
@@ -159,9 +204,9 @@ function usernameHandler(emailSpan) {
 
 function updateUsernames($usernameField) {
     /*
-    call to check if the usernames are all still valid parseltongue users
-    if yes/no, update the doEncrypt field of the corresponding unencrypted textarea
-    */
+     call to check if the usernames are all still valid parseltongue users
+     if yes/no, update the doEncrypt field of the corresponding unencrypted textarea
+     */
 
     //check if username field has been associated with a textarea yet
     var $unencryptedArea = $usernameField.data('unencryptedArea');
@@ -176,14 +221,13 @@ function updateUsernames($usernameField) {
 
 function requestEncrypt($encryptedArea, message, usernames) {
     /*
-    send message to back asking for the encrypted message
-    updates the textarea with the ciphertext
-    */
+     send message to back asking for the encrypted message
+     updates the textarea with the ciphertext
+     */
     sendMessage({
         "action" : "encrypt",
         "message" : message,
         "usernames" : usernames,
-        "which_network" : "gmail"
     }, function(response) {
         var res = $.parseJSON(response).res;
         var msg;
@@ -191,7 +235,7 @@ function requestEncrypt($encryptedArea, message, usernames) {
             msg = res;
         } else {
             var json_encoded = JSON.stringify(res);
-            msg = FAKEBLOCK_OPEN_TAG + 
+            msg = FAKEBLOCK_OPEN_TAG +
                 encodeString(json_encoded) +
                 FAKEBLOCK_CLOSE_TAG;
         }
@@ -201,13 +245,12 @@ function requestEncrypt($encryptedArea, message, usernames) {
 
 function requestCanEncryptFor($unencryptedArea, usernames) {
     /*
-    send message to back asking if the usernames can be encrypted for (are valid parseltongue users)
-    if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
-    */
+     send message to back asking if the usernames can be encrypted for (are valid parseltongue users)
+     if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
+     */
     sendMessage({
         "action" : "canEncryptFor",
         "usernames" : usernames,
-        "which_network" : "gmail"
     }, function(response) {
         var res = $.parseJSON(response).res;
         $unencryptedArea.data('doEncrypt', res.can_encrypt);

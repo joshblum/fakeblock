@@ -20,7 +20,7 @@
             <img src="http://icons.iconarchive.com/icons/martin-berube/animal/256/snake-icon.png" class="snake-logo"/>
         </div>
 
-        <div class="logged-in">
+        <div class="logged-in wrapper">
             <div>
                 Logged in as:
                 <p> <strong class="user-name"></strong> </p>
@@ -33,7 +33,10 @@
             </div>
         </div>
 
-        <div class="logged-out">
+        <div class="logged-out wrapper">
+            <div>
+                You are not logged in.
+            </div>
             <div class="pt-links">
                 <a data-href="/login/" href="" class="pull-left">login</a>
                 <a data-href="/contact/" href="" class="pull-right">contact</a>
@@ -42,7 +45,8 @@
 
     </div>
 
-    <script type="text/javascript" src="../libs/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../libs/jquery-1.10.2.min.js"></script> 
+    <script type="text/javascript" src="../libs/bootstrap-tooltip.js"></script>
     <script type="text/javascript" src="../js/content_scripts/common.js"></script>
     <script type="text/javascript" src="../js/popup/popup.js">
     </script>

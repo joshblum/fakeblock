@@ -111,7 +111,7 @@ $(document).ready(function() {
         $(".parseltongue_logout").click(function(e) {
             e.preventDefault();
             sendMessage({
-                "action" : "parseltongueLogout"
+                "action": "parseltongueLogout"
             }, function(response) {
                 window.location.href = "/logout/";
             });
