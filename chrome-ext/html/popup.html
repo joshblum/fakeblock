@@ -23,70 +23,60 @@
 
     <center>
 
-        <h3>ParselTongue</h3>
-
-        <hr />
-
-        <div class="encrypt-button">
-            <input type="checkbox" class="will_encrypt"/>
-            Check to encrypt
+        <div class="popup-header">
+            <h3 style="float:left;">ParselTongue</h3>
+            <img src="http://icons.iconarchive.com/icons/martin-berube/animal/256/snake-icon.png" class="snake-logo"/>
+            <div style="clear:both;"></div>
         </div>
+
+        <div class="you-are">
+            You are logged in as
+        </div>
+        <div class="who_are_you you-are" style="font-weight:bold;">
+            someone@gmail.com
+        </div>
+
+        <div class="pt-links">
+            <a href="http://www.parseltongueextension.com/settings/" style="float:left;" class="pt-link pt_link">settings</a>
+            <a href="http://www.parseltongueextension.com/docs/" style="float:left;margin-left:75px" class="pt-link pt_link">about</a>
+            <a href="http://www.parseltongueextension.com/logout/" style="float:right;" class="pt-link parseltongue_logout pt_link">logout</a>
+        </div>
+
+
 
         <br />
 
     </center>
 
-    <!--<div class="switch switch-small" data-on="warning" data-off="info" data-on-label="All" data-off-label="Some">-->
-    <!--<input type="checkbox">-->
-    <!--</div>-->
-
     <style>
-        input.will_encrypt {
-            height:20px;
-            width:20px;
-        }
-        div.encrypt-button {
-            margin-top:11px;
+        .you-are {
+            margin-top: 7px;
+            float: left;
+            width: 100%;
+            text-align: left;
+            font-size: 18px;
         }
 
-        div.contact {
-            padding-left:10px;
-            padding-top:10px;
-            padding-bottom:10px;
-            padding-right:10px;
-            float:left;
-            width:92%;
+        .snake-logo {
+            width: 55px;
+            float: right;
+            position: absolute;
+            top: 18px;
+            right: 18px;
         }
-        div.contact:hover {
-            background-color:lightgray;
-            cursor:pointer;
+
+        .pt-links {
+            margin-top:25px;
+            float: left;
+            width: 100%;
+            margin-bottom: 17px;
         }
-        div.contact.clicked {
-            background-color: lightgray;
-        }
-        div.contact.clicked:hover {
-            background-color:lightgray;
-            cursor:pointer;
-        }
-        .contact-name {
-            float:left;
-        }
-        input.select-contact {
-            float:left;
-            margin-right:20px;
-        }
-        .contacts {
-            padding:10px;
-            background-color: #f4f4f4;margin-top:10px;
-            margin-bottom:20px;
-            float:left;
-            border-radius:10px;
-            width:92%;
+
+        .pt-link {
+            font-size:16px;
         }
     </style>
 
-    <div class="contacts">
-    </div>
 </div>
 
 </body>
