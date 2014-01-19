@@ -24,6 +24,9 @@ $(document).ajaxSend(function(event, xhr, settings) {
 
 
 $(document).ready(function() {
+
+    $(".pt_extension_installed").show();
+
     // debugger;
     if (onThisPage("/register/")) {
         $(".register_button").click(function(e) {
