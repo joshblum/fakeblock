@@ -87,17 +87,18 @@ $(function() {
 //                            }) }
                         function(){ $(this).css('cursor', 'pointer') }
                     );
-//                    $("pt_unlocked").css('background-image', 'http://i.imgur.com/D95KZPO.png');
-                    $('.pt_unlocked').click(function(e) {
+                    $('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
                             $(this).hide();
                             $(this).siblings().show();
                         }
                     );
-                    $('.pt_locked').click(function(e) {
+                    $('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
                             $(this).hide();
                             $(this).siblings().show();
                         }
                     );
+                    // when can_encrypt_for returns false, hide pt-buttons-wrapper
+                    // when can_encrypt_for returns true, show pt-buttons-wrapper
                 }
             }
         }
