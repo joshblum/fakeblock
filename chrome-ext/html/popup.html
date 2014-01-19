@@ -9,6 +9,8 @@
     <meta name="author" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <link type="text/css" rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="../css/bootstrap-switch.css" />
+    <link type="text/css" rel="stylesheet" href="../css/font-awesome.css" />
     <link type="text/css" rel="stylesheet" href="../css/popup.css" />
 </head>
 
@@ -26,9 +28,12 @@
                 Logged in as:
                 <p> <strong class="user-name"></strong> </p>
                 
-                <label id="label-toggle-switch">Enable encryption by default?</label>
-                <input class="default-encrypt" type="checkbox" checked>
             </div>
+            <hr>
+            <div class="encrypt-wrapper">
+                <span class="encrypt-label"> Enable encryption by default?</span> <input type="checkbox" checked class="switch-large default-encrypt" data-label-icon="icon-large" data-on-label="<i class='icon-lock icon-white'></i>" data-off-label="<i class='icon-unlock-alt'></i>"> &nbsp;&nbsp;
+            </div>
+            <hr>
             <div class="pt-links">
                 <a data-href="/settings/" href="" class="pull-left">settings</a>
                 <a data-href="/about/" href="" class="pull-left">about</a>
@@ -49,6 +54,7 @@
     </div>
 
     <script type="text/javascript" src="../libs/jquery-1.10.2.min.js"></script> 
+    <script type="text/javascript" src="../libs/bootstrap-switch.js"></script>
     <script type="text/javascript" src="../libs/bootstrap-tooltip.js"></script>
     <script type="text/javascript" src="../js/content_scripts/common.js"></script>
     <script type="text/javascript" src="../js/popup/popup.js">
