@@ -11,7 +11,7 @@
 */
 function _encrypt(plaintext, encrypt_for) {
     
-    var sender_meta = loadLocalStore('user_meta');
+    var sender_meta = loadLocalStore('userMeta');
 
     //we can't encrypt
     if (!Object.size(sender_meta) || (encrypt_for === [])) {
@@ -23,11 +23,11 @@ function _encrypt(plaintext, encrypt_for) {
 
     var shared_secret = randString();
     var users = {};
-    var cached_users = getCachedUsers(encrypt_for);
+    var cachedUsers = getCachedUsers(encrypt_for);
     var username, user_data;
     for (i in encrypt_for) {
         username = encrypt_for[i];
-        user_data = genEncryptedMeta(cached_users[username], shared_secret);
+        user_data = genEncryptedMeta(cachedUsers[username], shared_secret);
         if (Object.size(user_data)) { //user exists
             users[username] = user_data
         }
@@ -48,15 +48,15 @@ function _encrypt(plaintext, encrypt_for) {
 
 function getCachedUsers(encrypt_for) {
     updateCache(encrypt_for);
-    return loadLocalStore('cached_users'); 
+    return loadLocalStore('cachedUsers'); 
 }
 
 //update the cache with any users we don't have
 function updateCache(encrypt_for) {
-    var cached_users = loadLocalStore('cached_users'); 
+    var cachedUsers = loadLocalStore('cachedUsers'); 
     var uncached = [];
     for (i in encrypt_for) {
-        if (!encrypt_for[i] in cached_users) {
+        if (!encrypt_for[i] in cachedUsers) {
             uncached.push(encrypt_for[i]);
         }
     }

@@ -11,10 +11,6 @@
     <link type="text/css" rel="stylesheet" href="../css/bootstrap-responsive.min.css" />
     <link type="text/css" rel="stylesheet" href="../css/bootstrapSwitch.css" />
     <link type="text/css" rel="stylesheet" href="../css/popup.css" />
-    <script type="text/javascript" src="../libs/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="../js/content_scripts/common.js"></script>
-    <script type="text/javascript" src="../js/popup/popup.js">
-    </script>
 </head>
 
 <body>
@@ -29,19 +25,27 @@
             <div style="clear:both;"></div>
         </div>
 
-        <div class="you-are">
-            You are logged in as
-        </div>
-        <div class="who_are_you you-are" style="font-weight:bold;">
-            someone@gmail.com
+        <div class="logged-in hide">
+            <div class="you-are">
+                You are logged in as:
+            </div>
+            <div class="who_are_you you-are" style="font-weight:bold;">
+                
+            </div>
+
+            <div class="pt-links">
+                <a data-href="/settings/" href="" style="float:left;" class="pt-link pt_link">settings</a>
+                <a data-href="/docs/" href="" style="float:left;margin-left:75px" class="pt-link pt_link">about</a>
+                <a data-href="/logout/" href="" style="float:right;" class="pt-link parseltongue_logout pt_link">logout</a>
+            </div>
         </div>
 
-        <div class="pt-links">
-            <a href="http://www.parseltongueextension.com/settings/" style="float:left;" class="pt-link pt_link">settings</a>
-            <a href="http://www.parseltongueextension.com/docs/" style="float:left;margin-left:75px" class="pt-link pt_link">about</a>
-            <a href="http://www.parseltongueextension.com/logout/" style="float:right;" class="pt-link parseltongue_logout pt_link">logout</a>
+        <div class="logged-out hide">
+            <div class="pt-links">
+                <a data-href="/login/" href="" style="float:left;" class="pt-link pt_link">login</a>
+                <a data-href="/contact/" href="" style="float:right;" class="pt-link parseltongue_logout pt_link">contact</a>
+            </div>
         </div>
-
 
 
         <br />
@@ -78,6 +82,11 @@
     </style>
 
 </div>
+
+    <script type="text/javascript" src="../libs/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../js/content_scripts/common.js"></script>
+    <script type="text/javascript" src="../js/popup/popup.js">
+    </script>
 
 </body>
 </html>
