@@ -210,9 +210,7 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
         "which_network" : "gmail"
     }, function(response) {
         var res = $.parseJSON(response).res;
-        if (res !== $unencryptedArea.data('doEncrypt')) {
-            //TODO: will have to encrypt or decrypt the current message if state changed
-        }
         $unencryptedArea.data('doEncrypt', res.can_encrypt);
+        encryptHandler($unencryptedArea);
     });
 }
