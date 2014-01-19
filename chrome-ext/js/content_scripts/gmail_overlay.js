@@ -7,7 +7,7 @@ var EMAIL_WINDOW_SELECTOR = '.I5';
 var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var USERNAME_FIELD_SELECTOR = '.oL';
 var TOOLBAR_SELECT = ".n1tfz";
-var FORMAT_BUTTON_SELECT = "td.Up";
+var FORMAT_BUTTON_SELECT = ".az5";
 
 function usernameGetter($usernameField) {
     var emailSpans = $usernameField.children().toArray();
@@ -68,34 +68,35 @@ $(function() {
                 var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
                 if (!(format_button.hasClass("yupper"))) {
                     format_button.addClass("yupper");
-                    var pt_button = '<div class="pt-buttons-wrapper" style="position:absolute;">    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">        <img class="pt_lock_img" src="http://i.imgur.com/D95KZPO.png" style="width:100%;"/>    </div>    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">        <img class="pt_lock_img" src="http://i.imgur.com/qhKbqCR.png" style="width:100%;"/>    </div></div>';
-                    format_button.after(pt_button);
+                    var pt_button = '<div class="pt-buttons-wrapper"">    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">        <img class="pt_lock_img" src="http://i.imgur.com/D95KZPO.png" style="width:100%;"/>    </div>    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">        <img class="pt_lock_img" src="http://i.imgur.com/qhKbqCR.png" style="width:100%;"/>    </div></div>';
+                    format_button.before(pt_button);
                     $(".pt-button").css(
                         {
-                            "                                top":" 1px",
-                            "                                padding":" 10px 7px 5px 8px",
-                            "                                width":" 22px",
-                            "                                height":" 25px",
-                            "                                border":" 1px solid gray",
-                            "                                float":" left",
-                            "                                position":" absolute",
-                            "                                left":" 360px"
+//                            "top":" 1px",
+                            "padding":" 10px 7px 5px 8px",
+                            "width":" 22px",
+                            "height":" 25px",
+                            "border":" 1px solid #f5f5f5",
+                            "border-top":"1px solid rgba(128, 128, 128, 0.32)",
+                            "float":"right"
                         });
                     $('.pt-button').hover(
-                        function(){ $(this).css('border', '1px solid gray') },
-                        function(){ $(this).css('border', '1px solid #f5f5f5') }
+//                        function(){ $(this).css('border', '1px solid gray') },
+//                        function(){ $(this).css(
+//                            {'border':'1px solid #f5f5f5',
+//                            "border-top":"1px solid rgba(128, 128, 128, 0.32)"
+//                            }) }
+                        function(){ $(this).css('cursor', 'pointer') }
                     );
 //                    $("pt_unlocked").css('background-image', 'http://i.imgur.com/D95KZPO.png');
                     $('.pt_unlocked').click(function(e) {
-                            var pt_wrapper = $(this).parents("pt-buttons-wrapper");
                             $(this).hide();
-                            pt_wrapper.find(".pt_locked").show();
+                            $(this).siblings().show();
                         }
                     );
                     $('.pt_locked').click(function(e) {
-                            var pt_wrapper = $(this).parents("pt-buttons-wrapper");
                             $(this).hide();
-                            pt_wrapper.find(".pt_unlocked").show();
+                            $(this).siblings().show();
                         }
                     );
                 }
