@@ -52,7 +52,7 @@ function updateCache(encrypt_for) {
     var cachedUsers = loadLocalStore('cachedUsers'); 
     var uncached = [];
     for (i in encrypt_for) {
-        if (!encrypt_for[i] in cachedUsers) {
+        if (!(encrypt_for[i] in cachedUsers)) {
             uncached.push(encrypt_for[i]);
         }
     }
