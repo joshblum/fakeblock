@@ -14,7 +14,7 @@ function encrypt(plaintext, encrypt_for) {
     var sender_meta = loadLocalStore('userMeta');
 
     //we can't encrypt
-    if (!Object.size(sender_meta) || (encrypt_for === [])) {
+    if (!Object.size(sender_meta) || (encrypt_for.length === 0)) {
         return plaintext
     }
 
@@ -33,6 +33,7 @@ function encrypt(plaintext, encrypt_for) {
         }
     }
 
+
     var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
 
     var res = {
@@ -45,6 +46,7 @@ function encrypt(plaintext, encrypt_for) {
 function getCachedUsers(encrypt_for) {
     updateCache(encrypt_for);
     return loadLocalStore('cachedUsers'); 
+
 }
 
 //update the cache with any users we don't have
