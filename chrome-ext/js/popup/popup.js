@@ -16,17 +16,17 @@ function logout() {
 function renderView() {
     var $loggedIn = $(".logged-in");
     var $loggedOut = $(".logged-out");
-    if (isLoggedIn()){
+    if (isLoggedIn()) {
         $loggedIn.show();
         $loggedOut.hide();
-        $(".who_are_you").text(userMeta.username);
+        $(".user-name").text(userMeta.username);
     } else {
         $loggedOut.show();
         $loggedIn.hide();
     }
 }
 
-function isLoggedIn(){
+function isLoggedIn() {
     return Object.size(userMeta) > 0;
 }
 
@@ -35,9 +35,9 @@ $(document).ready(function() {
     baseUrl = backpage.baseUrl;
     $("a").click(clickHandle);
     sendMessage({
-        "action" : "getUserMeta",
-    }, function(res){
-        userMeta = JSON.parse(res).res;    
+        "action": "getUserMeta",
+    }, function(res) {
+        userMeta = JSON.parse(res).res;
         renderView()
     });
 });
