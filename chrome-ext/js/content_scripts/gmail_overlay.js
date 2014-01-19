@@ -21,8 +21,16 @@ $(function() {
     }
 
     $(document).on('DOMNodeInserted', function(e) {
-        //don't allow the appended unencrypted textarea insert event to propagate
-        if ($(e.target).attr('role') === 'textbox') {
+        if ($(e.target).closest('.parseltongue-unencrypted').length > 0) {
+            //don't allow insert events for objects appended to the unencrypted area to propagate
+            return;
+        } else if ($(e.target).parent().hasClass('parseltongue-encrypted') && 
+            $(e.target).hasClass('gmail_extra')) {
+            //if an old email thread gets revealed in the original textarea
+            //append it to associated unencrypted area instead and reencrypt
+            var $unencryptedArea = $(e.target).parent().data('unencryptedArea');
+            $unencryptedArea.append($(e.target));
+            // encryptHandler($unencryptedArea);
             return;
         }
 
@@ -39,17 +47,16 @@ $(function() {
                 var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
                 makeOverlay($email);
             } else if (overlayable.hasClass('pre-draft')) {
-
-                if (overlayable.data('draft') === undefined || 
-                        overlayable.data('draft') != overlayable.text()) {
-                    //draft hasn't finished loading into compose window
-                    overlayable.data('draft', overlayable.text());
-                } else {
-                    //draft finished loading into compose window
-                    overlayable.data('unencryptedArea').text(
+                if (overlayable.data('draft') === overlayable.html() ||
+                    overlayable.html().indexOf('class="gmail_extra"') >= 0) {
+                    //if draft has finished loading
+                    overlayable.data('unencryptedArea').html(
                         overlayable.data('draft')
                     );
-                    overlayable.removeClass('pre-draft');
+                    overlayable.removeClass('pre-draft');   
+                } else {
+                    //draft hasn't finished loading into compose window
+                    overlayable.data('draft', overlayable.html());
                 }
 
             }
@@ -126,12 +133,12 @@ function encryptHandler($unencryptedArea) {
     uses doEncrypt in unencrypted area's data to check if should update with ciphertext or plaintext
     */
     var $encryptedArea = $unencryptedArea.data('encryptedArea');
-    var message = $unencryptedArea.text();
+    var message = $unencryptedArea.html();
     var usernames = $unencryptedArea.data('usernames');
     if ($unencryptedArea.data('doEncrypt')) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
-        $encryptedArea.text(message);
+        $encryptedArea.html(message);
     }
 
 }
@@ -184,11 +191,11 @@ function requestEncrypt($encryptedArea, message, usernames) {
             msg = res;
         } else {
             var json_encoded = JSON.stringify(res);
-            msg = "<fakeblock>" + 
+            msg = FAKEBLOCK_OPEN_TAG + 
                 encodeString(json_encoded) +
-                "</fakeblock>";
+                FAKEBLOCK_CLOSE_TAG;
         }
-        $encryptedArea.text(msg);
+        $encryptedArea.html(msg);
     });
 }
 
