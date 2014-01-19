@@ -1,8 +1,6 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-   debugger;
-
    decryptFakeblocks();
 
     /***** automatically try to decrypt DOM whenever it changes *****************************************************/
