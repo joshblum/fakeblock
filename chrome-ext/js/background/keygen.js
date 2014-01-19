@@ -6,8 +6,8 @@ var bitlength = 1024;
 //used to generate passphrases
 function randString(length) {
     var text = "";
-    var length = length || 26;
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+-={}[];:|<>,.?/`";
+    var length = length || possible.length;
 
     for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
