@@ -12,11 +12,14 @@ $(document).ready(function() {
 
 //get immediate parents of a fakeblock
 function getDivsContainingFakeBlock($container) {
-    return $container.find('div' +
+
+    return $container.find('div').add($container).filter(
         ':contains("' + FAKEBLOCK_OPEN_TAG + '")' +
-        ':contains("' + FAKEBLOCK_CLOSE_TAG + '")').filter(function(i, elm) {
-        return $(elm).find(':contains("' + FAKEBLOCK_OPEN_TAG + '")').length == 0 &&
-            $(elm).find(':contains("' + FAKEBLOCK_CLOSE_TAG + '")').length == 0 && !$(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS);
+        ':contains("' + FAKEBLOCK_CLOSE_TAG + '")'
+        ).filter(function(i, elm) {
+            return $(elm).find(':contains("' + FAKEBLOCK_OPEN_TAG + '")').length == 0 &&
+                $(elm).find(':contains("' + FAKEBLOCK_CLOSE_TAG + '")').length == 0 && 
+                !$(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS);
     });
 }
 
