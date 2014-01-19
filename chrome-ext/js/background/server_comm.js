@@ -1,4 +1,4 @@
-var URLS {
+var URLS = {
     "pub_upload" : "/upload_pubkey/",
     "pri_upload" : "/upload_prikey/",
     "get_pubkeys" : "/get_pubkeys/",
