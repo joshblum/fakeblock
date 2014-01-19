@@ -16,6 +16,7 @@
                 "js/content_scripts/main.js",
                 "js/content_scripts/grab_token.js",
                 "js/content_scripts/registration.js"
+
             ],
             "matches": [
                 "http://127.0.0.1:8000/*",
