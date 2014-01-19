@@ -34,6 +34,7 @@ function encrypt(plaintext, encrypt_for) {
     }
 
 
+
     var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
 
     var res = {
@@ -45,8 +46,7 @@ function encrypt(plaintext, encrypt_for) {
 
 function getCachedUsers(encrypt_for) {
     updateCache(encrypt_for);
-    return loadLocalStore('cachedUsers'); 
-
+    return loadLocalStore('cachedUsers');
 }
 
 //update the cache with any users we don't have
