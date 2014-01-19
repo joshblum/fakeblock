@@ -6,8 +6,8 @@ var bitlength = 1024;
 //used to generate passphrases
 function randString(length) {
     var text = "";
-    var length = length || 26;
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+-={}[];:|<>,.?/`";
+    var length = length || possible.length;
 
     for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -89,11 +89,11 @@ function uploadUserData() {
         var success = uploadPubKey(username, pub_key);
         var success2 = uploadPriKey(username, encrypted_pri_key);
         // TODO: check if both uploads were successful
-        var user_meta = {
+        var userMeta = {
             "username": username,
             "pri_key": pri_key
         };
-        writeLocalStorage("user_meta", user_meta);
+        writeLocalStorage("userMeta", userMeta);
         registration_data["completed"] = true;
         writeLocalStorage("registration", registration_data);
     }

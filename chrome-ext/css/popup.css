@@ -1,3 +1,31 @@
-hr {
-    margin: 10px 0;
+a {
+    margin:5px;
+}
+
+.popup-wrapper {
+    margin-left:15px;
+    margin-right:15px;
+    width:300px;
+}
+
+.logged-in {
+    margin-top: 7px;
+    float: left;
+    width: 100%;
+    text-align: left;
+    font-size: 18px;
+}
+
+.snake-logo {
+    width: 55px;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+}
+
+.pt-links {
+    float: left;
+    width: 100%;
+    margin-bottom: 8px;
+    font-size:16px;
 }

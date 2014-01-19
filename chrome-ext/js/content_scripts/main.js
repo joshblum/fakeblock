@@ -1,8 +1,6 @@
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
-   debugger;
-
    /**** automatically try to decrypt DOM whenever it changes ****************************************************/
     $(document).on('DOMNodeInserted', function(e) {
         decryptFakeblocks($(e.target));

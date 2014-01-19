@@ -1,19 +1,4 @@
 $(document).ajaxSend(function(event, xhr, settings) {
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie != '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 
     function sameOrigin(url) {
         // url could be relative or scheme relative or absolute
@@ -84,7 +69,7 @@ $(document).ready(function() {
         // local storage, and if there is, upload all the info to
         // the server
         sendMessage({
-            "action": "upload_user_data"
+            "action": "uploadUserData"
         }, function(response) {
             // TODO: something about checking if data upload worked
             // if it failed as opposed to just, already had been done
@@ -136,7 +121,7 @@ $(document).ready(function() {
 
 function initializeUser(email, password, redirect_url) {
     sendMessage({
-        "action": "user_initialize",
+        "action": "userInitialize",
         "username": email,
         "password": password
     }, function(response) {

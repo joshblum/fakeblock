@@ -2,12 +2,12 @@
 //calling backend functions
 
 function messageListener() {
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        executeMessage(request, sender, sendResponse);
-        return true
-    });
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+		executeMessage(request, sender, sendResponse);
+		return true
+	});
 }
 
 $(document).ready(function() {
-    messageListener();
+	messageListener();
 });

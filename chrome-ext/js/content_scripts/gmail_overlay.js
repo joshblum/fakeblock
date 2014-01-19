@@ -205,7 +205,7 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
     if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
     */
     sendMessage({
-        "action" : "can_encrypt_for",
+        "action" : "canEncryptFor",
         "usernames" : usernames,
         "which_network" : "gmail"
     }, function(response) {

@@ -1,69 +1,25 @@
-//global variables and helper functions
+/*
+    userMeta ::=
+     {
+     "pri_key": "",
+     "username": ""
+     }
 
-//localStorage datastructures
-//fakeblock ::=
-//{
-//  "users:" {
-//      "username" : {
-//              //used to verify decryption possible
-//              e_sentinals : [,,,], 
-//              e_shared_secrets : [,,,],
-//      },
-//      ...
-//  },
-//  "cipher_text" : "",
-// }
-
-//user_meta ::= 
-// {
-//  "pub_key" : "",
-//  "pri_key" : "",
-//  "username" : "",
-//  "encrypt_for" : "",
-//  "auth_token" : "",
-// }
-
-// user_map ::=
-// {
-//     "username" :  {
-//         "pub_keys" : [,,,],
-//         "fb_handle" : "",
-//         "fb_id" : "",
-//         "name" : "",
-//     },
-//     ...
-// }
-
-// group_map ::= 
-// {
-//     "group_id" : {
-//         "usernames" : [,,,],
-//         "shared_secret" : "",
-//     },
-//     ...
-// }
-
-
-///////////////////////////// NEW localStorage datastructures
-//user_meta ::=
-// {
-// "pri_key": "",
-// "username": ""
-// }
-//
-// registration ::=
-//{
-//    "pub_key": "",
-//    "pri_key": "",
-//    "encrypted_pri_key": "",
-//    "completed": bool
-//}
+     registration ::=
+    {
+        "pub_key": "",
+        "pri_key": "",
+        "encrypted_pri_key": "",
+        "completed": bool
+    }
+*/
 
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
 // var baseUrl = "http://127.0.0.1:8000";
 var baseUrl = "http://www.parseltongueextension.com";
 var SENTINAL = "fakeblock";
+var userMeta = loadLocalStore("userMeta");
 
 /*
     helper to execute messages between content and background script
@@ -73,13 +29,14 @@ function executeMessage(request, sender, sendResponse) {
     var action = msg.action;
     var ACTION_MAP = {
         "encrypt": [encrypt, msg.message, msg.usernames],
-        "can_encrypt_for": [canEncryptFor, msg.usernames],
+        "canEncryptFor": [canEncryptFor, msg.usernames],
         "decrypt": [decrypt, msg.json],
-        "user_initialize": [userInitialize, msg.username, msg.password],
-        "upload_user_data": [uploadUserData],
+        "userInitialize": [userInitialize, msg.username, msg.password],
+        "uploadUserData": [uploadUserData],
         "getPriKeyFromServer": [getPriKeyFromServer],
         "parseltongueLogout": [parseltongueLogout],
-        "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key]
+        "getUserMeta": [getUserMeta],
+        "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
     };
 
     if (action in ACTION_MAP) {
@@ -95,19 +52,19 @@ function executeMessage(request, sender, sendResponse) {
 }
 
 function getEncryptFor() {
-    var user_meta = loadLocalStore('user_meta');
-    return user_meta.encrypt_for
+    var userMeta = loadLocalStore('userMeta');
+    return userMeta.encrypt_for
 }
 
 function getWillEncrypt() {
-    var user_meta = loadLocalStore('user_meta');
-    return user_meta.will_encrypt
+    var userMeta = loadLocalStore('userMeta');
+    return userMeta.will_encrypt
 }
 
 function encryptFor(usernames) {
-    var user_meta = loadLocalStore('user_meta');
-    user_meta.encrypt_for = usernames;
-    writeLocalStorage('user_meta', user_meta);
+    var userMeta = loadLocalStore('userMeta');
+    userMeta.encrypt_for = usernames;
+    writeLocalStorage('userMeta', userMeta);
 }
 
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
@@ -120,7 +77,9 @@ Object.size = function(obj) {
     return size;
 };
 
-//returns a JSON object of the key or empty dict
+/*
+    returns a JSON object of the key or empty dict
+*/
 function loadLocalStore(key) {
     var localString = localStorage.getItem(key);
     // catch undefined case
@@ -128,13 +87,15 @@ function loadLocalStore(key) {
     return JSON.parse(localString);
 }
 
-//writes to localStorage... value is a dictionary
+/*
+    writes to localStorage... value is a dictionary
+*/
 function writeLocalStorage(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
 }
 
 /*
-Helper to open urls from the extension to the main website
+    Helper to open urls from the extension to the main website
 */
 function openLink(url) {
     chrome.tabs.create({
@@ -142,16 +103,18 @@ function openLink(url) {
     });
 }
 
-//helper function to build a url
-//adds the auth_token to every request
+/*
+    helper function to build a url
+    adds the auth_token to every request
+*/
 function buildUrl(path, getParam) {
     getParam = getParam || {};
-    var user_meta = loadLocalStore('user_meta');
+    var userMeta = loadLocalStore('userMeta');
     var url = baseUrl + path;
-    if (!Object.size(user_meta)) {
+    if (!Object.size(userMeta)) {
         return url
     }
-    url = url + "?auth_token=" + user_meta.auth_token;
+    url = url + "?auth_token=" + userMeta.auth_token;
     if (getParam === {}) {
         return url
     }
@@ -159,4 +122,8 @@ function buildUrl(path, getParam) {
         url += "&" + key + "=" + val
     });
     return url
+}
+
+function getUserMeta() {
+    return loadLocalStore("userMeta");
 }
