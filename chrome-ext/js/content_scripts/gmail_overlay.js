@@ -190,8 +190,12 @@ function encryptHandler($unencryptedArea) {
     var message = $unencryptedArea.html();
     var usernames = $unencryptedArea.data('usernames');
 
-    var canEncryptButton = $unencryptedArea.data('ptButtons') !== undefined && 
-        $unencryptedArea.data('ptButtons').find('.pt_locked').css('display') !== 'none';
+    //if can find button, check if button is visible and set to lock
+    //otherwise do not encrypt
+    var $ptButton = $unencryptedArea.data('ptButtons');
+    var canEncryptButton = $ptButton ?
+        $ptButton.find('.pt_locked').css('display') !== 'none' && $ptButton.css('display') !== 'none' :
+        false;
     if ($unencryptedArea.data('doEncrypt') && canEncryptButton) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
@@ -274,7 +278,7 @@ function requestCanEncryptFor($unencryptedArea) {
      if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
      parseltongue buttons will show or hide accordingly
      */
-    var usernames = $unencryptedArea.data('usernames') !== undefined ? 
+    var usernames = $unencryptedArea.data('usernames') ? 
         $unencryptedArea.data('usernames') : [];
     sendMessage({
         "action" : "canEncryptFor",
@@ -310,3 +314,12 @@ function requestDefaultEncrypt($ptButtons) {
         }
    });
 }
+
+chrome.runtime.onMessage.addListener(function(message) {
+    if ('defaultEncrypt' in message) {
+        var classToToggle = message.defaultEncrypt ? '.pt_unlocked' : '.pt_locked';
+        $.each($(classToToggle), function() {
+            togglePtButton($(this));
+        });
+    }
+});

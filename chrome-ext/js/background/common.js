@@ -63,6 +63,11 @@ function getWillEncrypt() {
     return userMeta.will_encrypt
 }
 
+function getDefaultEncrypt() {
+    var userMeta = loadLocalStore('userMeta');
+    return userMeta.defaultEncrypt;    
+}
+
 function encryptFor(usernames) {
     var userMeta = loadLocalStore('userMeta');
     userMeta.encrypt_for = usernames;
@@ -93,7 +98,13 @@ function loadLocalStore(key) {
     writes to localStorage... value is a dictionary
 */
 function writeLocalStorage(key, value) {
+    var originalDefault = getDefaultEncrypt();
     localStorage.setItem(key, JSON.stringify(value));
+    var newDefault = getDefaultEncrypt();
+    if (originalDefault != newDefault) {
+        sendDefaultEncrypt(newDefault);
+        console.log('hurrah');
+    }
 }
 
 /*
