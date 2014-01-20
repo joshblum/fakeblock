@@ -150,7 +150,7 @@ function makeOverlay($email) {
 }
 
 function makeOverlayHtml($textarea) {
-    /* lots of shit here to make the overlay look like the original */
+    /* lots of shit here to make the overlay look/act like the original */
 
     var $unencryptedArea = $textarea.clone();
     var unencrypted_id = $unencryptedArea.prop('id') + '_unencrypted';
@@ -165,8 +165,14 @@ function makeOverlayHtml($textarea) {
     $unencryptedArea.click(function(evt) {
         evt.stopPropagation();
     }).focus(function(evt) {
-            evt.stopPropagation();
-        });
+        evt.stopPropagation();
+    });
+
+    $textarea.closest('tbody').parent().closest('tbody').children('tr').first().click(function() {
+        //if user clicks on email window, focus into unencrypted area
+        //(TODO: this won't work if no html matched...don't know what to do then but maybe not big deal)
+        $unencryptedArea.focus();
+    }); 
 
     $unencryptedArea.css({
         'min-height' : '85px',
