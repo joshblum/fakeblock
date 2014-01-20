@@ -7,6 +7,11 @@ label {
     font-size: 15px;
 }
 
+hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 .popup-wrapper {
     margin-left:15px;
     margin-right:15px;
@@ -34,4 +39,17 @@ label {
     margin-top:15px;
     margin-bottom: 8px;
     font-size:16px;
+}
+
+.encrypt-wrapper {
+    margin-left:49px;
+}
+
+.has-switch {
+    margin-left:50px;
+    margin-top:15px;
+}
+
+.encrypt-label {
+    font-size: 15px;
 }
