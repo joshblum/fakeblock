@@ -66,7 +66,7 @@ $(function() {
                 var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
                 if (!(format_button.hasClass("yupper"))) {
                     format_button.addClass("yupper");
-                    var $ptButton = $('<div class="pt-buttons-wrapper">' +
+                    var $ptButton = $('<div class="pt-buttons-wrapper" style="display:none;">' +
                     '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
                     '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
                     '    </div>' +
