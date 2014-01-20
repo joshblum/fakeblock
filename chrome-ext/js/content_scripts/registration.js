@@ -78,7 +78,7 @@ $(document).ready(function() {
             // if it failed as opposed to just, already had been done
             // we have a problem
             var res = $.parseJSON(response).res;
-            window.location.replace("http://mail.google.com");
+            window.location.replace("/tutorial/");
         });
     } else if (onThisPage("/login/")) {
         // login button functionality
@@ -136,6 +136,10 @@ function initializeUser(email, password, redirect_url) {
 }
 
 function redirectToGmail() {
+    window.location.replace("http://mail.google.com");
+}
+
+function redirectToTutorial() {
     window.location.replace("http://mail.google.com");
 }
 
