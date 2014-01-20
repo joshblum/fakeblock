@@ -5,7 +5,6 @@ var doEncryptDomains = [
 
 var EMAIL_WINDOW_SELECTOR = '.I5';
 var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
-// var USERNAME_FIELD_SELECTOR = '.oL';
 var TOOLBAR_SELECT = ".n1tfz";
 var FORMAT_BUTTON_SELECT = ".az5";
 
@@ -23,23 +22,22 @@ $(function() {
     }
 
     $(document).on('DOMNodeInserted', function(e) {
-        if ($(e.target).closest('.parseltongue-unencrypted').length > 0) {
+        if ($(e.target).closest(NON_FAKEBLOCK_TEXTAREA_SELECTOR).length > 0) {
             //don't allow insert events for objects appended to the unencrypted area to propagate
             return;
-        } else if ($(e.target).parent().hasClass('parseltongue-encrypted') && 
+        } else if ($(e.target).parent().hasClass(NON_FAKEBLOCK_TEXTAREA_CLASS) && 
             $(e.target).hasClass('gmail_extra')) {
             //if an old email thread gets revealed in the original textarea
             //append it to associated unencrypted area instead and reencrypt
             var $unencryptedArea = $(e.target).parent().data('unencryptedArea');
             $unencryptedArea.append($(e.target));
-            // encryptHandler($unencryptedArea);
             return;
         }
 
         //gmail makes the first matching textarea found into the compose textarea
         //move the unencrypted textarea after the encrypted textarea
         if ($('.aO7').children(TEXTAREA_SELECTOR).length == 1) {
-            $('.aO7').append($('.parseltongue-unencrypted'));
+            $('.aO7').append($(NON_FAKEBLOCK_TEXTAREA_SELECTOR));
         }
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
@@ -68,16 +66,16 @@ $(function() {
                 var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
                 if (!(format_button.hasClass("yupper"))) {
                     format_button.addClass("yupper");
-                    var pt_button = '<div class="pt-buttons-wrapper">' +
+                    var $ptButton = $('<div class="pt-buttons-wrapper">' +
                     '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
                     '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
                     '    </div>' +
                     '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
                     '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
                     '    </div>' +
-                    '</div>';
-                    format_button.before(pt_button);
-                    $(".pt-button").css(
+                    '</div>');
+                    format_button.before($ptButton);
+                    $ptButton.find(".pt-button").css(
                         {
 //                            "top":" 1px",
                             "padding":" 10px 7px 5px 8px",
@@ -87,7 +85,7 @@ $(function() {
                             "border-top":"1px solid rgba(128, 128, 128, 0.32)",
                             "float":"right"
                         });
-                    $('.pt-button').hover(
+                    $ptButton.find('.pt-button').hover(
 //                        function(){ $(this).css('border', '1px solid gray') },
 //                        function(){ $(this).css(
 //                            {'border':'1px solid #f5f5f5',
@@ -95,18 +93,13 @@ $(function() {
 //                            }) }
                         function(){ $(this).css('cursor', 'pointer') }
                     );
-                    $('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
-                            $(this).hide();
-                            $(this).siblings().show();
-                        }
-                    );
-                    $('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
-                            $(this).hide();
-                            $(this).siblings().show();
-                        }
-                    );
-                    // when can_encrypt_for returns false, hide pt-buttons-wrapper
-                    // when can_encrypt_for returns true, show pt-buttons-wrapper
+                    $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
+                        togglePtButton($(this));
+                    });
+                    $ptButton.find('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
+                        togglePtButton($(this));
+                    });
+                    bindPtButtons(overlayable, $ptButton);
                 }
             }
         }
@@ -120,8 +113,24 @@ $(function() {
     });
 });
 
-function bindPtButtons() {
+function bindPtButtons($encryptedArea, $ptButtons) {
+    /*
+    initialize parseltongue buttons
+    binds parseltongue buttons to the proper unencrypted textarea
+    sets the default encrypt/decrypt option based on usermeta.defaultEncrypt
+    shows or hides all parseltongue buttons if can encrypt for current usernames
+    */
+    var $unencryptedArea = $encryptedArea.data('unencryptedArea');
+    $unencryptedArea.data('ptButtons', $ptButtons);
+    $ptButtons.data('unencryptedArea', $unencryptedArea);
+    requestDefaultEncrypt($ptButtons);
+    requestCanEncryptFor($unencryptedArea);
+}
 
+function togglePtButton($ptButton) {
+    $ptButton.hide();
+    $ptButton.siblings().show();
+    encryptHandler($ptButton.closest('.pt-buttons-wrapper').data('unencryptedArea'));
 }
 
 function makeOverlay($email) {
@@ -133,15 +142,7 @@ function makeOverlay($email) {
     $textarea.after($unencryptedArea);
     $textarea.hide();
 
-    //username field probably(?) hasn't loaded yet, but need to associate this unencrypted area and the username field 
-    // $usernameField = $email.find(USERNAME_FIELD_SELECTOR);
-    // if ($usernameField.length > 0) {
-    //     $usernameField.data('unencryptedArea', $unencryptedArea);
-    //     //this initial call may not be necessary since usernames probably haven't loaded yet
-    //     updateUsernames($usernameField);
-    // }
-
-    //if can't find a username field yet, default to not encrypting...username field should load later anyway
+    //set doencrypt to false since usernames should be empty when email first opens
     $unencryptedArea.data('doEncrypt', false);
 
     $unencryptedArea.keyup(function(e) {
@@ -173,7 +174,7 @@ function makeOverlayHtml($textarea) {
         'min-height' : '85px',
         'direction' : 'ltr'
     });
-    $unencryptedArea.addClass('Al LW-avf parseltongue-unencrypted');
+    $unencryptedArea.addClass(['Al', 'LW-avf', NON_FAKEBLOCK_TEXTAREA_CLASS].join(' '));
 
     $unencryptedArea.data('encryptedArea', $textarea);
 
@@ -188,7 +189,9 @@ function encryptHandler($unencryptedArea) {
     var $encryptedArea = $unencryptedArea.data('encryptedArea');
     var message = $unencryptedArea.html();
     var usernames = $unencryptedArea.data('usernames');
-    var canEncryptButton = $('.pt_locked').css('display') !== 'none';
+
+    var canEncryptButton = $unencryptedArea.data('ptButtons') !== undefined && 
+        $unencryptedArea.data('ptButtons').find('.pt_locked').css('display') !== 'none';
     if ($unencryptedArea.data('doEncrypt') && canEncryptButton) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
@@ -226,7 +229,9 @@ function updateUsernames($usernameField, usernameToDelete) {
     //check if username field has been associated with a textarea yet
     var $unencryptedArea = $usernameField.data('unencryptedArea');
     if ($unencryptedArea === undefined) {
-        $unencryptedArea = $usernameField.closest(EMAIL_WINDOW_SELECTOR).find('.parseltongue-unencrypted');
+        $unencryptedArea = $usernameField.closest(EMAIL_WINDOW_SELECTOR).find(
+            NON_FAKEBLOCK_TEXTAREA_SELECTOR
+        );
         $usernameField.data('unencryptedArea', $unencryptedArea);
     }
 
@@ -236,7 +241,7 @@ function updateUsernames($usernameField, usernameToDelete) {
         usernames.splice(usernameDeleteIndex, 1);
     }
     $unencryptedArea.data('usernames', usernames);
-    requestCanEncryptFor($unencryptedArea, usernames);
+    requestCanEncryptFor($unencryptedArea);
 }
 
 function requestEncrypt($encryptedArea, message, usernames) {
@@ -263,23 +268,45 @@ function requestEncrypt($encryptedArea, message, usernames) {
     });
 }
 
-function requestCanEncryptFor($unencryptedArea, usernames) {
+function requestCanEncryptFor($unencryptedArea) {
     /*
      send message to back asking if the usernames can be encrypted for (are valid parseltongue users)
      if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
+     parseltongue buttons will show or hide accordingly
      */
+    var usernames = $unencryptedArea.data('usernames') !== undefined ? 
+        $unencryptedArea.data('usernames') : [];
     sendMessage({
         "action" : "canEncryptFor",
         "usernames" : usernames,
     }, function(response) {
         var res = $.parseJSON(response).res;
         $unencryptedArea.data('doEncrypt', res.can_encrypt);
-        var ptButtonsWrapper = $('.pt-buttons-wrapper');
-        if (res.can_encrypt) {
-            ptButtonsWrapper.show();
-        } else {
-            ptButtonsWrapper.hide();
+        var ptButtonsWrapper = $unencryptedArea.data('ptButtons');
+        if (ptButtonsWrapper) {
+            if (res.can_encrypt) {
+                ptButtonsWrapper.show();
+            } else {
+                ptButtonsWrapper.hide();
+            }
         }
         encryptHandler($unencryptedArea);
     });
+}
+
+function requestDefaultEncrypt($ptButtons) {
+    /*
+    get default setting for encrypt on or off
+    show or hide $unencryptedArea's lock/snake buttons on opening compose window
+    */
+    sendMessage({
+       "action": "getUserMeta",
+   }, function(res) {
+        userMeta = JSON.parse(res).res;
+        if (userMeta.defaultEncrypt) {
+            togglePtButton($ptButtons.find('.pt_unlocked'));
+        } else {
+            togglePtButton($ptButtons.find('.pt_locked'));
+        }
+   });
 }
