@@ -5,7 +5,7 @@
     "browser_action": {
         "default_icon": "img/snake2.png",
         "default_popup": "html/popup.html",
-        "default_title": "Fakeblock"
+        "default_title": "ParselTongue"
     },
     "content_scripts": [
         {
@@ -22,7 +22,6 @@
             "matches": [
                 "http://127.0.0.1:8000/*",
                 "https://mail.google.com/*",
-                "http://fakeblock.herokuapp.com/*",
                 "http://*.getparseltongue.com/*",
                 "http://*.parseltongueextension.com/*",
                 "http://127.0.0.1:8000/*"
@@ -33,16 +32,15 @@
         "libs/jquery-1.10.2.min.js",
         "libs/jquery-1.10.2.min.map"
     ],
-    "description": "Fakeblock",
+    "description": "ParselTongue",
     "icons": {
         "128": "img/snake2.png",
         "48": "img/snake2.png"
     },
-    "homepage_url": "http://fakeblock.herokuapp.com/*",
+    "homepage_url": "http://www.parseltongueextension.com/",
     "manifest_version": 2,
-    "name": "Fakeblock",
+    "name": "ParselTongue",
     "permissions": [
-        "http://fakeblock.herokuapp.com/*",
         "http://www.parseltongueextension.com/*",
         "http://www.getparseltongue.com/*",
         "http://127.0.0.1:8000/*",
