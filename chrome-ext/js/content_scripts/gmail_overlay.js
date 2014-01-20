@@ -25,19 +25,13 @@ $(function() {
         if ($(e.target).closest(NON_FAKEBLOCK_TEXTAREA_SELECTOR).length > 0) {
             //don't allow insert events for objects appended to the unencrypted area to propagate
             return;
-        } else if ($(e.target).parent().hasClass(NON_FAKEBLOCK_TEXTAREA_CLASS) && 
+        } else if ($(e.target).parent().hasClass(FAKEBLOCK_TEXTAREA_CLASS) && 
             $(e.target).hasClass('gmail_extra')) {
             //if an old email thread gets revealed in the original textarea
             //append it to associated unencrypted area instead and reencrypt
             var $unencryptedArea = $(e.target).parent().data('unencryptedArea');
             $unencryptedArea.append($(e.target));
             return;
-        }
-
-        //gmail makes the first matching textarea found into the compose textarea
-        //move the unencrypted textarea after the encrypted textarea
-        if ($('.aO7').children(TEXTAREA_SELECTOR).length == 1) {
-            $('.aO7').append($(NON_FAKEBLOCK_TEXTAREA_SELECTOR));
         }
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
