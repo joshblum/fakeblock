@@ -44,7 +44,9 @@ $(function() {
         var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
         var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
 
-        if (overlayable.length > 0) {
+        //this is awkward, but we have to wait until the textarea's tabindex is set
+        //so can tab to overlay but can't tab to original email
+        if (overlayable.length > 0 && overlayable.attr('tabindex')) {
             if (! overlayable.hasClass('has-overlay')) {
                 var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
                 makeOverlay($email);
@@ -161,8 +163,10 @@ function makeOverlayHtml($textarea) {
     $unencryptedArea.attr({
         id : unencrypted_id,
         role : 'textbox',
-        contenteditable : true
+        contenteditable : true,
+        tabindex : $textarea.attr('tabindex')
     });
+    $textarea.removeAttr('tabindex');
 
     $unencryptedArea.click(function(evt) {
         evt.stopPropagation();
