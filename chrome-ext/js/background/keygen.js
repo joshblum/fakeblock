@@ -1,19 +1,23 @@
 //lib for creating a shared secret and RSA pub/pri keys
 // The length of the RSA key, in bits.
 var bitlength = 1024;
+// default to 256-bit aes key
+var aesBitLength = 256;
 
 //generate a random passphrase
 //used to generate passphrases
 function randString(length) {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+-={}[];:|<>,.?/`";
-    var length = length || possible.length;
+    length = length ? length : aesBitLength / 8;
+    randBuf= new Uint8Array(length);
+    window.crypto.getRandomValues(randBuf);
+    return arrayBufferToString(randBuf);
+}
 
-    for (var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return text;
+function arrayBufferToString(buf) {
+    /*
+    from http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+    */
+   return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
 
 //generates and returns a public/private key pair
