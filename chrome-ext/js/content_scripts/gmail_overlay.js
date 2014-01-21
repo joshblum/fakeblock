@@ -35,13 +35,13 @@ $(function() {
         }
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
-        var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
+        var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(FAKEBLOCK_TEXTAREA_SELECTOR);
         var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
 
-        //this is awkward, but we have to wait until the textarea's tabindex is set
-        //so can tab to overlay but can't tab to original email
-        if (overlayable.length > 0 && overlayable.attr('tabindex')) {
-            if (! overlayable.hasClass('has-overlay')) {
+        if (overlayable.length > 0) {
+            if (! overlayable.hasClass('has-overlay') && overlayable.attr('tabindex')) {
+                //this is awkward, but we have to wait until the textarea's tabindex is set
+                //so can tab to overlay but can't tab to original email
                 var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
                 makeOverlay($email);
             } else if (overlayable.hasClass('pre-draft')) {
@@ -58,7 +58,7 @@ $(function() {
                 }
 
             }
-            if (email_toolbar.length > 0) {
+            if (email_toolbar.length > 0 && overlayable.hasClass('has-overlay')) {
                 var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
                 if (!(format_button.hasClass("yupper"))) {
                     format_button.addClass("yupper");
@@ -155,6 +155,8 @@ function makeOverlayHtml($textarea) {
     /* lots of shit here to make the overlay look/act like the original */
 
     var $unencryptedArea = $textarea.clone();
+    // clear text in unencrypted area
+    $unencryptedArea.text('');
     var unencrypted_id = $unencryptedArea.prop('id') + '_unencrypted';
     $unencryptedArea.attr({
         id : unencrypted_id,

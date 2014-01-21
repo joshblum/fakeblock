@@ -1,5 +1,6 @@
 //class to add to the compose email textarea so that it doesn't get decrypted before being sent
 var FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-encrypted';
+var FAKEBLOCK_TEXTAREA_SELECTOR = '.' + FAKEBLOCK_TEXTAREA_CLASS;
 var NON_FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-unencrypted';
 var NON_FAKEBLOCK_TEXTAREA_SELECTOR = '.' + NON_FAKEBLOCK_TEXTAREA_CLASS;
 var FAKEBLOCK_OPEN_TAG = '|fakeblock|'
