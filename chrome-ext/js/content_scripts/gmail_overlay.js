@@ -35,7 +35,7 @@ $(function() {
         }
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
-        var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(FAKEBLOCK_TEXTAREA_SELECTOR);
+        var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
         var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
 
         if (overlayable.length > 0) {
@@ -58,47 +58,49 @@ $(function() {
                 }
 
             }
-            if (email_toolbar.length > 0 && overlayable.hasClass('has-overlay')) {
-                var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
-                if (!(format_button.hasClass("yupper"))) {
-                    format_button.addClass("yupper");
-                    var $ptButton = $('<div class="pt-buttons-wrapper" style="display:none;">' +
-                    '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
-                    '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
-                    '    </div>' +
-                    '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
-                    '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
-                    '    </div>' +
-                    '</div>');
-                    format_button.before($ptButton);
-                    $ptButton.find(".pt-button").css(
-                        {
+        }
+
+        if (email_toolbar.length > 0 && overlayable.filter('.has-overlay').length > 0) {
+            overlayable = overlayable.filter('.has-overlay');
+            var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
+            if (!(format_button.hasClass("yupper"))) {
+                format_button.addClass("yupper");
+                var $ptButton = $('<div class="pt-buttons-wrapper" style="display:none;">' +
+                '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
+                '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
+                '    </div>' +
+                '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
+                '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
+                '    </div>' +
+                '</div>');
+                format_button.before($ptButton);
+                $ptButton.find(".pt-button").css(
+                    {
 //                            "top":" 1px",
-                            "padding":" 10px 7px 5px 8px",
-                            "width":" 22px",
-                            "height":" 25px",
-                            "border":" 1px solid #f5f5f5",
-                            "border-top":"1px solid rgba(128, 128, 128, 0.32)",
-                            "float":"right"
-                        });
-                    $ptButton.find('.pt-button').hover(
+                        "padding":" 10px 7px 5px 8px",
+                        "width":" 22px",
+                        "height":" 25px",
+                        "border":" 1px solid #f5f5f5",
+                        "border-top":"1px solid rgba(128, 128, 128, 0.32)",
+                        "float":"right"
+                    });
+                $ptButton.find('.pt-button').hover(
 //                        function(){ $(this).css('border', '1px solid gray') },
 //                        function(){ $(this).css(
 //                            {'border':'1px solid #f5f5f5',
 //                            "border-top":"1px solid rgba(128, 128, 128, 0.32)"
 //                            }) }
-                        function(){ $(this).css('cursor', 'pointer') }
-                    );
-                    $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
-                        e.preventDefault();
-                        togglePtButton($(this));
-                    });
-                    $ptButton.find('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
-                        e.preventDefault();
-                        togglePtButton($(this));
-                    });
-                    bindPtButtons(overlayable, $ptButton);
-                }
+                    function(){ $(this).css('cursor', 'pointer') }
+                );
+                $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
+                    e.preventDefault();
+                    togglePtButton($(this));
+                });
+                $ptButton.find('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
+                    e.preventDefault();
+                    togglePtButton($(this));
+                });
+                bindPtButtons(overlayable, $ptButton);
             }
         }
 
