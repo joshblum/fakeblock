@@ -90,9 +90,11 @@ $(function() {
                         function(){ $(this).css('cursor', 'pointer') }
                     );
                     $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
+                        e.preventDefault();
                         togglePtButton($(this));
                     });
                     $ptButton.find('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
+                        e.preventDefault();
                         togglePtButton($(this));
                     });
                     bindPtButtons(overlayable, $ptButton);
