@@ -20,59 +20,6 @@
 // var baseUrl = "http://127.0.0.1:8000";
 var baseUrl = "http://www.parseltongueextension.com";
 var SENTINAL = "fakeblock";
-var userMeta = loadLocalStore("userMeta");
-
-/*
-    helper to execute messages between content and background script
-*/
-function executeMessage(request, sender, sendResponse) {
-    var msg = JSON.parse(request);
-    var action = msg.action;
-    var ACTION_MAP = {
-        "encrypt": [encrypt, msg.message, msg.usernames],
-        "canEncryptFor": [canEncryptFor, msg.usernames],
-        "decrypt": [decrypt, msg.json],
-        "userInitialize": [userInitialize, msg.username, msg.password],
-        "uploadUserData": [uploadUserData],
-        "getPriKeyFromServer": [getPriKeyFromServer],
-        "parseltongueLogout": [parseltongueLogout],
-        "getUserMeta": [getUserMeta],
-        "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
-        "writeLocalStorage": [writeLocalStorage, "userMeta", msg.userMeta]
-    };
-
-    if (action in ACTION_MAP) {
-        var args = ACTION_MAP[action]; //get mapped function and args
-        //apply func with args
-        var res = args[0].apply(this, args.slice(1));
-        if (args[args.length - 1] != sendResponse) {
-            sendResponse(JSON.stringify({
-                "res": res,
-            }));
-        }
-    }
-}
-
-function getEncryptFor() {
-    var userMeta = loadLocalStore('userMeta');
-    return userMeta.encrypt_for
-}
-
-function getWillEncrypt() {
-    var userMeta = loadLocalStore('userMeta');
-    return userMeta.will_encrypt
-}
-
-function getDefaultEncrypt() {
-    var userMeta = loadLocalStore('userMeta');
-    return userMeta.defaultEncrypt;    
-}
-
-function encryptFor(usernames) {
-    var userMeta = loadLocalStore('userMeta');
-    userMeta.encrypt_for = usernames;
-    writeLocalStorage('userMeta', userMeta);
-}
 
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {
@@ -135,10 +82,6 @@ function buildUrl(path, getParam) {
         url += "&" + key + "=" + val
     });
     return url
-}
-
-function getUserMeta() {
-    return loadLocalStore("userMeta");
 }
 
 function normalizeEmail(email) {

@@ -35,7 +35,7 @@ function toggleSwitch(e, data) {
     setTip();
     $(".has-switch").tooltip("show");
     sendMessage({
-        "action": "writeLocalStorage",
+        "action": "writeUserMeta",
         "userMeta": userMeta,
     }, function(res) {});
 }
