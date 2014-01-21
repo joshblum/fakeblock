@@ -38,70 +38,79 @@ $(function() {
         var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
         var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
 
-        if (overlayable.length > 0) {
+        if (overlayable.length == 1) {
             if (! overlayable.hasClass('has-overlay') && overlayable.attr('tabindex')) {
                 //this is awkward, but we have to wait until the textarea's tabindex is set
                 //so can tab to overlay but can't tab to original email
                 var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
                 makeOverlay($email);
             } else if (overlayable.hasClass('pre-draft')) {
-                if (overlayable.data('draft') === overlayable.html() ||
-                    overlayable.html().indexOf('class="gmail_extra"') >= 0) {
+
+            }
+        } else if (overlayable.length == 2) {
+            var draftable = overlayable.filter('.pre-draft');
+            if (draftable.length > 0) {
+                draft_html = draftable.html()
+                if ( ( draftable.data('draft') === draft_html ||
+                    draft_html.indexOf('class="gmail_extra"') >= 0 ) &&
+                    ( draft_html.indexOf('<wbr>') < 0 ||
+                    draft_html.length - draft_html.indexOf('<wbr>') !== '<wbr>'.length) )  {
                     //if draft has finished loading
-                    overlayable.data('unencryptedArea').html(
-                        overlayable.data('draft')
+                    draftable.data('unencryptedArea').html(
+                        draftable.data('draft')
                     );
-                    overlayable.removeClass('pre-draft');   
+                    draftable.removeClass('pre-draft');   
                 } else {
                     //draft hasn't finished loading into compose window
-                    overlayable.data('draft', overlayable.html());
+                    draftable.data('draft', draft_html);
                 }
-
             }
-        }
 
-        if (email_toolbar.length > 0 && overlayable.filter('.has-overlay').length > 0) {
-            overlayable = overlayable.filter('.has-overlay');
-            var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
-            if (!(format_button.hasClass("yupper"))) {
-                format_button.addClass("yupper");
-                var $ptButton = $('<div class="pt-buttons-wrapper" style="display:none;">' +
-                '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
-                '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
-                '    </div>' +
-                '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
-                '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
-                '    </div>' +
-                '</div>');
-                format_button.before($ptButton);
-                $ptButton.find(".pt-button").css(
-                    {
-//                            "top":" 1px",
-                        "padding":" 10px 7px 5px 8px",
-                        "width":" 22px",
-                        "height":" 25px",
-                        "border":" 1px solid #f5f5f5",
-                        "border-top":"1px solid rgba(128, 128, 128, 0.32)",
-                        "float":"right"
+            var buttonable = overlayable.filter('.has-overlay');
+            if (email_toolbar.length > 0 && buttonable.length > 0) {
+                var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
+                if (!(format_button.hasClass("yupper"))) {
+                    format_button.addClass("yupper");
+                    var $ptButton = $('<div class="pt-buttons-wrapper" style="display:none;">' +
+                    '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
+                    '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
+                    '    </div>' +
+                    '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
+                    '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
+                    '    </div>' +
+                    '</div>');
+                    format_button.before($ptButton);
+                    $ptButton.find(".pt-button").css(
+                        {
+    //                            "top":" 1px",
+                            "padding":" 10px 7px 5px 8px",
+                            "width":" 22px",
+                            "height":" 25px",
+                            "border":" 1px solid #f5f5f5",
+                            "border-top":"1px solid rgba(128, 128, 128, 0.32)",
+                            "float":"right"
+                        });
+                    $ptButton.find('.pt-button').hover(
+    //                        function(){ $(this).css('border', '1px solid gray') },
+    //                        function(){ $(this).css(
+    //                            {'border':'1px solid #f5f5f5',
+    //                            "border-top":"1px solid rgba(128, 128, 128, 0.32)"
+    //                            }) }
+                        function(){ $(this).css('cursor', 'pointer') }
+                    );
+                    $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
+                        e.preventDefault();
+                        togglePtButton($(this));
                     });
-                $ptButton.find('.pt-button').hover(
-//                        function(){ $(this).css('border', '1px solid gray') },
-//                        function(){ $(this).css(
-//                            {'border':'1px solid #f5f5f5',
-//                            "border-top":"1px solid rgba(128, 128, 128, 0.32)"
-//                            }) }
-                    function(){ $(this).css('cursor', 'pointer') }
-                );
-                $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
-                    e.preventDefault();
-                    togglePtButton($(this));
-                });
-                $ptButton.find('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
-                    e.preventDefault();
-                    togglePtButton($(this));
-                });
-                bindPtButtons(overlayable, $ptButton);
+                    $ptButton.find('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
+                        e.preventDefault();
+                        togglePtButton($(this));
+                    });
+                    bindPtButtons(buttonable, $ptButton);
+                }
+            
             }
+
         }
 
         //update usernames if (possibly) a new username has been added
