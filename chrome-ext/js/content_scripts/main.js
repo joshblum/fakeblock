@@ -23,7 +23,8 @@ function getDivsContainingFakeBlock($container) {
         ).filter(function(i, elm) {
             return $(elm).find(':contains("' + FAKEBLOCK_OPEN_TAG + '")').length == 0 &&
                 $(elm).find(':contains("' + FAKEBLOCK_CLOSE_TAG + '")').length == 0 && 
-                !$(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS);
+                ! $(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS) && 
+                ! $(elm).closest(FAKEBLOCK_TEXTAREA_SELECTOR).length > 0;
     });
 }
 

@@ -218,7 +218,9 @@ function encryptHandler($unencryptedArea) {
     if ($unencryptedArea.data('doEncrypt') && canEncryptButton) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
-        $encryptedArea.html(message);
+        if ($encryptedArea) {
+            $encryptedArea.html(message);
+        }
     }
 
 }
