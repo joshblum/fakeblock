@@ -69,7 +69,7 @@ function updateCache(encrypt_for) {
 function canEncryptFor(usernames) {
     if (usernames.length == 0 || usernames.indexOf(null) >= 0) {
         return {
-            "can_encrypt" : false;
+            "can_encrypt" : false
         }
     }
     var pub_keys = getPubKeysFromServer(usernames);

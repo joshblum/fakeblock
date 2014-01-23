@@ -7,18 +7,15 @@ var EMAIL_WINDOW_SELECTOR = '.I5';
 var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var TOOLBAR_SELECT = ".n1tfz";
 var FORMAT_BUTTON_SELECT = ".az5";
+var USERNAME_FIELD_CLASS = 'vR';
+var USERNAME_FIELD_SELECTOR = '.vR';
 
-function usernameGetter($usernameField) {
-    return $usernameField.find('*').filter(function(i, elm) {
-        return $(elm).attr('email') !== undefined;
-    }).toArray().map(function(emailSpan) {
-        return $(emailSpan).attr('email');
-    });
-}
+var doEncryptMap = {};
+var draftMap = {};
 
 $(function() {
     if (doEncryptDomains.indexOf(document.domain) < 0) {
-        return
+        return;
     }
 
     $(document).on('DOMNodeInserted', function(e) {
@@ -29,7 +26,7 @@ $(function() {
             $(e.target).hasClass('gmail_extra')) {
             //if an old email thread gets revealed in the original textarea
             //append it to associated unencrypted area instead and reencrypt
-            var $unencryptedArea = $(e.target).parent().data('unencryptedArea');
+            var $unencryptedArea = getUnencryptedAreaFor($(e.target));
             $unencryptedArea.append($(e.target));
             return;
         }
@@ -39,30 +36,33 @@ $(function() {
         var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
 
         if (overlayable.length == 1) {
+
             if (! overlayable.hasClass('has-overlay') && overlayable.attr('tabindex')) {
                 //this is awkward, but we have to wait until the textarea's tabindex is set
                 //so can tab to overlay but can't tab to original email
                 var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
                 makeOverlay($email);
-            } else if (overlayable.hasClass('pre-draft')) {
+            } 
 
-            }
         } else if (overlayable.length == 2) {
             var draftable = overlayable.filter('.pre-draft');
             if (draftable.length > 0) {
-                draft_html = draftable.html()
-                if ( ( draftable.data('draft') === draft_html ||
+                var draft_html = draftable.html();
+
+                if ( ( getDraftFor(draftable) === draft_html ||
                     draft_html.indexOf('class="gmail_extra"') >= 0 ) &&
                     ( draft_html.indexOf('<wbr>') < 0 ||
                     draft_html.length - draft_html.indexOf('<wbr>') !== '<wbr>'.length) )  {
+
                     //if draft has finished loading
-                    draftable.data('unencryptedArea').html(
-                        draftable.data('draft')
+                    getUnencryptedAreaFor(draftable).html(
+                        getDraftFor(draftable) 
                     );
                     draftable.removeClass('pre-draft');   
+
                 } else {
                     //draft hasn't finished loading into compose window
-                    draftable.data('draft', draft_html);
+                    setDraftFor(draftable, draft_html);
                 }
             }
 
@@ -106,32 +106,36 @@ $(function() {
                         e.preventDefault();
                         togglePtButton($(this));
                     });
-                    bindPtButtons(buttonable, $ptButton);
+
+                    bindPtButtons($ptButton);
                 }
             
             }
 
         }
+        if ($(e.target).hasClass(USERNAME_FIELD_CLASS)) {
+            //update usernames if (possibly) a new username has been added
+            usernameHandler($(e.target));
+        }
 
-        //update usernames if (possibly) a new username has been added
-        usernameHandler(e.target);
     });
 
     $(document).on('DOMNodeRemoved', function(e) {
-        usernameHandler(e.target, true);
+        if ($(e.target).hasClass(USERNAME_FIELD_CLASS)) {
+            usernameHandler($(e.target), true);
+        }
+
     });
 });
 
-function bindPtButtons($encryptedArea, $ptButtons) {
+function bindPtButtons($ptButtons) {
     /*
     initialize parseltongue buttons
     binds parseltongue buttons to the proper unencrypted textarea
     sets the default encrypt/decrypt option based on usermeta.defaultEncrypt
     shows or hides all parseltongue buttons if can encrypt for current usernames
     */
-    var $unencryptedArea = $encryptedArea.data('unencryptedArea');
-    $unencryptedArea.data('ptButtons', $ptButtons);
-    $ptButtons.data('unencryptedArea', $unencryptedArea);
+    var $unencryptedArea = getUnencryptedAreaFor($ptButtons);
     requestDefaultEncrypt($ptButtons);
     requestCanEncryptFor($unencryptedArea);
 }
@@ -139,7 +143,7 @@ function bindPtButtons($encryptedArea, $ptButtons) {
 function togglePtButton($ptButton) {
     $ptButton.hide();
     $ptButton.siblings().show();
-    encryptHandler($ptButton.closest('.pt-buttons-wrapper').data('unencryptedArea'));
+    encryptHandler(getUnencryptedAreaFor($ptButton));
 }
 
 function makeOverlay($email) {
@@ -152,14 +156,13 @@ function makeOverlay($email) {
     $textarea.hide();
 
     //set doencrypt to false since usernames should be empty when email first opens
-    $unencryptedArea.data('doEncrypt', false);
+    doEncryptDomains[$unencryptedArea.prop('id')] = false;
 
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
     });
     $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
     $textarea.addClass('has-overlay pre-draft');
-    $textarea.data('unencryptedArea', $unencryptedArea);
 }
 
 function makeOverlayHtml($textarea) {
@@ -195,8 +198,6 @@ function makeOverlayHtml($textarea) {
     });
     $unencryptedArea.addClass(['Al', 'LW-avf', NON_FAKEBLOCK_TEXTAREA_CLASS].join(' '));
 
-    $unencryptedArea.data('encryptedArea', $textarea);
-
     return $unencryptedArea;
 }
 
@@ -205,17 +206,17 @@ function encryptHandler($unencryptedArea) {
      handler for keyup in an unencrypted area
      uses doEncrypt in unencrypted area's data to check if should update with ciphertext or plaintext
      */
-    var $encryptedArea = $unencryptedArea.data('encryptedArea');
+    var $encryptedArea = getEncryptedAreaFor($unencryptedArea); 
     var message = $unencryptedArea.html();
-    var usernames = $unencryptedArea.data('usernames');
+    var usernames = getUsernamesFor($unencryptedArea); 
 
     //if can find button, check if button is visible and set to lock
     //otherwise do not encrypt
-    var $ptButton = $unencryptedArea.data('ptButtons');
-    var canEncryptButton = $ptButton ?
-        $ptButton.find('.pt_locked').css('display') !== 'none' && $ptButton.css('display') !== 'none' :
+    var $ptButtons = getPtButtonsFor($unencryptedArea);
+    var canEncryptButton = $ptButtons.length > 0 ?
+        $ptButtons.find('.pt_locked').css('display') !== 'none' && $ptButtons.css('display') !== 'none' :
         false;
-    if ($unencryptedArea.data('doEncrypt') && canEncryptButton) {
+    if (getDoEncryptFor($unencryptedArea) && canEncryptButton) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
         if ($encryptedArea) {
@@ -225,48 +226,84 @@ function encryptHandler($unencryptedArea) {
 
 }
 
-function usernameHandler(emailSpan, deleteEmail) {
+function usernameHandler($emailSpan, deleteEmail) {
     /*
      handler for an email address getting added or removed from the addressees
      updates the usernames list for the appropriate unencrypted textarea
      */
-    var emailSpans = $(emailSpan).children().add($(emailSpan)).filter(function(i, elm) { 
-        return $(elm).attr('email') !== undefined; 
-    });
-    //TODO: what happens if more than one email span? is this possible?
-    //TODO: normalize emails in frontend too?
-    if (emailSpans.length == 1) {
-        $usernameField = emailSpans.parent().parent();
-        var usernameToDelete = null;
-        if (deleteEmail) {
-            usernameToDelete = emailSpans.attr('email');
-        }
-        updateUsernames($usernameField, usernameToDelete);
+    var $unencryptedArea = $emailSpan.closest(EMAIL_WINDOW_SELECTOR).find(NON_FAKEBLOCK_TEXTAREA_SELECTOR);
+    if (deleteEmail) {
+        var usernameToDelete = $emailSpan.children().add($emailSpan).filter(function(i, elm) {
+            return $(elm).attr('email') !== undefined;
+        }).attr('email'); 
     }
+    requestCanEncryptFor($unencryptedArea, usernameToDelete)
+        
 }
 
-function updateUsernames($usernameField, usernameToDelete) {
-    /*
-     call to check if the usernames are all still valid parseltongue users
-     if yes/no, update the doEncrypt field of the corresponding unencrypted textarea
-     */
-
-    //check if username field has been associated with a textarea yet
-    var $unencryptedArea = $usernameField.data('unencryptedArea');
-    if ($unencryptedArea === undefined) {
-        $unencryptedArea = $usernameField.closest(EMAIL_WINDOW_SELECTOR).find(
-            NON_FAKEBLOCK_TEXTAREA_SELECTOR
-        );
-        $usernameField.data('unencryptedArea', $unencryptedArea);
+function getUsernamesFor($unencryptedArea, usernameToDelete) {
+    var $usernameElms = $unencryptedArea
+        .closest(EMAIL_WINDOW_SELECTOR)
+        .find(USERNAME_FIELD_SELECTOR)
+        .find('*')
+        .filter(function(i, elm) {
+            return $(elm).attr('email') !== undefined;
+        });
+    var usernames = $usernameElms.toArray().map(function(elm) { 
+        return $(elm).attr('email').toLowerCase();
+    });
+    var usernamesToReturn = [];
+    for (var i in usernames) {
+        if (usernames.indexOf(usernames[i]) == i) {
+            usernamesToReturn.push(usernames[i]);
+        }
     }
-
-    var usernames = usernameGetter($usernameField);
-    var usernameDeleteIndex = usernames.indexOf(usernameToDelete);
+    var usernameDeleteIndex = usernamesToReturn.indexOf(usernameToDelete);
     if (usernameDeleteIndex >= 0) {
-        usernames.splice(usernameDeleteIndex, 1);
+        usernamesToReturn.splice(usernameDeleteIndex, 1);
     }
-    $unencryptedArea.data('usernames', usernames);
-    requestCanEncryptFor($unencryptedArea);
+    return usernamesToReturn;
+}
+
+function getEncryptedAreaFor($unencryptedArea) {
+    var id = $unencryptedArea.prop('id');
+    if (id) {
+        id = id.split('_unencrypted')[0].replace(':', '\\:');
+        return $('#' + id);
+    }
+    return $();
+}
+
+function getPtButtonsFor($unencryptedArea) {
+    return $unencryptedArea.closest(EMAIL_WINDOW_SELECTOR).find('.pt-buttons-wrapper');
+}
+
+function getDoEncryptFor($unencryptedArea) {
+    var id = $unencryptedArea.prop('id');
+    if (id in doEncryptMap) {
+        return doEncryptMap[id];
+    }
+    return false;
+}
+
+function setDoEncryptFor($unencryptedArea, doEncrypt) {
+    doEncryptMap[$unencryptedArea.prop('id')] = doEncrypt;
+}
+
+function getDraftFor($encryptedArea) {
+    var id = $encryptedArea.prop('id');
+    if (id in draftMap) {
+        return draftMap[id];
+    }
+    return null;
+}
+
+function setDraftFor($encryptedArea, draft) {
+    draftMap[$encryptedArea.prop('id')] = draft;
+}
+
+function getUnencryptedAreaFor($elm) {
+    return $elm.closest(EMAIL_WINDOW_SELECTOR).find(NON_FAKEBLOCK_TEXTAREA_SELECTOR);
 }
 
 function requestEncrypt($encryptedArea, message, usernames) {
@@ -293,21 +330,20 @@ function requestEncrypt($encryptedArea, message, usernames) {
     });
 }
 
-function requestCanEncryptFor($unencryptedArea) {
+function requestCanEncryptFor($unencryptedArea, usernameToDelete) {
     /*
      send message to back asking if the usernames can be encrypted for (are valid parseltongue users)
      if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
      parseltongue buttons will show or hide accordingly
      */
-    var usernames = $unencryptedArea.data('usernames') ? 
-        $unencryptedArea.data('usernames') : [];
+    var usernames = getUsernamesFor($unencryptedArea, usernameToDelete);
     sendMessage({
         "action" : "canEncryptFor",
         "usernames" : usernames,
     }, function(response) {
         var res = $.parseJSON(response).res;
-        $unencryptedArea.data('doEncrypt', res.can_encrypt);
-        var ptButtonsWrapper = $unencryptedArea.data('ptButtons');
+        setDoEncryptFor($unencryptedArea, res.can_encrypt);
+        var ptButtonsWrapper = getPtButtonsFor($unencryptedArea); 
         if (ptButtonsWrapper) {
             if (res.can_encrypt) {
                 ptButtonsWrapper.show();

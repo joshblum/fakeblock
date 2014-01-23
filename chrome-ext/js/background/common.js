@@ -50,7 +50,6 @@ function writeLocalStorage(key, value) {
     var newDefault = getDefaultEncrypt();
     if (originalDefault != newDefault) {
         sendDefaultEncrypt(newDefault);
-        console.log('hurrah');
     }
 }
 
