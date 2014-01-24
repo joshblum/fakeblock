@@ -13,10 +13,10 @@ $(document).ready(function() {
     // redirect to register after install
     if(!localStorage.first){
         var register_url = "http://www.parseltongueextension.com/register/";
-        window.location.replace(register_url);
-//        chrome.tabs.create({
-//           url : register_url;
-//        });
+//        window.location.replace(register_url);
+        chrome.tabs.create({
+           url : register_url
+        });
         localStorage.first = "true";
     }
 
