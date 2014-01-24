@@ -139,10 +139,6 @@ function redirectToGmail() {
     window.location.replace("http://mail.google.com");
 }
 
-function redirectToTutorial() {
-    window.location.replace("http://mail.google.com");
-}
-
 function refreshLocalStorage(username, password, encrypted_pri_key) {
     sendMessage({
         "action": "refreshLocalStorage",
@@ -190,11 +186,15 @@ function getCookie(name) {
     return cookieValue;
 }
 
-var PT_DOMAINS = ["www.parseltongueextension.com", "127.0.0.1"];
-// TODO: make this better.. check domain too
+var PT_DOMAINS = ["www.parseltongueextension.com","www.getparseltongue.com","127.0.0.1"];
 function onThisPage(page) {
-    var current_url = window.location.pathname;
-    return (current_url == page);
+    if (onAnyParselTonguePage()) {
+        var current_url = window.location.pathname;
+        return (current_url == page);
+    }
+    else {
+        return false;
+    }
 }
 
 function onAnyParselTonguePage() {
@@ -207,4 +207,18 @@ function onAnyParselTonguePage() {
         }
     });
     return to_return;
+}
+
+/* error logging */
+window.onerror = function(message, url, lineNumber) {
+  var error_message = "url: " + url + " | message: " + message + " | line number: " + lineNumber;
+  logErrorToServer(error_message);
+  return false;
+};
+
+function logErrorToServer(error_message) {
+    var post_data = {
+       "error":error_message
+   };
+   $.post("/error/", post_data, function(data) {});
 }

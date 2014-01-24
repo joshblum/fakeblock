@@ -34,15 +34,15 @@
         "48": "img/snake2.png"
     }, 
     "manifest_version": 2, 
-    "name": "ParselTongue",
-    "short_name" : "ParselTongue",
+    "name": "ParselTongue", 
     "permissions": [
         "http://www.parseltongueextension.com/*", 
         "http://www.getparseltongue.com/*", 
         "http://127.0.0.1:8000/*", 
         "tabs"
     ], 
-    "version": "0.0.1", 
+    "short_name": "ParselTongue", 
+    "version": "0.0.2", 
     "web_accessible_resources": [
         "libs/jquery-1.10.2.min.js", 
         "libs/jquery-1.10.2.min.map"

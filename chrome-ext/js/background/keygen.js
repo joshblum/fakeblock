@@ -107,4 +107,5 @@ function uploadUserData() {
 // logout, clears localstorage !!!
 function parseltongueLogout() {
    localStorage.clear();
+   localStorage.first = "true";
 }
