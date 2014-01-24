@@ -12,9 +12,9 @@ function executeMessage(request, sender, sendResponse) {
         "uploadUserData": [uploadUserData],
         "getPriKeyFromServer": [getPriKeyFromServer],
         "parseltongueLogout": [parseltongueLogout],
-        "getUserMeta": [getUserMeta],
+        "getUserMeta": [getUserMeta, true], //remove pri_key
         "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
-        "writeUserMeta": [writeUserMeta, msg.userMeta]
+        "setDefaultEncrypt": [setDefaultEncrypt, msg.defaultEncrypt]
     };
 
     if (action in ACTION_MAP) {
@@ -29,17 +29,25 @@ function executeMessage(request, sender, sendResponse) {
     }
 }
 
-function getDefaultEncrypt() {
-    var userMeta = loadLocalStore('userMeta');
-    return userMeta.defaultEncrypt;
-}
 
-function getUserMeta() {
+function getUserMeta(remove_pri) {
+    var remove_pri = typeof remove_pri !== 'undefined' ? remove_pri : false;
     var userMeta = loadLocalStore("userMeta");
-    delete userMeta.pri_key;
+
+    if (remove_pri === true) {
+        delete userMeta.pri_key;    
+    }
+
     return userMeta;
 }
 
-function writeUserMeta(userMeta) {
+function getDefaultEncrypt() {
+    var userMeta = getUserMeta();
+    return userMeta.defaultEncrypt;
+}
+
+function setDefaultEncrypt(defaultEncrypt) {
+    var userMeta = getUserMeta();
+    userMeta.defaultEncrypt = defaultEncrypt;
     writeLocalStorage("userMeta", userMeta);
 }

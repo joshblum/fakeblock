@@ -35,8 +35,8 @@ function toggleSwitch(e, data) {
     setTip();
     $(".has-switch").tooltip("show");
     sendMessage({
-        "action": "writeUserMeta",
-        "userMeta": userMeta,
+        "action": "setDefaultEncrypt",
+        "defaultEncrypt": userMeta.defaultEncrypt,
     }, function(res) {});
 }
 
