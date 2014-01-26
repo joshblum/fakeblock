@@ -1,5 +1,4 @@
 var doEncryptDomains = [
-    "facebook.com",
     "mail.google.com"
 ];
 
@@ -10,7 +9,6 @@ var FORMAT_BUTTON_SELECT = ".az5";
 var USERNAME_FIELD_CLASS = 'vR';
 var USERNAME_FIELD_SELECTOR = '.vR';
 
-var doEncryptMap = {};
 var draftMap = {};
 
 $(function() {
@@ -155,9 +153,6 @@ function makeOverlay($email) {
     $textarea.after($unencryptedArea);
     $textarea.hide();
 
-    //set doencrypt to false since usernames should be empty when email first opens
-    doEncryptDomains[$unencryptedArea.prop('id')] = false;
-
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
     });
@@ -204,7 +199,7 @@ function makeOverlayHtml($textarea) {
 function encryptHandler($unencryptedArea) {
     /* 
      handler for keyup in an unencrypted area
-     uses doEncrypt in unencrypted area's data to check if should update with ciphertext or plaintext
+     checks if pt button is visible and set to locked
      */
     var $encryptedArea = getEncryptedAreaFor($unencryptedArea); 
     var message = $unencryptedArea.html();
@@ -213,10 +208,10 @@ function encryptHandler($unencryptedArea) {
     //if can find button, check if button is visible and set to lock
     //otherwise do not encrypt
     var $ptButtons = getPtButtonsFor($unencryptedArea);
-    var canEncryptButton = $ptButtons.length > 0 ?
+    var canEncrypt = $ptButtons.length > 0 ?
         $ptButtons.find('.pt_locked').css('display') !== 'none' && $ptButtons.css('display') !== 'none' :
         false;
-    if (getDoEncryptFor($unencryptedArea) && canEncryptButton) {
+    if (canEncrypt) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
         if ($encryptedArea) {
@@ -278,18 +273,6 @@ function getPtButtonsFor($unencryptedArea) {
     return $unencryptedArea.closest(EMAIL_WINDOW_SELECTOR).find('.pt-buttons-wrapper');
 }
 
-function getDoEncryptFor($unencryptedArea) {
-    var id = $unencryptedArea.prop('id');
-    if (id in doEncryptMap) {
-        return doEncryptMap[id];
-    }
-    return false;
-}
-
-function setDoEncryptFor($unencryptedArea, doEncrypt) {
-    doEncryptMap[$unencryptedArea.prop('id')] = doEncrypt;
-}
-
 function getDraftFor($encryptedArea) {
     var id = $encryptedArea.prop('id');
     if (id in draftMap) {
@@ -333,7 +316,7 @@ function requestEncrypt($encryptedArea, message, usernames) {
 function requestCanEncryptFor($unencryptedArea, usernameToDelete) {
     /*
      send message to back asking if the usernames can be encrypted for (are valid parseltongue users)
-     if yes or no, updates the doEncrypt state of the corresponding unencrypted textarea, switching encryption on or off
+     if yes or no, updates the buttons of the unencrypted textarea, switching encryption on or off
      parseltongue buttons will show or hide accordingly
      */
     var usernames = getUsernamesFor($unencryptedArea, usernameToDelete);
@@ -342,7 +325,6 @@ function requestCanEncryptFor($unencryptedArea, usernameToDelete) {
         "usernames" : usernames,
     }, function(response) {
         var res = $.parseJSON(response).res;
-        setDoEncryptFor($unencryptedArea, res.can_encrypt);
         var ptButtonsWrapper = getPtButtonsFor($unencryptedArea); 
         if (ptButtonsWrapper) {
             if (res.can_encrypt) {
