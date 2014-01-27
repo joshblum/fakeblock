@@ -42,7 +42,7 @@
         "tabs"
     ], 
     "short_name": "ParselTongue", 
-    "version": "0.0.4", 
+    "version": "0.0.5", 
     "web_accessible_resources": [
         "libs/jquery-1.10.2.min.js", 
         "libs/jquery-1.10.2.min.map"
