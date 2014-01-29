@@ -35,6 +35,7 @@
     "manifest_version": 2, 
     "name": "ParselTongue", 
     "permissions": [
+        "http://www.getparseltongue.com/*",
         "https://www.getparseltongue.com/*",
         "http://127.0.0.1:8000/*", 
         "tabs"
