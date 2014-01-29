@@ -3,8 +3,8 @@ var FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-encrypted';
 var FAKEBLOCK_TEXTAREA_SELECTOR = '.' + FAKEBLOCK_TEXTAREA_CLASS;
 var NON_FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-unencrypted';
 var NON_FAKEBLOCK_TEXTAREA_SELECTOR = '.' + NON_FAKEBLOCK_TEXTAREA_CLASS;
-var FAKEBLOCK_OPEN_TAG = '|fakeblock|'
-var FAKEBLOCK_CLOSE_TAG = '|/fakeblock|'
+var FAKEBLOCK_OPEN_TAG = '|parseltongue|';
+var FAKEBLOCK_CLOSE_TAG = '|/parseltongue|';
 
 function sendMessage(dict, callback) {
     var csrf_token = getCookie('csrftoken');
