@@ -22,13 +22,12 @@
                 "http://127.0.0.1:8000/*", 
                 "https://mail.google.com/*", 
                 "http://*.getparseltongue.com/*", 
-                "http://*.parseltongueextension.com/*", 
                 "http://127.0.0.1:8000/*"
             ]
         }
     ], 
     "description": "ParselTongue", 
-    "homepage_url": "http://www.parseltongueextension.com/", 
+    "homepage_url": "http://www.getparseltongue.com/",
     "icons": {
         "128": "img/snake2.png", 
         "48": "img/snake2.png"
@@ -36,13 +35,12 @@
     "manifest_version": 2, 
     "name": "ParselTongue", 
     "permissions": [
-        "http://www.parseltongueextension.com/*", 
-        "http://www.getparseltongue.com/*", 
+        "http://www.getparseltongue.com/*",
         "http://127.0.0.1:8000/*", 
         "tabs"
     ], 
     "short_name": "ParselTongue", 
-    "version": "0.0.4", 
+    "version": "0.0.5", 
     "web_accessible_resources": [
         "libs/jquery-1.10.2.min.js", 
         "libs/jquery-1.10.2.min.map"

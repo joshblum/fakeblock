@@ -9,8 +9,8 @@ $(document).ajaxSend(function(event, xhr, settings) {
         // Allow absolute or scheme relative URLs to same origin
         return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
             (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-        // or any other URL that isn't scheme relative or absolute i.e relative.
-        !(/^(\/\/|http:|https:).*/.test(url));
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
     }
 
     function safeMethod(method) {
@@ -107,8 +107,10 @@ $(document).ready(function() {
                     error_div.show();
                     error_div.html(error);
                 }
+                bindReconfirm();
             });
         });
+
     }
     if (onAnyParselTonguePage()) {
         $(".parseltongue_logout").click(function(e) {
@@ -121,6 +123,31 @@ $(document).ready(function() {
         });
     }
 });
+
+function bindReconfirm() {
+    $(".reconfirm_button").click(function(e) {
+        e.preventDefault();
+        var error_div = $(".login_error");
+        var loading_gif = $(".loading-gif");
+        error_div.hide();
+        loading_gif.fadeIn();
+        var login_email_input = $(".login_email");
+        var email_val = login_email_input.val();
+        var post_data = {
+            "email": email_val
+        };
+        $.post("/reconfirm/", post_data, function(data) {
+            loading_gif.hide();
+            var success = data['success'];
+            if (success == 1) {
+                error_div.html("A confirmation email has been resent.");
+            } else {
+                error_div.html("This email address was never registered. Please try <a href='/register/'>registering</a>");
+            }
+            error_div.show();
+        });
+    });
+}
 
 function initializeUser(email, password, redirect_url) {
     sendMessage({
@@ -165,7 +192,7 @@ function getPriKeyFromServerOrInitializeUser(username, password) {
         // else a private key was found, so write it to local storage, and redirect to gmail
         else {
             refreshLocalStorage(username, password, encrypted_private_key);
-            redirectToGmail();
+            window.location.href = "/settings/";
         }
     });
 }
@@ -186,7 +213,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-var PT_DOMAINS = ["www.parseltongueextension.com","www.getparseltongue.com","127.0.0.1"];
+var PT_DOMAINS = ["www.getparseltongue.com","127.0.0.1"];
 function onThisPage(page) {
     if (onAnyParselTonguePage()) {
         var current_url = window.location.pathname;
@@ -211,14 +238,14 @@ function onAnyParselTonguePage() {
 
 /* error logging */
 window.onerror = function(message, url, lineNumber) {
-  var error_message = "url: " + url + " | message: " + message + " | line number: " + lineNumber;
-  logErrorToServer(error_message);
-  return false;
+    var error_message = "url: " + url + " | message: " + message + " | line number: " + lineNumber;
+    logErrorToServer(error_message);
+    return false;
 };
 
 function logErrorToServer(error_message) {
     var post_data = {
-       "error":error_message
-   };
-   $.post("/error/", post_data, function(data) {});
+        "error":error_message
+    };
+    $.post("/error/", post_data, function(data) {});
 }
