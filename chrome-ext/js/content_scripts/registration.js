@@ -213,7 +213,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-var PT_DOMAINS = ["www.parseltongueextension.com","www.getparseltongue.com","127.0.0.1"];
+var PT_DOMAINS = ["www.getparseltongue.com","127.0.0.1"];
 function onThisPage(page) {
     if (onAnyParselTonguePage()) {
         var current_url = window.location.pathname;
