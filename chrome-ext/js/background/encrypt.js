@@ -67,6 +67,8 @@ function updateCache(encrypt_for) {
  returns boolean based on whether or not all usernames are parseltongue users
 */
 function canEncryptFor(usernames) {
+    var canEncrypt = false;
+
     var sender_meta = loadLocalStore('userMeta');
 
     if (!Object.size(sender_meta) || 
@@ -74,11 +76,16 @@ function canEncryptFor(usernames) {
         usernames.indexOf(null) >= 0) {
 
         return {
-            "can_encrypt" : false
+            "can_encrypt" : canEncrypt,
         }
 
     }
     var pub_keys = getPubKeysFromServer(usernames);
+    if (! pub_keys) {
+        return {
+            'can_encrypt' :  canEncrypt,
+        }
+    }
     var can_encrypt = true;
     
     for (i in pub_keys) {
