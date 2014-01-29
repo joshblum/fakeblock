@@ -192,7 +192,7 @@ function getPriKeyFromServerOrInitializeUser(username, password) {
         // else a private key was found, so write it to local storage, and redirect to gmail
         else {
             refreshLocalStorage(username, password, encrypted_private_key);
-            redirectToGmail();
+            window.location.href = "/settings/";
         }
     });
 }
