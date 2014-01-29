@@ -9,6 +9,8 @@ var FORMAT_BUTTON_SELECT = ".az5";
 var USERNAME_FIELD_CLASS = 'vR';
 var USERNAME_FIELD_SELECTOR = '.vR';
 
+var doEncryptMap = {};
+var canEncryptMap = {};
 var draftMap = {};
 
 $(function() {
@@ -258,6 +260,35 @@ function getUsernamesFor($unencryptedArea, usernameToDelete) {
         usernamesToReturn.splice(usernameDeleteIndex, 1);
     }
     return usernamesToReturn;
+}
+
+function getDoEncryptFor($unencryptedArea) {
+    return getMapValueFor($unencryptedArea, doEncryptMap);
+}
+
+function setDoEncryptFor($unencryptedArea, doEncrypt) {
+    return setMapValueFor($unencryptedArea, doEncryptMap, doEncrypt);
+}
+
+function getCanEncryptFor($unencryptedArea) {
+    return getMapValueFor($unencryptedArea, canEncryptMap);
+}
+
+function setCanEncryptFor($unencryptedArea, canEncrypt) {
+    return setMapValueFor($unencryptedArea, canEncryptMap, canEncrypt);
+}
+
+function getMapValueFor($unencryptedArea, map) {
+    var id = $unencryptedArea.prop('id');
+    if (id && id in map) {
+        return map[id]
+    }
+    return false;
+}
+
+function setMapValueFor($unencryptedArea, map, doEncrypt) {
+    var id = $unencryptedArea.prop('id');
+    doEncryptMap[id] = doEncrypt;
 }
 
 function getEncryptedAreaFor($unencryptedArea) {
