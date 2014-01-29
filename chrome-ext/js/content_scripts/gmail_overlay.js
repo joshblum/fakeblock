@@ -100,11 +100,11 @@ $(function() {
                     );
                     $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
                         e.preventDefault();
-                        togglePtButton($(this));
+                        togglePtButton($(this), true);
                     });
                     $ptButton.find('.pt_locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
                         e.preventDefault();
-                        togglePtButton($(this));
+                        togglePtButton($(this), false);
                     });
 
                     bindPtButtons($ptButton);
@@ -140,9 +140,14 @@ function bindPtButtons($ptButtons) {
     requestCanEncryptFor($unencryptedArea);
 }
 
-function togglePtButton($ptButton) {
+function togglePtButton($ptButton, doEncrypt) {
     $ptButton.hide();
     $ptButton.siblings().show();
+
+    var $unencryptedArea = getUnencryptedAreaFor($ptButton);
+    // TODO: show or hide overlay if doEncrypt value has changed
+    setDoEncryptFor($unencryptedArea, doEncrypt); 
+
     encryptHandler(getUnencryptedAreaFor($ptButton));
 }
 
@@ -207,13 +212,8 @@ function encryptHandler($unencryptedArea) {
     var message = $unencryptedArea.html();
     var usernames = getUsernamesFor($unencryptedArea); 
 
-    //if can find button, check if button is visible and set to lock
-    //otherwise do not encrypt
-    var $ptButtons = getPtButtonsFor($unencryptedArea);
-    var canEncrypt = $ptButtons.length > 0 ?
-        $ptButtons.find('.pt_locked').css('display') !== 'none' && $ptButtons.css('display') !== 'none' :
-        false;
-    if (canEncrypt) {
+    var willEncrypt = getDoEncryptFor($unencryptedArea) && getCanEncryptFor($unencryptedArea);
+    if (willEncrypt) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
         if ($encryptedArea) {
@@ -286,9 +286,9 @@ function getMapValueFor($unencryptedArea, map) {
     return false;
 }
 
-function setMapValueFor($unencryptedArea, map, doEncrypt) {
+function setMapValueFor($unencryptedArea, map, value) {
     var id = $unencryptedArea.prop('id');
-    doEncryptMap[id] = doEncrypt;
+    map[id] = value;
 }
 
 function getEncryptedAreaFor($unencryptedArea) {
@@ -364,6 +364,7 @@ function requestCanEncryptFor($unencryptedArea, usernameToDelete) {
                 ptButtonsWrapper.hide();
             }
         }
+        setCanEncryptFor($unencryptedArea, res.can_encrypt);
         encryptHandler($unencryptedArea);
     });
 }
@@ -377,11 +378,13 @@ function requestDefaultEncrypt($ptButtons) {
        "action": "getUserMeta",
    }, function(res) {
         userMeta = JSON.parse(res).res;
+        var $ptButton;
         if (userMeta.defaultEncrypt) {
-            togglePtButton($ptButtons.find('.pt_unlocked'));
+            $ptButton = $ptButtons.find('.pt_unlocked');
         } else {
-            togglePtButton($ptButtons.find('.pt_locked'));
+            $ptButton = $ptButtons.find('.pt_locked');
         }
+        togglePtButton($ptButton, res.defaultEncrypt);
    });
 }
 
@@ -389,7 +392,7 @@ chrome.runtime.onMessage.addListener(function(message) {
     if ('defaultEncrypt' in message) {
         var classToToggle = message.defaultEncrypt ? '.pt_unlocked' : '.pt_locked';
         $.each($(classToToggle), function() {
-            togglePtButton($(this));
+            togglePtButton($(this), message.defaultEncrypt);
         });
     }
 });
