@@ -108,9 +108,7 @@ function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace,
         var decrypted_text = $.parseJSON(response).res;
         if (decrypted_text != null) {
             $.each(ps_containing_fakeblocks, function(i, e) {
-                var all_html = $(this).text();
-                var new_html = all_html.replace(to_replace, decrypted_text);
-                $(this).html(new_html);
+                $(this).html(decrypted_text);
                 // if the newly decrypted text was in an unencrypted area, 
                 // make sure encrypted area is updated
                 var $unencryptedArea = $(this).closest('.parseltongue-unencrypted');
