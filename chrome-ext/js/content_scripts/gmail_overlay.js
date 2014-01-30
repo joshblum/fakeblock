@@ -9,6 +9,15 @@ var FORMAT_BUTTON_SELECT = ".az5";
 var USERNAME_FIELD_CLASS = 'vR';
 var USERNAME_FIELD_SELECTOR = '.vR';
 
+var PT_BUTTON_HTML = '<div class="pt-buttons-wrapper" style="display:none;">' +
+                    '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt">' +
+                    '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
+                    '    </div>' +
+                    '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
+                    '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
+                    '    </div>' +
+                    '</div>';
+
 var doEncryptMap = {};
 var canEncryptMap = {};
 var draftMap = {};
@@ -32,57 +41,33 @@ $(function() {
         }
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
-        var overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
+        var $overlayable = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TEXTAREA_SELECTOR);
         var email_toolbar = $(e.target).closest(EMAIL_WINDOW_SELECTOR).find(TOOLBAR_SELECT);
 
-        if (overlayable.length == 1) {
+        if ($overlayable.length == 1) {
 
-            if (! overlayable.hasClass('has-overlay') && overlayable.attr('tabindex')) {
+            if (! $overlayable.hasClass('has-overlay') && $overlayable.attr('tabindex')) {
                 //this is awkward, but we have to wait until the textarea's tabindex is set
                 //so can tab to overlay but can't tab to original email
-                var $email = overlayable.closest(EMAIL_WINDOW_SELECTOR);
+                var $email = $overlayable.closest(EMAIL_WINDOW_SELECTOR);
                 makeOverlay($email);
             } 
 
-        } else if (overlayable.length == 2) {
-            var draftable = overlayable.filter('.pre-draft');
-            if (draftable.length > 0) {
-                var draft_html = draftable.html();
-
-                if ( ( getDraftFor(draftable) === draft_html ||
-                    draft_html.indexOf('class="gmail_extra"') >= 0 ) &&
-                    ( draft_html.indexOf('<wbr>') < 0 ||
-                    draft_html.length - draft_html.indexOf('<wbr>') !== '<wbr>'.length) )  {
-
-                    //if draft has finished loading
-                    getUnencryptedAreaFor(draftable).html(
-                        getDraftFor(draftable) 
-                    );
-                    draftable.removeClass('pre-draft');   
-
-                } else {
-                    //draft hasn't finished loading into compose window
-                    setDraftFor(draftable, draft_html);
-                }
+        } else if ($overlayable.length == 2) {
+            var $draftable = $overlayable.filter('.pre-draft');
+            if ($draftable.length > 0) {
+                processDraft($draftable);
             }
 
-            var buttonable = overlayable.filter('.has-overlay');
-            if (email_toolbar.length > 0 && buttonable.length > 0) {
+            var $buttonable = $overlayable.filter('.has-overlay');
+            if (email_toolbar.length > 0 && $buttonable.length > 0) {
                 var format_button = email_toolbar.find(FORMAT_BUTTON_SELECT);
                 if (!(format_button.hasClass("yupper"))) {
                     format_button.addClass("yupper");
-                    var $ptButton = $('<div class="pt-buttons-wrapper" style="display:none;">' +
-                    '    <div class="pt-button pt_unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt" style="">' +
-                    '        <img class="pt_lock_img" src="https://i.imgur.com/D95KZPO.png" style="width:100%;"/>' +
-                    '    </div>' +
-                    '    <div class="pt-button pt_locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
-                    '        <img class="pt_lock_img" src="https://i.imgur.com/qhKbqCR.png" style="width:100%;"/>' +
-                    '    </div>' +
-                    '</div>');
+                    var $ptButton = $(PT_BUTTON_HTML);
                     format_button.before($ptButton);
                     $ptButton.find(".pt-button").css(
                         {
-    //                            "top":" 1px",
                             "padding":" 10px 7px 5px 8px",
                             "width":" 22px",
                             "height":" 25px",
@@ -91,11 +76,6 @@ $(function() {
                             "float":"right"
                         });
                     $ptButton.find('.pt-button').hover(
-    //                        function(){ $(this).css('border', '1px solid gray') },
-    //                        function(){ $(this).css(
-    //                            {'border':'1px solid #f5f5f5',
-    //                            "border-top":"1px solid rgba(128, 128, 128, 0.32)"
-    //                            }) }
                         function(){ $(this).css('cursor', 'pointer') }
                     );
                     $ptButton.find('.pt_unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
@@ -128,16 +108,36 @@ $(function() {
     });
 });
 
+function processDraft($draftable) {
+    var draft_html = $draftable.html();
+
+    if ( ( getDraftFor($draftable) === draft_html ||
+        draft_html.indexOf('class="gmail_extra"') >= 0 ) &&
+        ( draft_html.indexOf('<wbr>') < 0 ||
+        draft_html.length - draft_html.indexOf('<wbr>') !== '<wbr>'.length) )  {
+
+        //if draft has finished loading
+        getUnencryptedAreaFor($draftable).html(
+            getDraftFor($draftable) 
+        );
+        $draftable.removeClass('pre-draft');   
+
+    } else {
+        //draft hasn't finished loading into compose window
+        setDraftFor($draftable, draft_html);
+    }
+}
+
 function bindPtButtons($ptButtons) {
     /*
     initialize parseltongue buttons
     binds parseltongue buttons to the proper unencrypted textarea
     sets the default encrypt/decrypt option based on usermeta.defaultEncrypt
-    shows or hides all parseltongue buttons if can encrypt for current usernames
+    shows or hides all parseltongue buttons if can encrypt for current usernamesde the fact that it is normal gmail when you are not encrypting is huge
     */
     var $unencryptedArea = getUnencryptedAreaFor($ptButtons);
     requestDefaultEncrypt($ptButtons);
-    requestCanEncryptFor($unencryptedArea);
+    canEncryptHandler($unencryptedArea); 
 }
 
 function togglePtButton($ptButton, doEncrypt) {
@@ -178,8 +178,11 @@ function makeOverlay($email) {
         encryptHandler($(this));
     });
 
+    // initialize all encrypt settings to false at first
+    // when usernames are added/encrypt button is clicked, this will toggle to true
     setCanEncryptFor($unencryptedArea, false);
     setDoEncryptFor($unencryptedArea, false);
+    hideOverlay($unencryptedArea);
 
     $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
     $textarea.addClass('has-overlay pre-draft');
@@ -190,7 +193,6 @@ function toggleEncrypt($unencryptedArea, oldEncrypt) {
     if (oldEncrypt === encrypt) { 
         return;
     }
-
     if (encrypt) {
         showOverlay($unencryptedArea);
     } else {
@@ -243,15 +245,7 @@ function encryptHandler($unencryptedArea) {
     var message = $unencryptedArea.html();
     var usernames = getUsernamesFor($unencryptedArea); 
 
-    var willEncrypt = getWillEncryptFor($unencryptedArea); 
-    if (willEncrypt) {
-        requestEncrypt($encryptedArea, message, usernames);
-    } else {
-        if ($encryptedArea) {
-            $encryptedArea.html(message);
-        }
-    }
-
+    requestEncrypt($encryptedArea, message, usernames);
 }
 
 function usernameHandler($emailSpan, deleteEmail) {
@@ -265,8 +259,12 @@ function usernameHandler($emailSpan, deleteEmail) {
             return $(elm).attr('email') !== undefined;
         }).attr('email'); 
     }
-    requestCanEncryptFor($unencryptedArea, usernameToDelete)
-        
+    canEncryptHandler($unencryptedArea, usernameToDelete);
+}
+
+function canEncryptHandler($unencryptedArea, usernameToDelete) {
+    var usernames = getUsernamesFor($unencryptedArea, usernameToDelete);
+    requestCanEncryptFor($unencryptedArea, usernames);
 }
 
 function getUsernamesFor($unencryptedArea, usernameToDelete) {
@@ -371,13 +369,12 @@ function requestEncrypt($encryptedArea, message, usernames) {
     });
 }
 
-function requestCanEncryptFor($unencryptedArea, usernameToDelete) {
+function requestCanEncryptFor($unencryptedArea, usernames) {
     /*
      send message to back asking if the usernames can be encrypted for (are valid parseltongue users)
      if yes or no, updates the buttons of the unencrypted textarea, switching encryption on or off
      parseltongue buttons will show or hide accordingly
      */
-    var usernames = getUsernamesFor($unencryptedArea, usernameToDelete);
     sendMessage({
         "action" : "canEncryptFor",
         "usernames" : usernames,
