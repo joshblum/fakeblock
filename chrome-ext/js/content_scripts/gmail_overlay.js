@@ -145,10 +145,24 @@ function togglePtButton($ptButton, doEncrypt) {
     $ptButton.siblings().show();
 
     var $unencryptedArea = getUnencryptedAreaFor($ptButton);
-    // TODO: show or hide overlay if doEncrypt value has changed
+    var oldEncrypt = getWillEncryptFor($unencryptedArea);
     setDoEncryptFor($unencryptedArea, doEncrypt); 
+    toggleEncrypt($unencryptedArea, oldEncrypt);
+}
 
-    encryptHandler(getUnencryptedAreaFor($ptButton));
+function hideOverlay($unencryptedArea) {
+    var $encryptedArea = getEncryptedAreaFor($unencryptedArea);
+    $encryptedArea.html($unencryptedArea.html());
+    $encryptedArea.show();
+    $unencryptedArea.hide();
+}
+
+function showOverlay($unencryptedArea) {
+    var $encryptedArea = getEncryptedAreaFor($unencryptedArea);
+    $unencryptedArea.html($encryptedArea.html());
+    $encryptedArea.hide();
+    $unencryptedArea.show();
+    encryptHandler($unencryptedArea);
 }
 
 function makeOverlay($email) {
@@ -163,8 +177,25 @@ function makeOverlay($email) {
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
     });
+
+    setCanEncryptFor($unencryptedArea, false);
+    setDoEncryptFor($unencryptedArea, false);
+
     $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
     $textarea.addClass('has-overlay pre-draft');
+}
+
+function toggleEncrypt($unencryptedArea, oldEncrypt) {
+    var encrypt = getWillEncryptFor($unencryptedArea);
+    if (oldEncrypt === encrypt) { 
+        return;
+    }
+
+    if (encrypt) {
+        showOverlay($unencryptedArea);
+    } else {
+        hideOverlay($unencryptedArea);
+    }
 }
 
 function makeOverlayHtml($textarea) {
@@ -212,7 +243,7 @@ function encryptHandler($unencryptedArea) {
     var message = $unencryptedArea.html();
     var usernames = getUsernamesFor($unencryptedArea); 
 
-    var willEncrypt = getDoEncryptFor($unencryptedArea) && getCanEncryptFor($unencryptedArea);
+    var willEncrypt = getWillEncryptFor($unencryptedArea); 
     if (willEncrypt) {
         requestEncrypt($encryptedArea, message, usernames);
     } else {
@@ -262,16 +293,12 @@ function getUsernamesFor($unencryptedArea, usernameToDelete) {
     return usernamesToReturn;
 }
 
-function getDoEncryptFor($unencryptedArea) {
-    return getMapValueFor($unencryptedArea, doEncryptMap);
+function getWillEncryptFor($unencryptedArea) {
+    return getMapValueFor($unencryptedArea, doEncryptMap) && getMapValueFor($unencryptedArea, canEncryptMap);
 }
 
 function setDoEncryptFor($unencryptedArea, doEncrypt) {
     return setMapValueFor($unencryptedArea, doEncryptMap, doEncrypt);
-}
-
-function getCanEncryptFor($unencryptedArea) {
-    return getMapValueFor($unencryptedArea, canEncryptMap);
 }
 
 function setCanEncryptFor($unencryptedArea, canEncrypt) {
@@ -364,8 +391,9 @@ function requestCanEncryptFor($unencryptedArea, usernameToDelete) {
                 ptButtonsWrapper.hide();
             }
         }
+        var oldEncrypt = getWillEncryptFor($unencryptedArea);
         setCanEncryptFor($unencryptedArea, res.can_encrypt);
-        encryptHandler($unencryptedArea);
+        toggleEncrypt($unencryptedArea, oldEncrypt);
     });
 }
 
@@ -384,7 +412,7 @@ function requestDefaultEncrypt($ptButtons) {
         } else {
             $ptButton = $ptButtons.find('.pt_locked');
         }
-        togglePtButton($ptButton, res.defaultEncrypt);
+        togglePtButton($ptButton, userMeta.defaultEncrypt);
    });
 }
 
