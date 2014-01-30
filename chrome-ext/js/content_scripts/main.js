@@ -1,3 +1,6 @@
+var FAKEBLOCK_FILTER = ':contains("' + FAKEBLOCK_OPEN_TAG + '")' +
+        ':contains("' + FAKEBLOCK_CLOSE_TAG + '")';
+
 //attaches event listeners and handles passing messages
 
 $(document).ready(function() {
@@ -16,14 +19,10 @@ $(document).ready(function() {
 
 //get immediate parents of a fakeblock
 function getDivsContainingFakeBlock($container) {
-
-    return $container.find('div').add($container).filter(
-        ':contains("' + FAKEBLOCK_OPEN_TAG + '")' +
-        ':contains("' + FAKEBLOCK_CLOSE_TAG + '")'
-        ).filter(function(i, elm) {
-            return $(elm).find(':contains("' + FAKEBLOCK_OPEN_TAG + '")').length == 0 &&
-                $(elm).find(':contains("' + FAKEBLOCK_CLOSE_TAG + '")').length == 0 && 
-                ! $(elm).hasClass(FAKEBLOCK_TEXTAREA_CLASS) && 
+    return $container.find('div').add($container).filter(FAKEBLOCK_FILTER) 
+        .filter(function(i, elm) {
+            return $(elm).find(FAKEBLOCK_FILTER).length == 0 ||
+                $(elm).filter(FAKEBLOCK_FILTER).length == 0 && 
                 ! $(elm).closest(FAKEBLOCK_TEXTAREA_SELECTOR).length > 0;
     });
 }
