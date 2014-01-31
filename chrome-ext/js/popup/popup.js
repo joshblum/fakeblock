@@ -52,7 +52,7 @@ function setTip() {
     var title;
     title = "Click the snake when composing to encrypt.";
     if (isLoggedIn() && userMeta.defaultEncrypt) {
-        title = "Emails to parsletongue users will automatically be encrypted.";
+        title = "Emails to parseltongue users will automatically be encrypted.";
     }
     $(".has-switch").tooltip("destroy").tooltip({
         "placement": "bottom",
