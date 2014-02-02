@@ -25,7 +25,7 @@ $(document).ajaxSend(function(event, xhr, settings) {
 
 $(document).ready(function() {
 
-    $(".pt_extension_installed").show();
+    $(".pt-ext-installed").show();
 
     // debugger;
     if (onThisPage("/register/")) {
@@ -65,7 +65,7 @@ $(document).ready(function() {
                         error_div.html(error);
                     }
                 });
-            }, 200);
+            }, 0);
         });
     } else if (onThisPage("/initializing/")) {
         // check if there is a non-completed registration info in
