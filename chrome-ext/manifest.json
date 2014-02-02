@@ -21,8 +21,8 @@
             "matches": [
                 "http://127.0.0.1:8000/*", 
                 "https://mail.google.com/*", 
-                "http://*.getparseltongue.com/*",
-                "https://*.getparseltongue.com/*",
+                "http://*.getparseltongue.com/*", 
+                "https://*.getparseltongue.com/*", 
                 "http://127.0.0.1:8000/*"
             ]
         }
@@ -36,13 +36,13 @@
     "manifest_version": 2, 
     "name": "ParselTongue", 
     "permissions": [
-        "http://www.getparseltongue.com/*",
-        "https://www.getparseltongue.com/*",
+        "http://getparseltongue.com/*",
+        "https://getparseltongue.com/*",
         "http://127.0.0.1:8000/*", 
         "tabs"
     ], 
     "short_name": "ParselTongue", 
-    "version": "0.0.7", 
+    "version": "0.0.8", 
     "web_accessible_resources": [
         "libs/jquery-1.10.2.min.js", 
         "libs/jquery-1.10.2.min.map", 
