@@ -6,7 +6,7 @@ Speak freely knowing that only the intended recipients of your messages can read
 ## Contact Info
 
 + [parseltongueextension@gmail.com](mailto:parseltongueextension@gmail.com)
-+ [ParselTongue](http://www.getparseltongue.com/)
++ [ParselTongue](http://getparseltongue.com/)
 
 
 ## Authors

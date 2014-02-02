@@ -28,7 +28,7 @@
         }
     ], 
     "description": "ParselTongue", 
-    "homepage_url": "http://www.getparseltongue.com/", 
+    "homepage_url": "http://getparseltongue.com/",
     "icons": {
         "128": "img/snake-icon.png", 
         "48": "img/snake-icon.png"

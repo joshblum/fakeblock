@@ -17,7 +17,7 @@
 
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
-//var baseUrl = "https://www.getparseltongue.com";
+//var baseUrl = "https://getparseltongue.com";
 var baseUrl = "https://getparseltongue.com";
 var SENTINAL = "fakeblock";
 

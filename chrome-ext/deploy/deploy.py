@@ -3,7 +3,7 @@ import json
 MAINJS_PATH = "js/background/common.js"
 MANIFEST_PATH = "manifest.json"
 DEV_URL = "http://127.0.0.1:8000"
-PROD_URL = "https://www.getparseltongue.com"
+PROD_URL = "https://getparseltongue.com"
 
 
 def rewriteBaseUrl():
