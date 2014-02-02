@@ -125,11 +125,11 @@ function makePtButtons($buttonable, $email_toolbar) {
         $ptButton.find('.pt-unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
             e.preventDefault();
             togglePtButton($(this), true);
-        }).attr('src', unlockedImgSrc);
+        }).find('.pt-button-img').attr('src', unlockedImgSrc); // set snake image
         $ptButton.find('.pt-locked').click(function(e) { // they clicked the lock, stuff should be unencrypted now
             e.preventDefault();
             togglePtButton($(this), false);
-        }).attr('src', lockedImgSrc);
+        }).find('.pt-button-img').attr('src', lockedImgSrc); // set lock image
 
         bindPtButtons($ptButton);
     }
