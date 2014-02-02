@@ -3,7 +3,8 @@ import json
 MAINJS_PATH = "js/background/common.js"
 MANIFEST_PATH = "manifest.json"
 DEV_URL = "http://127.0.0.1:8000"
-PROD_URL = "http://www.getparseltongue.com"
+PROD_URL = "https://www.getparseltongue.com"
+
 
 def rewriteBaseUrl():
     with open(MAINJS_PATH, "r+") as f:
@@ -12,6 +13,7 @@ def rewriteBaseUrl():
         f.seek(0)
         f.write(text)
         f.truncate()
+
 
 def rewriteManifest():
 
@@ -28,10 +30,10 @@ def rewriteManifest():
 
 def main():
     """"
-        rewrite main.js to replace the baseUrl 
+        rewrite main.js to replace the baseUrl
         and update manifest.json to have a new manifest
     """
-    
+
     rewriteBaseUrl()
 
     rewriteManifest()
