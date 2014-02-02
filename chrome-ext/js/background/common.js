@@ -18,7 +18,7 @@
 ///////////Global vars/////////////
 // global website base, set to localhost for testing, use deploy script to change
 //var baseUrl = "https://www.getparseltongue.com";
-var baseUrl = "https://www.getparseltongue.com";
+var baseUrl = "https://getparseltongue.com";
 var SENTINAL = "fakeblock";
 
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
