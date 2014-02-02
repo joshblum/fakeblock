@@ -3,7 +3,7 @@
         "page": "html/background.html"
     }, 
     "browser_action": {
-        "default_icon": "img/snake2.png", 
+        "default_icon": "img/snake-icon.png", 
         "default_popup": "html/popup.html", 
         "default_title": "ParselTongue"
     }, 
@@ -29,8 +29,8 @@
     "description": "ParselTongue", 
     "homepage_url": "http://www.getparseltongue.com/", 
     "icons": {
-        "128": "img/snake2.png", 
-        "48": "img/snake2.png"
+        "128": "img/snake-icon.png", 
+        "48": "img/snake-icon.png"
     }, 
     "manifest_version": 2, 
     "name": "ParselTongue", 
@@ -44,6 +44,8 @@
     "version": "0.0.6", 
     "web_accessible_resources": [
         "libs/jquery-1.10.2.min.js", 
-        "libs/jquery-1.10.2.min.map"
+        "libs/jquery-1.10.2.min.map",
+        "img/snake-btn.png",
+        "img/lock-btn.png"
     ]
 }
