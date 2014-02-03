@@ -107,6 +107,8 @@ function decryptElements($encryptedElms) {
     var decryptDict = {};
     $.each($encryptedElms, function(i, elm){
         var htmlsToReplace = getHtmlToReplace($(elm));
+        // TODO: if htmlsToReplace's first element isn't same as beginning substring of a draft element,
+        // then have to call decryptDraft, false 
         var encryptedTexts = htmlsToReplace.map(function(html) {
             return getEncryptedText(html);
         });
@@ -133,10 +135,25 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedText) {
     }, function(response) {
         var decryptedText = $.parseJSON(response).res;
         if (decryptedText == null) {
+            decryptDraft($encryptedElm, false);
             return;
         }
         var all_html = $encryptedElm.html();
         all_html = all_html.replace(htmlToReplace, decryptedText);
         $encryptedElm.html(all_html);
+
+        decryptDraft($encryptedElm, true);
     })
+}
+
+function decryptDraft($draftable, wasEncrypted) {
+    if (! $draftable.hasClass('pre-draft')) {
+        return;
+    }
+
+    var ptButtonSelector = wasEncrypted ? '.pt-unlocked' : '.pt-locked';
+    var $ptButton = getPtButtonsFor($draftable).find(ptButtonSelector);
+    togglePtButton($ptButton, wasEncrypted); 
+
+    $draftable.removeClass('pre-draft');
 }

@@ -90,12 +90,9 @@ function processDraft($draftable) {
         ( draft_html.indexOf(DRAFT_SEPARATOR) < 0 ||
         draft_html.length - draft_html.indexOf(DRAFT_SEPARATOR) !== DRAFT_SEPARATOR.length) )  {
 
-        // if draft has finished loading
-        //TODO: need a check here to see if any elements actually got decrypted...but how do we do that if it's async?
-        // decryptElements($draftable);
-        // var $ptButton = getPtButtonsFor(getUnencryptedAreaFor($draftable)).find('.pt-unlocked');
-        // togglePtButton($ptButton, true)
-        $draftable.removeClass('pre-draft');   
+        // if draft has finished loading, try to decrypt the draft
+        // depending on if decryption is successful, show/hide overlay and toggle parseltongue buttons
+        decryptElements($draftable);
 
     } else {
         //draft hasn't finished loading into compose window
@@ -139,11 +136,11 @@ function makePtButtons($buttonable, $email_toolbar) {
 function bindPtButtons($ptButtons) {
     /*
     initialize parseltongue buttons
-    binds parseltongue buttons to the proper unencrypted textarea
     sets the default encrypt/decrypt option based on usermeta.defaultEncrypt
-    shows or hides all parseltongue buttons if can encrypt for current usernamesde the fact that it is normal gmail when you are not encrypting is huge
+    shows or hides all parseltongue buttons if can encrypt for current usernames
     */
     var $unencryptedArea = getUnencryptedAreaFor($ptButtons);
+    // TODO: may have to move this into decryptDraft
     requestDefaultEncrypt($ptButtons);
     canEncryptHandler($unencryptedArea); 
 }
@@ -213,8 +210,6 @@ function toggleEncrypt($unencryptedArea, oldEncrypt) {
     calls 'show' or 'hide' for the overlay toggle 
     */
     var encrypt = getWillEncryptFor($unencryptedArea);
-    // TODO: maybe not necessary, but don't allow overlay to be toggled if still loading draft
-    // var loadingDraft = getEncryptedAreaFor($unencryptedArea).hasClass('pre-draft');
     if (oldEncrypt === encrypt) { 
         return;
     }
@@ -449,6 +444,8 @@ function requestDefaultEncrypt($ptButtons) {
        "action": "getUserMeta",
    }, function(res) {
         userMeta = JSON.parse(res).res;
+        // TODO: don't allow this to override lock buttons if draft is still being loaded
+        // var loadingDraft = getEncryptedAreaFor($unencryptedArea).hasClass('pre-draft');
         var $ptButton;
         var defaultEncrypt = userMeta.defaultEncrypt != null ? userMeta.defaultEncrypt : false;
         if (defaultEncrypt) {
