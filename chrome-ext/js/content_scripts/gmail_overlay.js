@@ -42,6 +42,7 @@ $(function() {
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
         var $overlayable = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(TEXTAREA_SELECTOR);
+        console.log($overlayable.text());
 
         if ($overlayable.length == 1) {
 

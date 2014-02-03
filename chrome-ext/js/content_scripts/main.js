@@ -1,6 +1,3 @@
-var FAKEBLOCK_FILTER = ':contains("' + FAKEBLOCK_OPEN_TAG + '")' +
-        ':contains("' + FAKEBLOCK_CLOSE_TAG + '")' +
-        ':not(.gmail_extra'
 var DRAFT_SEPARATOR_REGEX = '(' + DRAFT_SEPARATOR + ')?';
 var PT_HTML_REGEX = new RegExp(FAKEBLOCK_OPEN_TAG.split('').join(DRAFT_SEPARATOR_REGEX).split('|').join('\\|') +
     '(.*)' +
@@ -103,6 +100,7 @@ function decryptHandler($container) {
     if ($encryptedElms.length == 0) {
         return;
     }
+    decryptElements($encryptedElms);
 }
 
 function decryptElements($encryptedElms) {
