@@ -9,7 +9,7 @@ function getPubKeysFromServer(usernames) {
     var url = buildUrl(URLS.get_pubkeys);
     var data = {
         "requested_keys": JSON.stringify(usernames),
-    }
+    };
     var pub_keys;
     $.ajax({
         type: "GET",
@@ -23,8 +23,13 @@ function getPubKeysFromServer(usernames) {
             }
             writeLocalStorage("cachedUsers", cachedUsers);
         },
-        async: false,
-    })
+        failure: function() {
+            var e_message = "JS ERROR: getPubKeysFromServer ";
+            logErrorToServer(e_message);
+            return false;
+        },
+        async: false
+    });
     return pub_keys
 }
 
@@ -49,6 +54,11 @@ function getPriKeyFromServer() {
         success: function(res) {
             pri_key = res.pri_key;
         },
+        failure: function() {
+            var e_message = "JS ERROR: getPriKeyFromServer ";
+            logErrorToServer(e_message);
+            return false;
+        },
         async: false
     });
     return pri_key
@@ -67,6 +77,8 @@ function uploadPubKey(username, pub_key) {
             return true;
         },
         failure: function() {
+            var e_message = "JS ERROR: uploadPubKey | " + username;
+            logErrorToServer(e_message);
             return false;
         },
         async: false
@@ -86,6 +98,8 @@ function uploadPriKey(username, pri_key) {
             return true;
         },
         failure: function() {
+            var e_message = "JS ERROR: uploadPriKey | " + username;
+            logErrorToServer(e_message);
             return false;
         },
         async: false
