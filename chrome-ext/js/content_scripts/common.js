@@ -1,10 +1,10 @@
 //class to add to the compose email textarea so that it doesn't get decrypted before being sent
 var FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-encrypted';
-var FAKEBLOCK_TEXTAREA_SELECTOR = '.' + FAKEBLOCK_TEXTAREA_CLASS;
 var NON_FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-unencrypted';
-var NON_FAKEBLOCK_TEXTAREA_SELECTOR = '.' + NON_FAKEBLOCK_TEXTAREA_CLASS;
 var FAKEBLOCK_OPEN_TAG = '|parseltongue|';
 var FAKEBLOCK_CLOSE_TAG = '|/parseltongue|';
+var PRE_DRAFT_CLASS = 'pre-draft';
+var DRAFT_SEPARATOR = '<wbr>';
 
 function sendMessage(dict, callback) {
     var csrf_token = getCookie('csrftoken');
@@ -74,3 +74,7 @@ Object.size = function(obj) {
     }
     return size;
 };
+
+function getSelectorForClass(klass) {
+    return '.' + klass;
+}

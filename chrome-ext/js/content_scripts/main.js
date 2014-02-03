@@ -1,120 +1,142 @@
 var FAKEBLOCK_FILTER = ':contains("' + FAKEBLOCK_OPEN_TAG + '")' +
-        ':contains("' + FAKEBLOCK_CLOSE_TAG + '")';
-
+        ':contains("' + FAKEBLOCK_CLOSE_TAG + '")' +
+        ':not(.gmail_extra'
+var DRAFT_SEPARATOR_REGEX = '(' + DRAFT_SEPARATOR + ')?';
+var PT_HTML_REGEX = new RegExp(FAKEBLOCK_OPEN_TAG.split('').join(DRAFT_SEPARATOR_REGEX).split('|').join('\\|') +
+    '(.*)' +
+    FAKEBLOCK_CLOSE_TAG.split('').join(DRAFT_SEPARATOR_REGEX).split('|').join('\\|'),
+    'g'
+);
+var PT_TEXT_REGEX = new RegExp(FAKEBLOCK_OPEN_TAG.split('|').join('\\|') +
+    '(.*)' +
+    FAKEBLOCK_CLOSE_TAG.split('|').join('\\|')
+);
 //attaches event listeners and handles passing messages
+
+jQuery.fn.justtext = function() {
+    /* http://stackoverflow.com/questions/11362085/jquery-get-text-for-element-without-children-text */
+    return $(this).clone()
+            .children()
+            .remove()
+            .end()
+            .text();
+
+};
 
 $(document).ready(function() {
     setTimeout(function() {
-        decryptFakeblocks($('body'));
+        decryptHandler($('body'));
     }, 1000);
     
     /**** automatically try to decrypt DOM whenever it changes ****************************************************/
     $(document).on('DOMNodeInserted', function(e) {
-        decryptFakeblocks($(e.target));
+        decryptHandler($(e.target));
     });
 
 });
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
-//get immediate parents of a fakeblock
 function getDivsContainingFakeBlock($container) {
-    return $container.find('div').add($container).filter(FAKEBLOCK_FILTER) 
-        .filter(function(i, elm) {
-            return $(elm).find(FAKEBLOCK_FILTER).length == 0 ||
-                $(elm).filter(FAKEBLOCK_FILTER).length == 0 && 
-                ! $(elm).closest(FAKEBLOCK_TEXTAREA_SELECTOR).length > 0;
+    /* 
+    get divs that are all of the following:
+        -immediate parent of a fakeblock to be decrypted
+        -not in a div where the draft is still being loaded
+        -not in the unencrypted textarea overlay
+    */
+    return $container.find('div').add($container).filter(function(i, elm) {
+        var isEncrypted = PT_HTML_REGEX.test($(elm).justtext());
+
+        return isEncrypted &&
+            $(elm).closest(getSelectorForClass(PRE_DRAFT_CLASS)).length == 0 &&
+            $(elm).closest(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS)).length == 0;
     });
 }
 
-// returns array of match objects,
-// match_object[0] = whole match
-// match_object[1] = json
-// returns empty array if there were no matches
-function getFakeBlocksFromText(text) {
+function getHtmlToReplace($encryptedElm) {
+    /*
+    returns an array of the encrypted parts of the html in $encryptedElm
+    */
+    var all_html = $encryptedElm.html();
     var to_return = [];
-    var myRe = new RegExp(FAKEBLOCK_OPEN_TAG.split('|').join('\\|') +
-        "(.*)" +
-        FAKEBLOCK_CLOSE_TAG.split('|').join('\\|'),
-        "g"
-    );
-    var result = myRe.exec(text);
+    var result = PT_HTML_REGEX.exec(all_html);
+
     while (result != null) {
-        to_return.push(result);
-        result = myRe.exec(text);
+        to_return.push(result[0]);
+        result = PT_HTML_REGEX.exec(all_html);
     }
-    return to_return;
+
+    return to_return; 
 }
 
-// get all fakeblock objects from whole page
-function getFakeblockObjectsFromContainer($container) {
-    var ps_containing_fblocks = getDivsContainingFakeBlock($container);
-    if (ps_containing_fblocks.length == 0) {
+function getEncryptedText(html) {
+    /*
+    returns the text of the given html, with all html tags stripped
+    returns null if html is null
+    */
+    if (html == null) {
         return null;
     }
-    var all_fakeblocks = [];
-    ps_containing_fblocks.each(function() {
-        var div = $(this);
-        var match_objects = getFakeBlocksFromText(div.text());
-        $.each(match_objects, function() {
-            try {
-                var match_object = $(this);
-                var whole_match = match_object[0];
-                var byte_str = match_object[1];
-                var unparsed_json = decodeByteString(byte_str);
-                var parsed_json = JSON.parse(unparsed_json);
-                var fakeblock_obj = {
-                    'whole_match': whole_match,
-                    'unparsed_json': unparsed_json,
-                    'parsed_json': parsed_json
-                };
-                all_fakeblocks.push(fakeblock_obj);
-            } catch (ex) {
-                console.log(ex);
-            }
-        });
-    });
-    return {
-        'all_fakeblocks': all_fakeblocks,
-        'ps_containing_fakeblocks': ps_containing_fblocks
-    };
+    var $dummyDiv = $('<div>' + html + '</div>');
+    return $dummyDiv.text();
 }
 
-// decrypt and replace all faceblocks for a user
-function decryptFakeblocks($container) {
-    var returned_dict = getFakeblockObjectsFromContainer($container);
-    if (returned_dict === null) {
+function getEncryptedJson(encryptedText) {
+    /*
+    given an encryped parseltongue block of text
+    return the json holding the ciphertext, etc.
+    */
+    var match = PT_TEXT_REGEX.exec(encryptedText);
+    if (! match) {
+        return null;
+    }
+    var byte_str = match[1];
+    var json = decodeByteString(byte_str);
+    return $.parseJSON(json);
+}
+
+function decryptHandler($container) {
+    /*
+    try and decrypt all possible DOM elements in $container
+    finds and replaces all matching parseltongue blocks
+    */
+    var $encryptedElms = getDivsContainingFakeBlock($container);
+    if ($encryptedElms.length == 0) {
         return;
     }
-    var fakeblocks = returned_dict['all_fakeblocks'];
-    var ps_containing_fakeblocks = returned_dict['ps_containing_fakeblocks'];
-    $.each(fakeblocks, function() {
-        var fakeblock = $(this)[0];
-        var to_replace = fakeblock['whole_match'];
-        var unparsed_json = fakeblock['unparsed_json'];
-        var parsed_json = fakeblock['parsed_json'];
-        // send to back to decrypt and replace to_replace with decrypted_text
-        replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace, parsed_json);
-    });
+    var decryptDict = {};
+    $.each($encryptedElms, function(i, elm){
+        var htmlsToReplace = getHtmlToReplace($(elm));
+        var encryptedTexts = htmlsToReplace.map(function(html) {
+            return getEncryptedText(html);
+        });
+
+        for (var j in htmlsToReplace) {
+            if (encryptedTexts[j] == null) {
+                continue;
+            }
+            var encryptedJson = getEncryptedJson(encryptedTexts[j]);
+            decryptEncryptedHtml($(elm), htmlsToReplace[j], encryptedJson);
+        }
+    });  
 }
 
-// backend decrypts fakeblock unparsed_json into decrypted_text
-function replaceFakeblockWithDecryptedText(ps_containing_fakeblocks, to_replace, json) {
+function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedText) {
+    /*
+    given a DOM element with encrypted content, the encrypted html content to replace, 
+    and the text of the encrypted html, send a message to decrypt the encrypted text
+    and replace the encrypted html of the element if successful
+    */
     sendMessage({
-        "action": "decrypt",
-        "json": json
+        'action' : 'decrypt',
+        'json' : encryptedText,
     }, function(response) {
-        var decrypted_text = $.parseJSON(response).res;
-        if (decrypted_text != null) {
-            $.each(ps_containing_fakeblocks, function(i, e) {
-                $(this).html(decrypted_text);
-                // if the newly decrypted text was in an unencrypted area, 
-                // make sure encrypted area is updated
-                var $unencryptedArea = $(this).closest('.parseltongue-unencrypted');
-                if ($unencryptedArea.length > 0) {
-                    encryptHandler($unencryptedArea);
-                }
-            });
+        var decryptedText = $.parseJSON(response).res;
+        if (decryptedText == null) {
+            return;
         }
-    });
+        var all_html = $encryptedElm.html();
+        all_html = all_html.replace(htmlToReplace, decryptedText);
+        $encryptedElm.html(all_html);
+    })
 }
