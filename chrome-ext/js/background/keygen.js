@@ -96,7 +96,7 @@ function uploadUserData() {
         var userMeta = {
             "username": username,
             "pri_key": pri_key,
-            "defaultEncrpyt" : true
+            "defaultEncrypt" : true
         };
         writeLocalStorage("userMeta", userMeta);
         registration_data["completed"] = true;

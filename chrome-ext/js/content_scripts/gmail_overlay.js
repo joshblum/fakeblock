@@ -89,10 +89,11 @@ function processDraft($draftable) {
         ( draft_html.indexOf(DRAFT_SEPARATOR) < 0 ||
         draft_html.length - draft_html.indexOf(DRAFT_SEPARATOR) !== DRAFT_SEPARATOR.length) )  {
 
-        //if draft has finished loading
-        getUnencryptedAreaFor($draftable).html(
-            getDraftFor($draftable) 
-        );
+        // if draft has finished loading
+        //TODO: need a check here to see if any elements actually got decrypted...but how do we do that if it's async?
+        // decryptElements($draftable);
+        // var $ptButton = getPtButtonsFor(getUnencryptedAreaFor($draftable)).find('.pt-unlocked');
+        // togglePtButton($ptButton, true)
         $draftable.removeClass('pre-draft');   
 
     } else {
@@ -153,7 +154,6 @@ function makeOverlay($email) {
     var $unencryptedArea = makeOverlayHtml($textarea);
 
     $textarea.after($unencryptedArea);
-    $textarea.hide();
 
     $unencryptedArea.keyup(function(e) {
         encryptHandler($(this));
@@ -163,7 +163,6 @@ function makeOverlay($email) {
     // when usernames are added/encrypt button is clicked, this will toggle to true
     setCanEncryptFor($unencryptedArea, false);
     setDoEncryptFor($unencryptedArea, false);
-    toggleOverlay($unencryptedArea, false);
 
     $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
     $textarea.addClass('has-overlay pre-draft');
@@ -213,6 +212,8 @@ function toggleEncrypt($unencryptedArea, oldEncrypt) {
     calls 'show' or 'hide' for the overlay toggle 
     */
     var encrypt = getWillEncryptFor($unencryptedArea);
+    // TODO: maybe not necessary, but don't allow overlay to be toggled if still loading draft
+    // var loadingDraft = getEncryptedAreaFor($unencryptedArea).hasClass('pre-draft');
     if (oldEncrypt === encrypt) { 
         return;
     }
@@ -231,9 +232,10 @@ function makeOverlayHtml($textarea) {
         role : 'textbox',
         contenteditable : true,
     });
+    $unencryptedArea.hide();
     // save the textarea tabindex so we can use it later while showing/hiding the overlay
     setTabIndexFor($unencryptedArea, $textarea.attr('tabindex'));
-    $textarea.removeAttr('tabindex');
+    // $textarea.removeAttr('tabindex');
 
     $unencryptedArea.click(function(evt) {
         evt.stopPropagation();
@@ -447,12 +449,13 @@ function requestDefaultEncrypt($ptButtons) {
    }, function(res) {
         userMeta = JSON.parse(res).res;
         var $ptButton;
-        if (userMeta.defaultEncrypt) {
+        var defaultEncrypt = userMeta.defaultEncrypt != null ? userMeta.defaultEncrypt : false;
+        if (defaultEncrypt) {
             $ptButton = $ptButtons.find('.pt-unlocked');
         } else {
             $ptButton = $ptButtons.find('.pt-locked');
         }
-        togglePtButton($ptButton, userMeta.defaultEncrypt);
+        togglePtButton($ptButton, defaultEncrypt);
    });
 }
 

@@ -48,7 +48,6 @@ function getDivsContainingFakeBlock($container) {
         var isEncrypted = PT_HTML_REGEX.test($(elm).justtext());
 
         return isEncrypted &&
-            $(elm).closest(getSelectorForClass(PRE_DRAFT_CLASS)).length == 0 &&
             $(elm).closest(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS)).length == 0;
     });
 }
@@ -104,6 +103,9 @@ function decryptHandler($container) {
     if ($encryptedElms.length == 0) {
         return;
     }
+}
+
+function decryptElements($encryptedElms) {
     var decryptDict = {};
     $.each($encryptedElms, function(i, elm){
         var htmlsToReplace = getHtmlToReplace($(elm));
