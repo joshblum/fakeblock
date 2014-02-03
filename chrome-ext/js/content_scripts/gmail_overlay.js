@@ -42,7 +42,6 @@ $(function() {
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
         var $overlayable = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(TEXTAREA_SELECTOR);
-        console.log($overlayable.text());
 
         if ($overlayable.length == 1) {
 
@@ -54,10 +53,7 @@ $(function() {
             } 
 
         } else if ($overlayable.length == 2) {
-            var $draftable = $overlayable.filter('.pre-draft');
-            if ($draftable.length > 0) {
-                processDraft($draftable);
-            }
+            processDraft($overlayable);
 
             var $email_toolbar = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(getSelectorForClass(TOOLBAR_CLASS));
             var $buttonable = $overlayable.filter('.has-overlay');
@@ -82,13 +78,18 @@ $(function() {
     });
 });
 
-function processDraft($draftable) {
+function processDraft($overlayable) {
+    var $draftable = $overlayable.filter('.pre-draft');
+    if ($draftable.length == 0) {
+        return;
+    }
+
     var draft_html = $draftable.html();
 
     if ( ( getDraftFor($draftable) === draft_html ||
         draft_html.indexOf('class="gmail_extra"') >= 0 ) &&
         ( draft_html.indexOf(DRAFT_SEPARATOR) < 0 ||
-        draft_html.length - draft_html.indexOf(DRAFT_SEPARATOR) !== DRAFT_SEPARATOR.length) )  {
+        draft_html.length - draft_html.lastIndexOf(DRAFT_SEPARATOR) !== DRAFT_SEPARATOR.length) )  {
 
         // if draft has finished loading, try to decrypt the draft
         // depending on if decryption is successful, show/hide overlay and toggle parseltongue buttons
@@ -136,12 +137,10 @@ function makePtButtons($buttonable, $email_toolbar) {
 function bindPtButtons($ptButtons) {
     /*
     initialize parseltongue buttons
-    sets the default encrypt/decrypt option based on usermeta.defaultEncrypt
     shows or hides all parseltongue buttons if can encrypt for current usernames
+    (doesn't set defaultEncrypt since must wait for draft to finish loading)
     */
     var $unencryptedArea = getUnencryptedAreaFor($ptButtons);
-    // TODO: may have to move this into decryptDraft
-    requestDefaultEncrypt($ptButtons);
     canEncryptHandler($unencryptedArea); 
 }
 
@@ -241,7 +240,7 @@ function makeOverlayHtml($textarea) {
 
     $textarea.closest('tbody').parent().closest('tbody').children('tr').first().click(function() {
         //if user clicks on email window, focus into unencrypted area
-        //(TODO: this won't work if no html matched...don't know what to do then but maybe not big deal)
+        // TODO: this won't work if no html matched...don't know what to do then but maybe not big deal)
         $unencryptedArea.focus();
     }); 
 
@@ -444,8 +443,6 @@ function requestDefaultEncrypt($ptButtons) {
        "action": "getUserMeta",
    }, function(res) {
         userMeta = JSON.parse(res).res;
-        // TODO: don't allow this to override lock buttons if draft is still being loaded
-        // var loadingDraft = getEncryptedAreaFor($unencryptedArea).hasClass('pre-draft');
         var $ptButton;
         var defaultEncrypt = userMeta.defaultEncrypt != null ? userMeta.defaultEncrypt : false;
         if (defaultEncrypt) {

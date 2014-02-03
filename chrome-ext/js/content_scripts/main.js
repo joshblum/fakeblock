@@ -103,12 +103,16 @@ function decryptHandler($container) {
     decryptElements($encryptedElms);
 }
 
-function decryptElements($encryptedElms) {
+function decryptElements($encryptedElms, isDraft) {
     var decryptDict = {};
     $.each($encryptedElms, function(i, elm){
         var htmlsToReplace = getHtmlToReplace($(elm));
-        // TODO: if htmlsToReplace's first element isn't same as beginning substring of a draft element,
-        // then have to call decryptDraft, false 
+
+        var isEncryptedDraft = $(elm).html().indexOf(htmlsToReplace[0]) == 0;
+        if (! isEncryptedDraft) {
+            setDraftStateFor($(elm), false);
+        }
+
         var encryptedTexts = htmlsToReplace.map(function(html) {
             return getEncryptedText(html);
         });
@@ -133,27 +137,36 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedText) {
         'action' : 'decrypt',
         'json' : encryptedText,
     }, function(response) {
+        console.log(response);
+        var isEncryptedDraft = false;
         var decryptedText = $.parseJSON(response).res;
         if (decryptedText == null) {
-            decryptDraft($encryptedElm, false);
+            setDraftStateFor($encryptedElm, isEncryptedDraft);
             return;
         }
-        var all_html = $encryptedElm.html();
-        all_html = all_html.replace(htmlToReplace, decryptedText);
-        $encryptedElm.html(all_html);
 
-        decryptDraft($encryptedElm, true);
-    })
+        var allHtml = $encryptedElm.html();
+        var decryptedHtml = allHtml.replace(htmlToReplace, decryptedText);
+        $encryptedElm.html(decryptedHtml);
+
+        isEncryptedDraft = allHtml.indexOf(htmlToReplace) == 0;
+        setDraftStateFor($encryptedElm, isEncryptedDraft);
+    });
 }
 
-function decryptDraft($draftable, wasEncrypted) {
+function setDraftStateFor($draftable, isEncrypted) {
     if (! $draftable.hasClass('pre-draft')) {
         return;
     }
 
-    var ptButtonSelector = wasEncrypted ? '.pt-unlocked' : '.pt-locked';
-    var $ptButton = getPtButtonsFor($draftable).find(ptButtonSelector);
-    togglePtButton($ptButton, wasEncrypted); 
+    var ptButtonSelector = isEncrypted ? '.pt-unlocked' : '.pt-locked';
+    var $ptButtons = getPtButtonsFor($draftable);
+    var $ptButton = $ptButtons.find(ptButtonSelector);
+    togglePtButton($ptButton, isEncrypted); 
+
+    if ($.trim( getUnencryptedAreaFor($draftable).justtext() ).length == 0) {
+        requestDefaultEncrypt($ptButtons);
+    }
 
     $draftable.removeClass('pre-draft');
 }
