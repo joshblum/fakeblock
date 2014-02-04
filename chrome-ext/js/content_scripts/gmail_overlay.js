@@ -37,8 +37,7 @@ $(function() {
             // don't allow insert events for objects appended to the unencrypted area to propagate
             return;
         } else if ($(e.target).parent().hasClass(FAKEBLOCK_TEXTAREA_CLASS) &&
-            $(e.target).hasClass('gmail_extra') &&
-            ! loadingDraft) {
+            $(e.target).hasClass('gmail_extra') && !loadingDraft) {
             // if an old email thread gets revealed in the original textarea
             //      if encryption is on, append the old email thread div to the overlay
             //      if encryption is off, explicitly decrypt any encrypted old email thread text in original textarea
@@ -320,7 +319,7 @@ function getFromUsernameFor($unencryptedArea) {
 
     var emailMatch = FROM_EMAIL_REGEX.exec($fromElm.text());
     if (emailMatch) {
-        emailMatch = emailMatch[1]; 
+        emailMatch = emailMatch[1];
     }
     return emailMatch;
 }

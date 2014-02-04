@@ -104,11 +104,11 @@ function decryptHandler($container) {
 
 function decryptElements($encryptedElms, isDraft) {
     var decryptDict = {};
-    $.each($encryptedElms, function(i, elm){
+    $.each($encryptedElms, function(i, elm) {
         var htmlsToReplace = getHtmlToReplace($(elm));
 
         var isEncryptedDraft = $(elm).html().indexOf(htmlsToReplace[0]) == 0;
-        if (! isEncryptedDraft) {
+        if (!isEncryptedDraft) {
             setDraftStateFor($(elm), false);
         }
 
@@ -123,7 +123,7 @@ function decryptElements($encryptedElms, isDraft) {
             var encryptedJson = getEncryptedJson(encryptedTexts[j]);
             decryptEncryptedHtml($(elm), htmlsToReplace[j], encryptedJson);
         }
-    });  
+    });
 }
 
 function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
@@ -133,8 +133,8 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
     and replace the encrypted html of the element if successful
     */
     sendMessage({
-        'action' : 'decrypt',
-        'json' : encryptedJson,
+        'action': 'decrypt',
+        'json': encryptedJson,
     }, function(response) {
         var isEncryptedDraft = false;
         var decryptedText = $.parseJSON(response).res;
@@ -158,16 +158,16 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
 }
 
 function setDraftStateFor($draftable, isEncrypted) {
-    if (! $draftable.hasClass('pre-draft')) {
+    if (!$draftable.hasClass('pre-draft')) {
         return;
     }
 
     var ptButtonSelector = isEncrypted ? '.pt-unlocked' : '.pt-locked';
     var $ptButtons = getPtButtonsFor($draftable);
     var $ptButton = $ptButtons.find(ptButtonSelector);
-    togglePtButton($ptButton, isEncrypted); 
+    togglePtButton($ptButton, isEncrypted);
 
-    if ($.trim( getUnencryptedAreaFor($draftable).justtext() ).length == 0) {
+    if ($.trim(getUnencryptedAreaFor($draftable).justtext()).length == 0) {
         requestDefaultEncrypt($ptButtons);
     }
 
