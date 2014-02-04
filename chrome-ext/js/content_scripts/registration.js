@@ -25,7 +25,9 @@ $(document).ajaxSend(function(event, xhr, settings) {
 
 $(document).ready(function() {
 
-    $(".pt-ext-installed").show();
+    $(".no_ext_installed").removeClass("no_ext_installed");
+    $(".pt-ext-installed").fadeIn();
+    $(".pt-ext-installed").removeClass("pt-ext-installed");
 
     // debugger;
     if (onThisPage("/register/")) {

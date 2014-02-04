@@ -16,12 +16,12 @@
                 "js/content_scripts/gmail_overlay.js", 
                 "js/content_scripts/main.js", 
                 "js/content_scripts/registration.js"
-            ], 
+            ],
             "matches": [
                 "http://127.0.0.1:8000/*", 
                 "https://mail.google.com/*", 
                 "http://getparseltongue.com/*",
-                "https://getparseltongue.com/*",
+                "https://getparseltongue.com/*"
             ]
         }
     ], 
