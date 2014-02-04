@@ -28,11 +28,13 @@ $(function() {
     }
 
     $(document).on('DOMNodeInserted', function(e) {
+        var loadingDraft = getEncryptedAreaFor($(e.target)).hasClass('pre-draft');
         if ($(e.target).closest(getSelectorForClass(NON_FAKEBLOCK_TEXTAREA_CLASS)).length > 0) {
             //don't allow insert events for objects appended to the unencrypted area to propagate
             return;
         } else if ($(e.target).parent().hasClass(FAKEBLOCK_TEXTAREA_CLASS) &&
-            $(e.target).hasClass('gmail_extra')) {
+            $(e.target).hasClass('gmail_extra') &&
+            ! loadingDraft) {
             //if an old email thread gets revealed in the original textarea
             var $unencryptedArea = getUnencryptedAreaFor($(e.target));
             if (getWillEncryptFor($unencryptedArea)) {
@@ -122,6 +124,7 @@ function makePtButtons($buttonable, $email_toolbar) {
 
         var unlockedImgSrc = chrome.extension.getURL('img/snake-btn.png');
         var lockedImgSrc = chrome.extension.getURL('img/lock-btn.png');
+
         $ptButton.find('.pt-unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
             e.preventDefault();
             togglePtButton($(this), true);
@@ -357,13 +360,8 @@ function setMapValueFor($unencryptedArea, map, value) {
     map[id] = value;
 }
 
-function getEncryptedAreaFor($unencryptedArea) {
-    var id = $unencryptedArea.prop('id');
-    if (id) {
-        id = id.split('_unencrypted')[0].replace(':', '\\:');
-        return $('#' + id);
-    }
-    return $();
+function getEncryptedAreaFor($elm) {
+    return $elm.closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS));
 }
 
 function getPtButtonsFor($unencryptedArea) {
