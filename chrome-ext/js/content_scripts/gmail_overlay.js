@@ -211,7 +211,7 @@ function toggleOverlay($unencryptedArea, doShow) {
         'tabindex': getTabIndexFor($unencryptedArea),
     });
     $toHide.hide();
-    $toShow.show().focus();
+    $toShow.show();
 
     if (doShow) {
         encryptHandler($unencryptedArea);
