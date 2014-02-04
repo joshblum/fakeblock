@@ -136,7 +136,6 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
         'action' : 'decrypt',
         'json' : encryptedJson,
     }, function(response) {
-        console.log(response);
         var isEncryptedDraft = false;
         var decryptedText = $.parseJSON(response).res;
         if (decryptedText == null) {
