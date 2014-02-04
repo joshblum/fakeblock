@@ -34,9 +34,12 @@ $(function() {
         } else if ($(e.target).parent().hasClass(FAKEBLOCK_TEXTAREA_CLASS) && 
             $(e.target).hasClass('gmail_extra')) {
             //if an old email thread gets revealed in the original textarea
-            //append it to associated unencrypted area instead and reencrypt
             var $unencryptedArea = getUnencryptedAreaFor($(e.target));
-            $unencryptedArea.append($(e.target));
+            if (getWillEncryptFor($unencryptedArea)) {
+                $unencryptedArea.append($(e.target));
+            } else {
+                decryptElements($(e.target));
+            }
             return;
         }
 
@@ -230,7 +233,6 @@ function makeOverlayHtml($textarea) {
     $unencryptedArea.hide();
     // save the textarea tabindex so we can use it later while showing/hiding the overlay
     setTabIndexFor($unencryptedArea, $textarea.attr('tabindex'));
-    // $textarea.removeAttr('tabindex');
 
     $unencryptedArea.click(function(evt) {
         evt.stopPropagation();
