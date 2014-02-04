@@ -27,7 +27,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-z
+
 // byte encoding
 function strToByteArray(str) {
     var bytes = [];
