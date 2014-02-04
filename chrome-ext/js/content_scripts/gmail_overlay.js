@@ -34,15 +34,17 @@ $(function() {
         } else if ($(e.target).parent().hasClass(FAKEBLOCK_TEXTAREA_CLASS) && 
             $(e.target).hasClass('gmail_extra')) {
             //if an old email thread gets revealed in the original textarea
-            //append it to associated unencrypted area instead and reencrypt
             var $unencryptedArea = getUnencryptedAreaFor($(e.target));
-            $unencryptedArea.append($(e.target));
+            if (getWillEncryptFor($unencryptedArea)) {
+                $unencryptedArea.append($(e.target));
+            } else {
+                decryptElements($(e.target));
+            }
             return;
         }
 
         //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
         var $overlayable = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(TEXTAREA_SELECTOR);
-        console.log($overlayable.text());
 
         if ($overlayable.length == 1) {
 
@@ -54,10 +56,7 @@ $(function() {
             } 
 
         } else if ($overlayable.length == 2) {
-            var $draftable = $overlayable.filter('.pre-draft');
-            if ($draftable.length > 0) {
-                processDraft($draftable);
-            }
+            processDraft($overlayable);
 
             var $email_toolbar = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(getSelectorForClass(TOOLBAR_CLASS));
             var $buttonable = $overlayable.filter('.has-overlay');
@@ -82,20 +81,22 @@ $(function() {
     });
 });
 
-function processDraft($draftable) {
+function processDraft($overlayable) {
+    var $draftable = $overlayable.filter('.pre-draft');
+    if ($draftable.length == 0) {
+        return;
+    }
+
     var draft_html = $draftable.html();
 
     if ( ( getDraftFor($draftable) === draft_html ||
         draft_html.indexOf('class="gmail_extra"') >= 0 ) &&
         ( draft_html.indexOf(DRAFT_SEPARATOR) < 0 ||
-        draft_html.length - draft_html.indexOf(DRAFT_SEPARATOR) !== DRAFT_SEPARATOR.length) )  {
+        draft_html.length - draft_html.lastIndexOf(DRAFT_SEPARATOR) !== DRAFT_SEPARATOR.length) )  {
 
-        // if draft has finished loading
-        //TODO: need a check here to see if any elements actually got decrypted...but how do we do that if it's async?
-        // decryptElements($draftable);
-        // var $ptButton = getPtButtonsFor(getUnencryptedAreaFor($draftable)).find('.pt-unlocked');
-        // togglePtButton($ptButton, true)
-        $draftable.removeClass('pre-draft');   
+        // if draft has finished loading, try to decrypt the draft
+        // depending on if decryption is successful, show/hide overlay and toggle parseltongue buttons
+        decryptElements($draftable);
 
     } else {
         //draft hasn't finished loading into compose window
@@ -139,12 +140,10 @@ function makePtButtons($buttonable, $email_toolbar) {
 function bindPtButtons($ptButtons) {
     /*
     initialize parseltongue buttons
-    binds parseltongue buttons to the proper unencrypted textarea
-    sets the default encrypt/decrypt option based on usermeta.defaultEncrypt
-    shows or hides all parseltongue buttons if can encrypt for current usernamesde the fact that it is normal gmail when you are not encrypting is huge
+    shows or hides all parseltongue buttons if can encrypt for current usernames
+    (doesn't set defaultEncrypt since must wait for draft to finish loading)
     */
     var $unencryptedArea = getUnencryptedAreaFor($ptButtons);
-    requestDefaultEncrypt($ptButtons);
     canEncryptHandler($unencryptedArea); 
 }
 
@@ -213,8 +212,6 @@ function toggleEncrypt($unencryptedArea, oldEncrypt) {
     calls 'show' or 'hide' for the overlay toggle 
     */
     var encrypt = getWillEncryptFor($unencryptedArea);
-    // TODO: maybe not necessary, but don't allow overlay to be toggled if still loading draft
-    // var loadingDraft = getEncryptedAreaFor($unencryptedArea).hasClass('pre-draft');
     if (oldEncrypt === encrypt) { 
         return;
     }
@@ -236,7 +233,6 @@ function makeOverlayHtml($textarea) {
     $unencryptedArea.hide();
     // save the textarea tabindex so we can use it later while showing/hiding the overlay
     setTabIndexFor($unencryptedArea, $textarea.attr('tabindex'));
-    // $textarea.removeAttr('tabindex');
 
     $unencryptedArea.click(function(evt) {
         evt.stopPropagation();
@@ -246,7 +242,7 @@ function makeOverlayHtml($textarea) {
 
     $textarea.closest('tbody').parent().closest('tbody').children('tr').first().click(function() {
         //if user clicks on email window, focus into unencrypted area
-        //(TODO: this won't work if no html matched...don't know what to do then but maybe not big deal)
+        // TODO: this won't work if no html matched...don't know what to do then but maybe not big deal)
         $unencryptedArea.focus();
     }); 
 
