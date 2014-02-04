@@ -9,8 +9,8 @@ $(document).ajaxSend(function(event, xhr, settings) {
         // Allow absolute or scheme relative URLs to same origin
         return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
             (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-            // or any other URL that isn't scheme relative or absolute i.e relative.
-            !(/^(\/\/|http:|https:).*/.test(url));
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
     }
 
     function safeMethod(method) {
@@ -213,13 +213,13 @@ function getCookie(name) {
     return cookieValue;
 }
 
-var PT_DOMAINS = ["getparseltongue.com","127.0.0.1"];
+var PT_DOMAINS = ["getparseltongue.com", "127.0.0.1"];
+
 function onThisPage(page) {
     if (onAnyParselTonguePage()) {
         var current_url = window.location.pathname;
         return (current_url == page);
-    }
-    else {
+    } else {
         return false;
     }
 }
@@ -245,7 +245,7 @@ window.onerror = function(message, url, lineNumber) {
 
 function logErrorToServer(error_message) {
     var post_data = {
-        "error":error_message
+        "error": error_message
     };
     $.post("/error/", post_data, function(data) {});
 }

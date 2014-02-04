@@ -8,7 +8,7 @@ var aesBitLength = 256;
 //used to generate passphrases
 function randString(length) {
     length = length ? length : aesBitLength / 8;
-    randBuf= new Uint8Array(length);
+    randBuf = new Uint8Array(length);
     window.crypto.getRandomValues(randBuf);
     return arrayBufferToString(randBuf);
 }
@@ -17,7 +17,7 @@ function arrayBufferToString(buf) {
     /*
     from http://updates.html5rocks.com/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
     */
-   return String.fromCharCode.apply(null, new Uint16Array(buf));
+    return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
 
 //generates and returns a public/private key pair
@@ -96,7 +96,7 @@ function uploadUserData() {
         var userMeta = {
             "username": username,
             "pri_key": pri_key,
-            "defaultEncrypt" : true
+            "defaultEncrypt": true
         };
         writeLocalStorage("userMeta", userMeta);
         registration_data["completed"] = true;
@@ -106,6 +106,6 @@ function uploadUserData() {
 
 // logout, clears localstorage !!!
 function parseltongueLogout() {
-   localStorage.clear();
-   localStorage.first = "true";
+    localStorage.clear();
+    localStorage.first = "true";
 }

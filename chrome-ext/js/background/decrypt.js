@@ -2,7 +2,7 @@
 //or an empty string if decryption fails.
 function decrypt(fakeblock) {
     var userMeta = loadLocalStore('userMeta');
-    if (!Object.size(userMeta)){
+    if (!Object.size(userMeta)) {
         //maybe should use null instead of ""
         return null;
     }

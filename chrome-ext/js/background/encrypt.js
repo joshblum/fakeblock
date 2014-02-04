@@ -10,7 +10,7 @@
     fakeblock_obj ::= def in common.js
 */
 function encrypt(plaintext, encrypt_for) {
-    
+
     var sender_meta = loadLocalStore('userMeta');
 
     //we can't encrypt
@@ -51,14 +51,14 @@ function getCachedUsers(encrypt_for) {
 
 //update the cache with any users we don't have
 function updateCache(encrypt_for) {
-    var cachedUsers = loadLocalStore('cachedUsers'); 
+    var cachedUsers = loadLocalStore('cachedUsers');
     var uncached = [];
     for (i in encrypt_for) {
         if (!(encrypt_for[i] in cachedUsers)) {
             uncached.push(encrypt_for[i]);
         }
     }
-    if (uncached.length > 0){
+    if (uncached.length > 0) {
         getPubKeysFromServer(uncached);
     }
 }
@@ -71,23 +71,23 @@ function canEncryptFor(usernames) {
 
     var sender_meta = loadLocalStore('userMeta');
 
-    if (!Object.size(sender_meta) || 
+    if (!Object.size(sender_meta) ||
         usernames.length == 0 ||
         usernames.indexOf(null) >= 0) {
 
         return {
-            "can_encrypt" : canEncrypt,
+            "can_encrypt": canEncrypt,
         }
 
     }
     var pub_keys = getPubKeysFromServer(usernames);
-    if (! pub_keys) {
+    if (!pub_keys) {
         return {
-            'can_encrypt' :  canEncrypt,
+            'can_encrypt': canEncrypt,
         }
     }
     var can_encrypt = true;
-    
+
     for (i in pub_keys) {
         var pub_key = pub_keys[i];
         if (!pub_key.length) {

@@ -31,19 +31,19 @@ function getCookie(name) {
 // byte encoding
 function strToByteArray(str) {
     var bytes = [];
-    for (var i = 0; i < str.length; ++i)
-    {
+    for (var i = 0; i < str.length; ++i) {
         bytes.push(str.charCodeAt(i));
     }
     return bytes;
 }
+
 function encodeString(str) {
     var b_array = strToByteArray(str);
     var to_return = "";
     for (var i = 0; i < str.length; i++) {
         var c = String(b_array[i]);
         to_return += c;
-        if (i < str.length-1) {
+        if (i < str.length - 1) {
             to_return += "*";
         }
     }

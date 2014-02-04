@@ -35,7 +35,7 @@ function getUserMeta(remove_pri) {
     var userMeta = loadLocalStore("userMeta");
 
     if (remove_pri === true) {
-        delete userMeta.pri_key;    
+        delete userMeta.pri_key;
     }
 
     return userMeta;
