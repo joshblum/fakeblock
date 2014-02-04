@@ -7,6 +7,9 @@ var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var TOOLBAR_CLASS = "n1tfz";
 var FORMAT_BUTTON_CLASS = "az5";
 var USERNAME_FIELD_CLASS = 'vR';
+var FROM_EMAIL_CLASS = 'az2';
+
+var FROM_EMAIL_REGEX = new RegExp('<(.*)>$');
 
 var PT_BUTTON_HTML = '<div class="pt-buttons-wrapper" style="display:none;">' +
     '    <div class="pt-button pt-unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt">' +
@@ -28,12 +31,17 @@ $(function() {
     }
 
     $(document).on('DOMNodeInserted', function(e) {
+        // check if the draft text is still being loaded
+        var loadingDraft = getEncryptedAreaFor($(e.target)).hasClass('pre-draft');
         if ($(e.target).closest(getSelectorForClass(NON_FAKEBLOCK_TEXTAREA_CLASS)).length > 0) {
-            //don't allow insert events for objects appended to the unencrypted area to propagate
+            // don't allow insert events for objects appended to the unencrypted area to propagate
             return;
         } else if ($(e.target).parent().hasClass(FAKEBLOCK_TEXTAREA_CLASS) &&
-            $(e.target).hasClass('gmail_extra')) {
-            //if an old email thread gets revealed in the original textarea
+            $(e.target).hasClass('gmail_extra') && !loadingDraft) {
+            // if an old email thread gets revealed in the original textarea
+            //      if encryption is on, append the old email thread div to the overlay
+            //      if encryption is off, explicitly decrypt any encrypted old email thread text in original textarea
+            //          since encryption is disabled in the original textarea
             var $unencryptedArea = getUnencryptedAreaFor($(e.target));
             if (getWillEncryptFor($unencryptedArea)) {
                 $unencryptedArea.append($(e.target));
@@ -43,19 +51,18 @@ $(function() {
             return;
         }
 
-        //make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
         var $overlayable = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(TEXTAREA_SELECTOR);
 
         if ($overlayable.length == 1) {
-
+            // make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
+            // this is awkward, but we have to wait until the textarea's tabindex is set
             if (!$overlayable.hasClass('has-overlay') && $overlayable.attr('tabindex')) {
-                //this is awkward, but we have to wait until the textarea's tabindex is set
-                //so can tab to overlay but can't tab to original email
                 var $email = $overlayable.closest(getSelectorForClass(EMAIL_WINDOW_CLASS));
                 makeOverlay($email);
             }
 
         } else if ($overlayable.length == 2) {
+
             processDraft($overlayable);
 
             var $email_toolbar = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(getSelectorForClass(TOOLBAR_CLASS));
@@ -66,9 +73,13 @@ $(function() {
             }
 
         }
+
         if ($(e.target).hasClass(USERNAME_FIELD_CLASS)) {
             //update usernames if (possibly) a new username has been added
             usernameHandler($(e.target));
+        } else if (FROM_EMAIL_REGEX.test($(e.target).text())) {
+            var $unencryptedArea = getUnencryptedAreaFor($(e.target));
+            canEncryptHandler($unencryptedArea);
         }
 
     });
@@ -122,6 +133,7 @@ function makePtButtons($buttonable, $email_toolbar) {
 
         var unlockedImgSrc = chrome.extension.getURL('img/snake-btn.png');
         var lockedImgSrc = chrome.extension.getURL('img/lock-btn.png');
+
         $ptButton.find('.pt-unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
             e.preventDefault();
             togglePtButton($(this), true);
@@ -198,7 +210,7 @@ function toggleOverlay($unencryptedArea, doShow) {
         'tabindex': getTabIndexFor($unencryptedArea),
     });
     $toHide.hide();
-    $toShow.show().focus();
+    $toShow.show();
 
     if (doShow) {
         encryptHandler($unencryptedArea);
@@ -290,12 +302,26 @@ function canEncryptHandler($unencryptedArea, usernameToDelete) {
     */
     var usernames = getUsernamesFor($unencryptedArea);
 
-    var usernameDeleteIndex = usernames.indexOf(usernameToDelete);
-    if (usernameDeleteIndex >= 0) {
-        usernames.splice(usernameDeleteIndex, 1);
+    if (usernameToDelete) {
+        var usernameDeleteIndex = usernames.indexOf(usernameToDelete);
+        if (usernameDeleteIndex >= 0) {
+            usernames.splice(usernameDeleteIndex, 1);
+        }
     }
 
     requestCanEncryptFor($unencryptedArea, usernames);
+}
+
+function getFromUsernameFor($unencryptedArea) {
+    var $fromElm = $unencryptedArea
+        .closest(getSelectorForClass(EMAIL_WINDOW_CLASS))
+        .find(getSelectorForClass(FROM_EMAIL_CLASS));
+
+    var emailMatch = FROM_EMAIL_REGEX.exec($fromElm.text());
+    if (emailMatch) {
+        emailMatch = emailMatch[1];
+    }
+    return emailMatch;
 }
 
 function getUsernamesFor($unencryptedArea) {
@@ -315,12 +341,20 @@ function getUsernamesFor($unencryptedArea) {
     var usernames = $usernameElms.toArray().map(function(elm) {
         return $(elm).attr('email').toLowerCase();
     });
+
     var usernamesToReturn = [];
+
     for (var i in usernames) {
         if (usernames.indexOf(usernames[i]) == i) {
             usernamesToReturn.push(usernames[i]);
         }
     }
+
+    var fromEmail = getFromUsernameFor($unencryptedArea);
+    if (fromEmail) {
+        usernamesToReturn.push(fromEmail);
+    }
+
     return usernamesToReturn;
 }
 
@@ -357,13 +391,8 @@ function setMapValueFor($unencryptedArea, map, value) {
     map[id] = value;
 }
 
-function getEncryptedAreaFor($unencryptedArea) {
-    var id = $unencryptedArea.prop('id');
-    if (id) {
-        id = id.split('_unencrypted')[0].replace(':', '\\:');
-        return $('#' + id);
-    }
-    return $();
+function getEncryptedAreaFor($elm) {
+    return $elm.closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS));
 }
 
 function getPtButtonsFor($unencryptedArea) {

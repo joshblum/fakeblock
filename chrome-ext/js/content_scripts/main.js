@@ -38,11 +38,10 @@ function getDivsContainingFakeBlock($container) {
     /* 
     get divs that are all of the following:
         -immediate parent of a fakeblock to be decrypted
-        -not in a div where the draft is still being loaded
-        -not in the unencrypted textarea overlay
+        -not in the encrypted textarea overlay
     */
     return $container.find('div').add($container).filter(function(i, elm) {
-        var isEncrypted = PT_HTML_REGEX.test($(elm).justtext());
+        var isEncrypted = PT_TEXT_REGEX.test($(elm).justtext());
 
         return isEncrypted &&
             $(elm).closest(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS)).length == 0;
@@ -103,10 +102,16 @@ function decryptHandler($container) {
     decryptElements($encryptedElms);
 }
 
-function decryptElements($encryptedElms) {
+function decryptElements($encryptedElms, isDraft) {
     var decryptDict = {};
     $.each($encryptedElms, function(i, elm) {
         var htmlsToReplace = getHtmlToReplace($(elm));
+
+        var isEncryptedDraft = $(elm).html().indexOf(htmlsToReplace[0]) == 0;
+        if (!isEncryptedDraft) {
+            setDraftStateFor($(elm), false);
+        }
+
         var encryptedTexts = htmlsToReplace.map(function(html) {
             return getEncryptedText(html);
         });
@@ -121,7 +126,7 @@ function decryptElements($encryptedElms) {
     });
 }
 
-function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedText) {
+function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
     /*
     given a DOM element with encrypted content, the encrypted html content to replace, 
     and the text of the encrypted html, send a message to decrypt the encrypted text
@@ -129,14 +134,42 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedText) {
     */
     sendMessage({
         'action': 'decrypt',
-        'json': encryptedText,
+        'json': encryptedJson,
     }, function(response) {
+        var isEncryptedDraft = false;
         var decryptedText = $.parseJSON(response).res;
         if (decryptedText == null) {
+            setDraftStateFor($encryptedElm, isEncryptedDraft);
             return;
         }
-        var all_html = $encryptedElm.html();
-        all_html = all_html.replace(htmlToReplace, decryptedText);
-        $encryptedElm.html(all_html);
-    })
+
+        var allHtml = $encryptedElm.html();
+        var decryptedHtml = allHtml.replace(htmlToReplace, decryptedText);
+        $encryptedElm.html(decryptedHtml);
+
+        isEncryptedDraft = allHtml.indexOf(htmlToReplace) == 0;
+        setDraftStateFor($encryptedElm, isEncryptedDraft);
+
+        if ($encryptedElm.closest(getSelectorForClass(NON_FAKEBLOCK_TEXTAREA_CLASS)).length > 0) {
+            var $unencryptedArea = getUnencryptedAreaFor($encryptedElm);
+            encryptHandler($unencryptedArea);
+        }
+    });
+}
+
+function setDraftStateFor($draftable, isEncrypted) {
+    if (!$draftable.hasClass('pre-draft')) {
+        return;
+    }
+
+    var ptButtonSelector = isEncrypted ? '.pt-unlocked' : '.pt-locked';
+    var $ptButtons = getPtButtonsFor($draftable);
+    var $ptButton = $ptButtons.find(ptButtonSelector);
+    togglePtButton($ptButton, isEncrypted);
+
+    if ($.trim(getUnencryptedAreaFor($draftable).justtext()).length == 0) {
+        requestDefaultEncrypt($ptButtons);
+    }
+
+    $draftable.removeClass('pre-draft');
 }

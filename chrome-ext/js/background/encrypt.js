@@ -65,14 +65,20 @@ function updateCache(encrypt_for) {
 
 /*
  returns boolean based on whether or not all usernames are parseltongue users
+ input list of usernames includes the from email address, and a list of to email addresses, duplicates removed
+ if from email address also appears in to email addresses, both copies are included in input list 
 */
 function canEncryptFor(usernames) {
     var canEncrypt = false;
 
     var sender_meta = loadLocalStore('userMeta');
 
+    // can't encrypt if
+    //      -user not signed in
+    //      -the only username included is the from email address (usernames only has one email)
+    //      -one of the usernames is null (not a valid email address) 
     if (!Object.size(sender_meta) ||
-        usernames.length == 0 ||
+        usernames.length <= 1 ||
         usernames.indexOf(null) >= 0) {
 
         return {
