@@ -16,17 +16,17 @@
                 "js/content_scripts/gmail_overlay.js", 
                 "js/content_scripts/main.js", 
                 "js/content_scripts/registration.js"
-            ],
+            ], 
             "matches": [
                 "http://127.0.0.1:8000/*", 
                 "https://mail.google.com/*", 
-                "http://getparseltongue.com/*",
+                "http://getparseltongue.com/*", 
                 "https://getparseltongue.com/*"
             ]
         }
     ], 
     "description": "ParselTongue", 
-    "homepage_url": "http://getparseltongue.com/",
+    "homepage_url": "http://getparseltongue.com/", 
     "icons": {
         "128": "img/snake-icon.png", 
         "48": "img/snake-icon.png"
@@ -34,13 +34,13 @@
     "manifest_version": 2, 
     "name": "ParselTongue", 
     "permissions": [
-        "http://getparseltongue.com/*",
-        "https://getparseltongue.com/*",
+        "http://getparseltongue.com/*", 
+        "https://getparseltongue.com/*", 
         "http://127.0.0.1:8000/*", 
         "tabs"
     ], 
     "short_name": "ParselTongue", 
-    "version": "0.0.8", 
+    "version": "0.0.11",
     "web_accessible_resources": [
         "libs/jquery-1.10.2.min.js", 
         "libs/jquery-1.10.2.min.map", 
