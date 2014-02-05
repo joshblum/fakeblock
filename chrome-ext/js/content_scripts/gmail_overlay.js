@@ -7,16 +7,15 @@ var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var TOOLBAR_CLASS = "n1tfz";
 var FORMAT_BUTTON_CLASS = "az5";
 var USERNAME_FIELD_CLASS = 'vR';
-var FROM_EMAIL_CLASS = 'az2';
+var COMPOSE_FROM_EMAIL_CLASS = 'az2';
+var PAGE_FROM_EMAIL_CLASS = 'msg';
 var GMAIL_TOOLBAR_CLASS = 'gU';
 
-var FROM_EMAIL_REGEX = new RegExp('<(.*)>$');
-
 var PT_BUTTON_HTML = '<td class="pt-buttons-wrapper">' +
-    '    <div class="pt-button pt-unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt">' +
+    '    <div class="pt-button pt-unlocked" data-tooltip="Encrypt email" aria-label="Encrypt email">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
-    '    <div class="pt-button pt-locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt">' +
+    '    <div class="pt-button pt-locked" style="display:none" data-tooltip="Decrypt email" aria-label="Decrypt email">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
     '</td>';
@@ -33,7 +32,7 @@ $(function() {
 
     $(document).on('DOMNodeInserted', function(e) {
         // check if the draft text is still being loaded
-        var loadingDraft = getEncryptedAreaFor($(e.target)).hasClass('pre-draft');
+        var loadingDraft = getEncryptedAreaFor($(e.target)).hasClass(PRE_DRAFT_CLASS);
         if ($(e.target).closest(getSelectorForClass(NON_FAKEBLOCK_TEXTAREA_CLASS)).length > 0) {
             // don't allow insert events for objects appended to the unencrypted area to propagate
             return;
@@ -78,7 +77,7 @@ $(function() {
         if ($(e.target).hasClass(USERNAME_FIELD_CLASS)) {
             //update usernames if (possibly) a new username has been added
             usernameHandler($(e.target));
-        } else if (FROM_EMAIL_REGEX.test($(e.target).text())) {
+        } else if (getEmailFromString($(e.target).text()) !== null) {
             var $unencryptedArea = getUnencryptedAreaFor($(e.target));
             canEncryptHandler($unencryptedArea);
         }
@@ -94,7 +93,7 @@ $(function() {
 });
 
 function processDraft($overlayable) {
-    var $draftable = $overlayable.filter('.pre-draft');
+    var $draftable = $overlayable.filter(getSelectorForClass(PRE_DRAFT_CLASS));
     if ($draftable.length == 0) {
         return;
     }
@@ -178,8 +177,8 @@ function makeOverlay($email) {
     setCanEncryptFor($unencryptedArea, false);
     setDoEncryptFor($unencryptedArea, false);
 
-    $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
-    $textarea.addClass('has-overlay pre-draft');
+    $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS).addClass(PRE_DRAFT_CLASS);
+    $textarea.addClass('has-overlay');
 }
 
 function togglePtButton($ptButton, doEncrypt) {
@@ -218,6 +217,14 @@ function toggleOverlay($unencryptedArea, doShow) {
     if (doShow) {
         encryptHandler($unencryptedArea);
     }
+
+    // TODO: implement a real way of calculating cursor position
+    // this is temporary logic to focus into an empty textarea (not a draft)
+    if (doShow && $.trim($unencryptedArea.justtext()).length == 0 &&
+        $(document.activeElement).hasClass(FAKEBLOCK_TEXTAREA_CLASS)) {
+        $toShow.focus();
+    }
+
 }
 
 function toggleEncrypt($unencryptedArea, oldEncrypt) {
@@ -316,15 +323,21 @@ function canEncryptHandler($unencryptedArea, usernameToDelete) {
 }
 
 function getFromUsernameFor($unencryptedArea) {
+    /*
+    Try to return the from email address. Tries to find a match in this order
+        -looking at 'from' field in a compose window, needed if multiple addresses on one gmail
+        -looking for the primary account email in a div on the page
+        -if neither is found, return null
+    */
     var $fromElm = $unencryptedArea
         .closest(getSelectorForClass(EMAIL_WINDOW_CLASS))
-        .find(getSelectorForClass(FROM_EMAIL_CLASS));
+        .find(getSelectorForClass(COMPOSE_FROM_EMAIL_CLASS));
 
-    var emailMatch = FROM_EMAIL_REGEX.exec($fromElm.text());
-    if (emailMatch) {
-        emailMatch = emailMatch[1];
+    if (getEmailFromString($fromElm.text()) === null) {
+        $fromElm = $(getSelectorForClass(PAGE_FROM_EMAIL_CLASS));
     }
-    return emailMatch;
+
+    return getEmailFromString($fromElm.text());
 }
 
 function getUsernamesFor($unencryptedArea) {
@@ -354,9 +367,7 @@ function getUsernamesFor($unencryptedArea) {
     }
 
     var fromEmail = getFromUsernameFor($unencryptedArea);
-    if (fromEmail) {
-        usernamesToReturn.push(fromEmail);
-    }
+    usernamesToReturn.push(fromEmail);
 
     return usernamesToReturn;
 }

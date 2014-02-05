@@ -10,7 +10,6 @@
     fakeblock_obj ::= def in common.js
 */
 function encrypt(plaintext, encrypt_for) {
-
     var sender_meta = loadLocalStore('userMeta');
 
     //we can't encrypt
@@ -33,8 +32,6 @@ function encrypt(plaintext, encrypt_for) {
         }
     }
 
-
-
     var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
 
     var res = {
@@ -54,11 +51,19 @@ function updateCache(encrypt_for) {
     var cachedUsers = loadLocalStore('cachedUsers');
     var uncached = [];
     for (i in encrypt_for) {
-        if (!(encrypt_for[i] in cachedUsers)) {
-            uncached.push(encrypt_for[i]);
+        var email = encrypt_for[i];
+        if (email in cachedUsers && cachedUsers[email].length == 0) {
+            //invalidate empty cache entries 
+            delete cachedUsers[email];
+        }
+        if (!(email in cachedUsers)) {
+            uncached.push(email);
         }
     }
+    //add deletes
+    writeLocalStorage("cachedUsers", cachedUsers);
     if (uncached.length > 0) {
+        //adds keys to cache
         getPubKeysFromServer(uncached);
     }
 }
@@ -86,17 +91,12 @@ function canEncryptFor(usernames) {
         }
 
     }
-    var pub_keys = getPubKeysFromServer(usernames);
-    if (!pub_keys) {
-        return {
-            'can_encrypt': canEncrypt,
-        }
-    }
+    var cachedUsers = getCachedUsers(usernames);
     var can_encrypt = true;
 
-    for (i in pub_keys) {
-        var pub_key = pub_keys[i];
-        if (!pub_key.length) {
+    for (i in usernames) {
+        var username = usernames[i];
+        if (cachedUsers[username] === undefined) {
             can_encrypt = false;
             break
         }

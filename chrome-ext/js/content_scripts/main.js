@@ -1,14 +1,33 @@
 var DRAFT_SEPARATOR_REGEX = '(' + DRAFT_SEPARATOR + ')?';
-var PT_HTML_REGEX = new RegExp(FAKEBLOCK_OPEN_TAG.split('').join(DRAFT_SEPARATOR_REGEX).split('|').join('\\|') +
+var PT_HTML_REGEX = new RegExp(escapeString(FAKEBLOCK_OPEN_TAG.split('').join(DRAFT_SEPARATOR_REGEX)) +
     '(.*)' +
-    FAKEBLOCK_CLOSE_TAG.split('').join(DRAFT_SEPARATOR_REGEX).split('|').join('\\|'),
+    escapeString(FAKEBLOCK_CLOSE_TAG.split('').join(DRAFT_SEPARATOR_REGEX)),
     'g'
 );
-var PT_TEXT_REGEX = new RegExp(FAKEBLOCK_OPEN_TAG.split('|').join('\\|') +
+var PT_TEXT_REGEX = new RegExp(escapeString(getTextFromHtml(FAKEBLOCK_OPEN_TAG)) +
     '(.*)' +
-    FAKEBLOCK_CLOSE_TAG.split('|').join('\\|')
+    escapeString(getTextFromHtml(FAKEBLOCK_CLOSE_TAG))
 );
-//attaches event listeners and handles passing messages
+
+function escapeString(str) {
+    /*
+    escape strings for a regex
+    */
+    // escape all pipes
+    return str.replace(/\|/g, '\\|');
+}
+
+function getTextFromHtml(html) {
+    /*
+    returns the text of the given html, with all html tags stripped
+    returns null if html is null
+    */
+    if (html == null) {
+        return null;
+    }
+    var $dummyDiv = $('<div>' + html + '</div>');
+    return $dummyDiv.text();
+}
 
 jQuery.fn.justtext = function() {
     /* http://stackoverflow.com/questions/11362085/jquery-get-text-for-element-without-children-text */
@@ -64,18 +83,6 @@ function getHtmlToReplace($encryptedElm) {
     return to_return;
 }
 
-function getEncryptedText(html) {
-    /*
-    returns the text of the given html, with all html tags stripped
-    returns null if html is null
-    */
-    if (html == null) {
-        return null;
-    }
-    var $dummyDiv = $('<div>' + html + '</div>');
-    return $dummyDiv.text();
-}
-
 function getEncryptedJson(encryptedText) {
     /*
     given an encryped parseltongue block of text
@@ -113,7 +120,7 @@ function decryptElements($encryptedElms, isDraft) {
         }
 
         var encryptedTexts = htmlsToReplace.map(function(html) {
-            return getEncryptedText(html);
+            return getTextFromHtml(html);
         });
 
         for (var j in htmlsToReplace) {
@@ -158,7 +165,7 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
 }
 
 function setDraftStateFor($draftable, isEncrypted) {
-    if (!$draftable.hasClass('pre-draft')) {
+    if (!$draftable.hasClass(PRE_DRAFT_CLASS)) {
         return;
     }
 
@@ -171,5 +178,5 @@ function setDraftStateFor($draftable, isEncrypted) {
         requestDefaultEncrypt($ptButtons);
     }
 
-    $draftable.removeClass('pre-draft');
+    $draftable.removeClass(PRE_DRAFT_CLASS);
 }

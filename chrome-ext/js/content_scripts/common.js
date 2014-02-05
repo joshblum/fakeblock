@@ -1,8 +1,8 @@
 //class to add to the compose email textarea so that it doesn't get decrypted before being sent
 var FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-encrypted';
 var NON_FAKEBLOCK_TEXTAREA_CLASS = 'parseltongue-unencrypted';
-var FAKEBLOCK_OPEN_TAG = '|parseltongue|';
-var FAKEBLOCK_CLOSE_TAG = '|/parseltongue|';
+var FAKEBLOCK_OPEN_TAG = 'Email encrypted by ParselTongue<br>|begin encrypted email|';
+var FAKEBLOCK_CLOSE_TAG = '|end encrypted email|';
 var PRE_DRAFT_CLASS = 'pre-draft';
 var DRAFT_SEPARATOR = '<wbr>';
 
@@ -77,4 +77,12 @@ Object.size = function(obj) {
 
 function getSelectorForClass(klass) {
     return '.' + klass;
+}
+
+function getEmailFromString(str) {
+    var re = /(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
+    if (re.test(str)) {
+        return re.exec(str)[0];
+    }
+    return null;
 }
