@@ -52,11 +52,12 @@ function updateCache(encrypt_for) {
     var uncached = [];
     for (i in encrypt_for) {
         var email = encrypt_for[i];
-        if (!(email in cachedUsers)) {
-            uncached.push(email);
-        } else if (cachedUsers[email].length == 0) {
+        if (email in cachedUsers && cachedUsers[email].length == 0) {
             //invalidate empty cache entries 
             delete cachedUsers[email];
+        }
+        if (!(email in cachedUsers)) {
+            uncached.push(email);
         }
     }
     //add deletes
