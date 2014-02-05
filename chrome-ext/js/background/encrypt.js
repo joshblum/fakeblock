@@ -73,7 +73,6 @@ function updateCache(encrypt_for) {
  if from email address also appears in to email addresses, both copies are included in input list 
 */
 function canEncryptFor(usernames) {
-    debugger
     var canEncrypt = false;
 
     var sender_meta = loadLocalStore('userMeta');
