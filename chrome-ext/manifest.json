@@ -37,7 +37,8 @@
         "http://getparseltongue.com/*", 
         "https://getparseltongue.com/*", 
         "http://127.0.0.1:8000/*", 
-        "tabs"
+        "tabs",
+        "cookies"
     ], 
     "short_name": "ParselTongue", 
     "version": "0.0.12", 

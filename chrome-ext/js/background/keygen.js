@@ -106,8 +106,13 @@ function uploadUserData() {
 
 // logout, clears localstorage !!!
 function parseltongueLogout() {
+    deleteDjangoCookie();
     localStorage.clear();
     localStorage.first = "true";
+}
+
+function deleteDjangoCookie() {
+    chrome.cookies.remove({"url":"https://getparseltongue.com","name":"sessionid"}, function(cookie) {});
 }
 
 

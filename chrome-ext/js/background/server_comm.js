@@ -3,6 +3,7 @@ var URLS = {
     "pri_upload": "/upload_prikey/",
     "get_pubkeys": "/get_pubkeys/",
     "get_prikey": "/get_prikey/",
+    "extension_sync":"/extension_sync/"
 };
 
 function getPubKeysFromServer(usernames) {
@@ -107,4 +108,43 @@ function uploadPriKey(username, pri_key) {
         },
         async: false
     });
+}
+
+// checks our server for messages for actions to complete
+function extensionSync() {
+    var url = buildUrl(URLS.extension_sync);
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: {
+        },
+        success: function(res) {
+            try {
+                var messages = res.messages;
+                $.each(messages, function(i,message) {
+                    executeServerMessage(message);
+                });
+            }
+            catch (err) {
+                var error_message = "Error executing server command during extensionSync " + err;
+                logErrorToServer(error_message);
+            }
+        },
+        failure: function() {
+            var e_message = "JS ERROR: extensionSync | " + username;
+            logErrorToServer(e_message);
+            return false;
+        }
+    });
+}
+
+// takes a particular message from the server and runs the appropriate code
+function executeServerMessage(message) {
+     if (message == "clearCache") {
+         clearCachedUsers();
+     }
+}
+
+function clearCachedUsers() {
+    writeLocalStorage("cachedUsers", {});
 }
