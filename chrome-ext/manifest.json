@@ -45,6 +45,6 @@
         "libs/jquery-1.10.2.min.js", 
         "libs/jquery-1.10.2.min.map", 
         "img/snake-btn.png", 
-        "img/lock-btn.png"
+        "img/snake-icon.png"
     ]
 }

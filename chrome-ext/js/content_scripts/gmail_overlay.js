@@ -8,17 +8,18 @@ var TOOLBAR_CLASS = "n1tfz";
 var FORMAT_BUTTON_CLASS = "az5";
 var USERNAME_FIELD_CLASS = 'vR';
 var FROM_EMAIL_CLASS = 'az2';
+var GMAIL_TOOLBAR_CLASS = 'gU';
 
 var FROM_EMAIL_REGEX = new RegExp('<(.*)>$');
 
-var PT_BUTTON_HTML = '<div class="pt-buttons-wrapper" style="display:none;">' +
+var PT_BUTTON_HTML = '<td class="pt-buttons-wrapper">' +
     '    <div class="pt-button pt-unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
-    '    <div class="pt-button pt-locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt" style="width: 22px;height: 25px;padding-top: 10px;padding-left: 8px;border-top: 1px solid rgba(134, 134, 134, 0.33);float: left;">' +
+    '    <div class="pt-button pt-locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
-    '</div>';
+    '</td>';
 
 var doEncryptMap = {};
 var canEncryptMap = {};
@@ -117,22 +118,24 @@ function processDraft($overlayable) {
 
 function makePtButtons($buttonable, $email_toolbar) {
     var format_button = $email_toolbar.find(getSelectorForClass(FORMAT_BUTTON_CLASS));
-    if (!(format_button.hasClass("yupper"))) {
-        format_button.addClass("yupper");
+    if (!(format_button.hasClass("has-pt-buttons"))) {
+        format_button.addClass("has-pt-buttons");
         var $ptButton = $(PT_BUTTON_HTML);
+        $ptButton.addClass(GMAIL_TOOLBAR_CLASS);
+        $ptButton.hide();
+
         format_button.before($ptButton);
+
         $ptButton.find(".pt-button").css({
             'padding': '10px 7px 5px 8px',
             'width': ' 22px',
             'height': ' 25px',
-            'border': ' 1px solid #f5f5f5',
-            'border-top': '1px solid rgba(128, 128, 128, 0.32)',
             'float': 'right',
             'cursor': 'pointer',
         });
 
         var unlockedImgSrc = chrome.extension.getURL('img/snake-btn.png');
-        var lockedImgSrc = chrome.extension.getURL('img/lock-btn.png');
+        var lockedImgSrc = chrome.extension.getURL('img/snake-icon.png');
 
         $ptButton.find('.pt-unlocked').click(function(e) { // they clicked the snake, stuff should be encrypted now
             e.preventDefault();
