@@ -215,15 +215,17 @@ function toggleOverlay($unencryptedArea, doShow) {
     $toHide.hide();
     $toShow.show();
 
-    // TODO: implement a real way of calculating cursor position
-    // this is temporary logic to focus into an empty textarea (not a draft)
-    if ($toShow.text().trim().length == 0) {
-        $toShow.focus();
-    }
-
     if (doShow) {
         encryptHandler($unencryptedArea);
     }
+
+    // TODO: implement a real way of calculating cursor position
+    // this is temporary logic to focus into an empty textarea (not a draft)
+    if (doShow && $.trim($unencryptedArea.justtext()).length == 0 &&
+        $(document.activeElement).hasClass(FAKEBLOCK_TEXTAREA_CLASS)) {
+        $toShow.focus();
+    }
+
 }
 
 function toggleEncrypt($unencryptedArea, oldEncrypt) {
