@@ -13,10 +13,10 @@ var GMAIL_TOOLBAR_CLASS = 'gU';
 var FROM_EMAIL_REGEX = new RegExp('<(.*)>$');
 
 var PT_BUTTON_HTML = '<td class="pt-buttons-wrapper">' +
-    '    <div class="pt-button pt-unlocked" data-tooltip="Click me to encrypt" aria-label="Click me to encrypt">' +
+    '    <div class="pt-button pt-unlocked" data-tooltip="Encrypt email" aria-label="Encrypt email">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
-    '    <div class="pt-button pt-locked" style="display:none" data-tooltip="Click me to turn off encrypt" aria-label="Click me to turn off encrypt">' +
+    '    <div class="pt-button pt-locked" style="display:none" data-tooltip="Decrypt email" aria-label="Decrypt email">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
     '</td>';
