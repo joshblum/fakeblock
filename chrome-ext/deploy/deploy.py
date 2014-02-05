@@ -19,10 +19,16 @@ def rewriteManifest():
 
     with open(MANIFEST_PATH, "r+") as f:
         data = json.load(f)
+
         version = data["version"].split(".")
         version[2] = str(int(version[2]) + 1)
         version = ".".join(version)
         data["version"] = version
+
+        permissions = data["permissions"]
+        permissions = [perm for perm in permissions if "127.0.0.1" not in perm]
+        data["permissions"] = permissions
+
         f.seek(0)
         json.dump(data, f, indent=4, sort_keys=True)
         f.truncate()
