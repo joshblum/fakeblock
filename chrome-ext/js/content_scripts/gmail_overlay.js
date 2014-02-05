@@ -7,10 +7,9 @@ var TEXTAREA_SELECTOR = '.Am[role="textbox"][contenteditable="true"]';
 var TOOLBAR_CLASS = "n1tfz";
 var FORMAT_BUTTON_CLASS = "az5";
 var USERNAME_FIELD_CLASS = 'vR';
-var FROM_EMAIL_CLASS = 'az2';
+var COMPOSE_FROM_EMAIL_CLASS = 'az2';
+var PAGE_FROM_EMAIL_CLASS = 'msg';
 var GMAIL_TOOLBAR_CLASS = 'gU';
-
-var FROM_EMAIL_REGEX = new RegExp('<(.*)>$');
 
 var PT_BUTTON_HTML = '<td class="pt-buttons-wrapper">' +
     '    <div class="pt-button pt-unlocked" data-tooltip="Encrypt email" aria-label="Encrypt email">' +
@@ -78,7 +77,7 @@ $(function() {
         if ($(e.target).hasClass(USERNAME_FIELD_CLASS)) {
             //update usernames if (possibly) a new username has been added
             usernameHandler($(e.target));
-        } else if (FROM_EMAIL_REGEX.test($(e.target).text())) {
+        } else if (getEmailFromString($(e.target).text()) !== null) {
             var $unencryptedArea = getUnencryptedAreaFor($(e.target));
             canEncryptHandler($unencryptedArea);
         }
@@ -324,15 +323,21 @@ function canEncryptHandler($unencryptedArea, usernameToDelete) {
 }
 
 function getFromUsernameFor($unencryptedArea) {
+    /*
+    Try to return the from email address. Tries to find a match in this order
+        -looking at 'from' field in a compose window, needed if multiple addresses on one gmail
+        -looking for the primary account email in a div on the page
+        -if neither is found, return null
+    */
     var $fromElm = $unencryptedArea
         .closest(getSelectorForClass(EMAIL_WINDOW_CLASS))
-        .find(getSelectorForClass(FROM_EMAIL_CLASS));
+        .find(getSelectorForClass(COMPOSE_FROM_EMAIL_CLASS));
 
-    var emailMatch = FROM_EMAIL_REGEX.exec($fromElm.text());
-    if (emailMatch) {
-        emailMatch = emailMatch[1];
+    if (getEmailFromString($fromElm.text()) === null) {
+        $fromElm = $(getSelectorForClass(PAGE_FROM_EMAIL_CLASS));
     }
-    return emailMatch;
+
+    return getEmailFromString($fromElm.text());
 }
 
 function getUsernamesFor($unencryptedArea) {
@@ -362,9 +367,7 @@ function getUsernamesFor($unencryptedArea) {
     }
 
     var fromEmail = getFromUsernameFor($unencryptedArea);
-    if (fromEmail) {
-        usernamesToReturn.push(fromEmail);
-    }
+    usernamesToReturn.push(fromEmail);
 
     return usernamesToReturn;
 }
