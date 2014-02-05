@@ -251,3 +251,4 @@ function logErrorToServer(error_message) {
     };
     $.post("/error/", post_data, function(data) {});
 }
+

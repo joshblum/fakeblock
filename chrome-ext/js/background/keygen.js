@@ -109,3 +109,5 @@ function parseltongueLogout() {
     localStorage.clear();
     localStorage.first = "true";
 }
+
+
