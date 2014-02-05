@@ -19,7 +19,10 @@ function getPubKeysFromServer(usernames) {
             pub_keys = res;
             var cachedUsers = loadLocalStore('cachedUsers');
             for (username in res) {
-                cachedUsers[username] = res[username];
+                var pub_key = res[username];
+                if (pub_key.length != 0) {
+                    cachedUsers[username] = res[username];
+                }
             }
             writeLocalStorage("cachedUsers", cachedUsers);
         },
