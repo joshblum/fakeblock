@@ -215,6 +215,12 @@ function toggleOverlay($unencryptedArea, doShow) {
     $toHide.hide();
     $toShow.show();
 
+    // TODO: implement a real way of calculating cursor position
+    // this is temporary logic to focus into an empty textarea (not a draft)
+    if ($toShow.text().trim().length == 0) {
+        $toShow.focus();
+    }
+
     if (doShow) {
         encryptHandler($unencryptedArea);
     }
