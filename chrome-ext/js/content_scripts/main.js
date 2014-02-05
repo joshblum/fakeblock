@@ -158,7 +158,7 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
 }
 
 function setDraftStateFor($draftable, isEncrypted) {
-    if (!$draftable.hasClass('pre-draft')) {
+    if (!$draftable.hasClass(PRE_DRAFT_CLASS)) {
         return;
     }
 
@@ -171,5 +171,5 @@ function setDraftStateFor($draftable, isEncrypted) {
         requestDefaultEncrypt($ptButtons);
     }
 
-    $draftable.removeClass('pre-draft');
+    $draftable.removeClass(PRE_DRAFT_CLASS);
 }

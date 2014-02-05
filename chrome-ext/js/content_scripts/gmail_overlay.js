@@ -33,7 +33,7 @@ $(function() {
 
     $(document).on('DOMNodeInserted', function(e) {
         // check if the draft text is still being loaded
-        var loadingDraft = getEncryptedAreaFor($(e.target)).hasClass('pre-draft');
+        var loadingDraft = getEncryptedAreaFor($(e.target)).hasClass(PRE_DRAFT_CLASS);
         if ($(e.target).closest(getSelectorForClass(NON_FAKEBLOCK_TEXTAREA_CLASS)).length > 0) {
             // don't allow insert events for objects appended to the unencrypted area to propagate
             return;
@@ -94,7 +94,7 @@ $(function() {
 });
 
 function processDraft($overlayable) {
-    var $draftable = $overlayable.filter('.pre-draft');
+    var $draftable = $overlayable.filter(getSelectorForClass(PRE_DRAFT_CLASS));
     if ($draftable.length == 0) {
         return;
     }
@@ -178,8 +178,8 @@ function makeOverlay($email) {
     setCanEncryptFor($unencryptedArea, false);
     setDoEncryptFor($unencryptedArea, false);
 
-    $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS);
-    $textarea.addClass('has-overlay pre-draft');
+    $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS).addClass(PRE_DRAFT_CLASS);
+    $textarea.addClass('has-overlay');
 }
 
 function togglePtButton($ptButton, doEncrypt) {
