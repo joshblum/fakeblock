@@ -96,7 +96,7 @@ function canEncryptFor(usernames) {
 
     for (i in usernames) {
         var username = usernames[i];
-        if (cachedUsers[username] === undefined) {
+        if (!(username in cachedUsers)) {
             can_encrypt = false;
             break
         }
