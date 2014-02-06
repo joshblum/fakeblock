@@ -58,6 +58,10 @@ $(function() {
 
         var $overlayable = $(e.target).closest(getSelectorForClass(EMAIL_WINDOW_CLASS)).find(TEXTAREA_SELECTOR);
 
+        if ($overlayable.length > 0) {
+            loginPrompt();
+        }
+
         if ($overlayable.length == 1) {
             // make overlay if the email window and the associated textarea are found, and if doesn't already have overlay
             // this is awkward, but we have to wait until the textarea's tabindex is set

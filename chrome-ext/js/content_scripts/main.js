@@ -179,6 +179,5 @@ $(document).ready(function() {
     /**** automatically try to decrypt DOM whenever it changes ****************************************************/
     $(document).on('DOMNodeInserted', function(e) {
         decryptHandler($(e.target));
-        loginPrompt();
     });
 });

@@ -110,7 +110,7 @@ function uploadUserData() {
         var userMeta = {
             "username": username,
             "pri_key": pri_key,
-            "defaultEncrypt": true 
+            "defaultEncrypt": true,
             "ignoreLoginPrompt": false,
         };
         writeLocalStorage("userMeta", userMeta);
