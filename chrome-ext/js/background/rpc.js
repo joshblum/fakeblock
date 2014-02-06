@@ -14,7 +14,8 @@ function executeMessage(request, sender, sendResponse) {
         "parseltongueLogout": [parseltongueLogout],
         "getUserMeta": [getUserMeta, true], //remove pri_key
         "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
-        "setDefaultEncrypt": [setDefaultEncrypt, msg.defaultEncrypt]
+        "setDefaultEncrypt": [setDefaultEncrypt, msg.defaultEncrypt],
+        "extensionSync": [extensionSync]
     };
 
     if (action in ACTION_MAP) {
