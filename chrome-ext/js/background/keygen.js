@@ -1,6 +1,6 @@
 //lib for creating a shared secret and RSA pub/pri keys
 // The length of the RSA key, in bits.
-var bitlength = 1024;
+var rsaBitLength = 1024;
 // default to 256-bit aes key
 var aesBitLength = 256;
 
@@ -23,12 +23,26 @@ function arrayBufferToString(buf) {
 //generates and returns a public/private key pair
 //for a user
 function genKeys() {
-    var pri_key = cryptico.generateRSAKey(randString(), bitlength);
+    var pri_key;
+    do {
+        pri_key = genPriKey();
+    } while (pri_key == null)
+
     var pub_key = cryptico.publicKeyString(pri_key);
     return {
         "pri_key": pri_key,
         "pub_key": pub_key,
     }
+}
+
+function genPriKey() {
+    var priKey = cryptico.generateRSAKey(randString(rsaBitLength), rsaBitLength);
+    try {
+        JSON.stringify(priKey);
+    } catch (e) {
+        return null;
+    }
+    return priKey;
 }
 
 //convert json_parsed_key into an RSA object
