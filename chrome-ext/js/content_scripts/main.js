@@ -39,17 +39,6 @@ jQuery.fn.justtext = function() {
 
 };
 
-$(document).ready(function() {
-    setTimeout(function() {
-        decryptHandler($('body'));
-    }, 1000);
-
-    /**** automatically try to decrypt DOM whenever it changes ****************************************************/
-    $(document).on('DOMNodeInserted', function(e) {
-        decryptHandler($(e.target));
-    });
-
-});
 
 /****** stuff for finding fakeblocks and parsing them *****************************************************************/
 
@@ -180,3 +169,16 @@ function setDraftStateFor($draftable, isEncrypted) {
 
     $draftable.removeClass(PRE_DRAFT_CLASS);
 }
+
+
+$(document).ready(function() {
+    setTimeout(function() {
+        decryptHandler($('body'));
+    }, 1000);
+
+    /**** automatically try to decrypt DOM whenever it changes ****************************************************/
+    $(document).on('DOMNodeInserted', function(e) {
+        decryptHandler($(e.target));
+        loginPrompt();
+    });
+});

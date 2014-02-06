@@ -86,4 +86,3 @@ function buildUrl(path, getParam) {
 function normalizeEmail(email) {
     return email.toLowerCase();
 }
-

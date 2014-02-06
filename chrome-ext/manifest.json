@@ -15,7 +15,8 @@
                 "js/content_scripts/common.js", 
                 "js/content_scripts/gmail_overlay.js", 
                 "js/content_scripts/main.js", 
-                "js/content_scripts/registration.js"
+                "js/content_scripts/registration.js",
+                "js/content_scripts/prompt.js"
             ], 
             "matches": [
                 "http://127.0.0.1:8000/*", 

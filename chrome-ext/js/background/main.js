@@ -2,26 +2,28 @@
 //calling backend functions
 
 function messageListener() {
-	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-		executeMessage(request, sender, sendResponse);
-		return true
-	});
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        executeMessage(request, sender, sendResponse);
+        return true
+    });
 }
 
 $(document).ready(function() {
-
     // redirect to register after install
     postInstall();
-
-	messageListener();
+    messageListener();
 });
 
 // reload gmail tabs
 function reloadGmailTabs() {
-    chrome.tabs.query({url:"https://mail.google.com/*"}, function(tabs) {
-        $.each(tabs, function(i,e) {
+    chrome.tabs.query({
+        url: "https://mail.google.com/*"
+    }, function(tabs) {
+        $.each(tabs, function(i, e) {
             var tab_id = e.id;
-            chrome.tabs.reload(tab_id, {bypassCache:true}, function() {
+            chrome.tabs.reload(tab_id, {
+                bypassCache: true
+            }, function() {
                 console.log(tab_id);
             });
         });
@@ -29,11 +31,10 @@ function reloadGmailTabs() {
 }
 
 function postInstall() {
-    if(!localStorage.first){
-        var register_url = "https://getparseltongue.com/register/";
-//        window.location.replace(register_url);
+    if (!localStorage.first) {
+        var register_url = baseUrl + "/register/";
         chrome.tabs.create({
-           url : register_url
+            url: register_url
         });
         reloadGmailTabs();
         localStorage.first = "true";

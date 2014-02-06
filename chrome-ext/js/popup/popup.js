@@ -16,7 +16,7 @@ function logout() {
 function renderView() {
     var $loggedIn = $(".logged-in");
     var $loggedOut = $(".logged-out");
-    if (isLoggedIn()) {
+    if (isLoggedIn(userMeta)) {
         $loggedIn.show();
         $loggedOut.hide();
         $(".user-name").text(userMeta.username);
@@ -26,8 +26,8 @@ function renderView() {
     }
 }
 
-function isLoggedIn() {
-    return Object.size(userMeta) > 0;
+function isLoggedIn(userMeta) {
+    return 'username' in userMeta;
 }
 
 function toggleSwitch(e, data) {
@@ -51,7 +51,7 @@ function initToggle() {
 function setTip() {
     var title;
     title = "Click the snake when composing to encrypt.";
-    if (isLoggedIn() && userMeta.defaultEncrypt) {
+    if (isLoggedIn(userMeta) && userMeta.defaultEncrypt) {
         title = "Emails to parseltongue users will automatically be encrypted.";
     }
     $(".has-switch").tooltip("destroy").tooltip({
