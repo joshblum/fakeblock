@@ -143,7 +143,8 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
         var decryptedHtml = allHtml.replace(htmlToReplace, decryptedText);
         $encryptedElm.html(decryptedHtml);
 
-        isEncryptedDraft = allHtml.indexOf(htmlToReplace) == 0;
+        isEncryptedDraft = allHtml.indexOf(htmlToReplace) == 0 && 
+            $encryptedElm.closest(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS)).length > 0;
         setDraftStateFor($encryptedElm, isEncryptedDraft);
 
         if ($encryptedElm.closest(getSelectorForClass(NON_FAKEBLOCK_TEXTAREA_CLASS)).length > 0) {
@@ -157,14 +158,16 @@ function setDraftStateFor($draftable, isEncrypted) {
     if (!$draftable.hasClass(PRE_DRAFT_CLASS)) {
         return;
     }
+    var draftText = $draftable.justtext(); 
 
     var ptButtonSelector = isEncrypted ? '.pt-unlocked' : '.pt-locked';
     var $ptButtons = getPtButtonsFor($draftable);
     var $ptButton = $ptButtons.find(ptButtonSelector);
-    togglePtButton($ptButton, isEncrypted);
 
-    if ($.trim(getUnencryptedAreaFor($draftable).justtext()).length == 0) {
+    if (draftText.length == 0) {
         requestDefaultEncrypt($ptButtons);
+    } else {
+        togglePtButton($ptButton, isEncrypted);
     }
 
     $draftable.removeClass(PRE_DRAFT_CLASS);
