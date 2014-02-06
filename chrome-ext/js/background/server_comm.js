@@ -3,7 +3,7 @@ var URLS = {
     "pri_upload": "/upload_prikey/",
     "get_pubkeys": "/get_pubkeys/",
     "get_prikey": "/get_prikey/",
-    "extension_sync":"/extension_sync/"
+    "extension_sync": "/extension_sync/"
 };
 
 function getPubKeysFromServer(usernames) {
@@ -42,6 +42,7 @@ function refreshLocalStorage(username, password, encrypted_pri_key) {
         'username': username,
         'pri_key': recoverPriKey(encrypted_pri_key, password),
         'defaultEncrypt': true,
+        'ignoreLoginPrompt' : false,
     });
 }
 
@@ -116,16 +117,14 @@ function extensionSync() {
     $.ajax({
         type: "POST",
         url: url,
-        data: {
-        },
+        data: {},
         success: function(res) {
             try {
                 var messages = res.messages;
-                $.each(messages, function(i,message) {
+                $.each(messages, function(i, message) {
                     executeServerMessage(message);
                 });
-            }
-            catch (err) {
+            } catch (err) {
                 var error_message = "Error executing server command during extensionSync " + err;
                 logErrorToServer(error_message);
             }
@@ -140,9 +139,9 @@ function extensionSync() {
 
 // takes a particular message from the server and runs the appropriate code
 function executeServerMessage(message) {
-     if (message == "clearCache") {
-         clearCachedUsers();
-     }
+    if (message == "clearCache") {
+        clearCachedUsers();
+    }
 }
 
 function clearCachedUsers() {

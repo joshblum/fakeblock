@@ -96,7 +96,8 @@ function uploadUserData() {
         var userMeta = {
             "username": username,
             "pri_key": pri_key,
-            "defaultEncrypt": false 
+            "defaultEncrypt": false,
+            "ignoreLoginPrompt": false,
         };
         writeLocalStorage("userMeta", userMeta);
         registration_data["completed"] = true;
@@ -112,7 +113,8 @@ function parseltongueLogout() {
 }
 
 function deleteDjangoCookie() {
-    chrome.cookies.remove({"url":"https://getparseltongue.com","name":"sessionid"}, function(cookie) {});
+    chrome.cookies.remove({
+        "url": "https://getparseltongue.com",
+        "name": "sessionid"
+    }, function(cookie) {});
 }
-
-

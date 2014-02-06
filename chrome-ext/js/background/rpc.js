@@ -15,7 +15,9 @@ function executeMessage(request, sender, sendResponse) {
         "getUserMeta": [getUserMeta, true], //remove pri_key
         "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
         "setDefaultEncrypt": [setDefaultEncrypt, msg.defaultEncrypt],
-        "extensionSync": [extensionSync]
+        "extensionSync": [extensionSync],
+        "loginPrompt": [handleLoginMsg],
+        "ignoreLoginPrompt": [handleIgnoreMsg],
     };
 
     if (action in ACTION_MAP) {
@@ -29,7 +31,6 @@ function executeMessage(request, sender, sendResponse) {
         }
     }
 }
-
 
 function getUserMeta(remove_pri) {
     var remove_pri = typeof remove_pri !== 'undefined' ? remove_pri : false;
@@ -50,5 +51,21 @@ function getDefaultEncrypt() {
 function setDefaultEncrypt(defaultEncrypt) {
     var userMeta = getUserMeta();
     userMeta.defaultEncrypt = defaultEncrypt;
+    writeLocalStorage("userMeta", userMeta);
+}
+
+/*
+    Open the popup so the user can logback in again
+*/
+function handleLoginMsg() {
+    openLink(buildUrl("/login"));
+}
+
+/*
+    Store the ignore state so the popup message does not display
+*/
+function handleIgnoreMsg() {
+    var userMeta = getUserMeta();
+    userMeta.ignoreLoginPrompt = true;
     writeLocalStorage("userMeta", userMeta);
 }

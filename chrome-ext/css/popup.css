@@ -13,6 +13,7 @@ hr {
 }
 
 .popup-wrapper {
+    position: relative;
     margin-left:15px;
     margin-right:15px;
     width:300px;

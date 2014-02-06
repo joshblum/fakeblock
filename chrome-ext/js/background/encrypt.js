@@ -76,7 +76,7 @@ function updateCache(encrypt_for) {
 function canEncryptFor(usernames) {
     var canEncrypt = false;
 
-    var sender_meta = loadLocalStore('userMeta');
+    var sender_meta = getUserMeta();
 
     // can't encrypt if
     //      -user not signed in
