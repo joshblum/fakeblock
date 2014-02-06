@@ -12,11 +12,16 @@ var PAGE_FROM_EMAIL_CLASS = 'msg';
 var GMAIL_TOOLBAR_CLASS = 'gU';
 
 var PT_BUTTON_HTML = '<td class="pt-buttons-wrapper">' +
-    '    <div class="pt-button pt-unlocked" data-tooltip="Encrypt email" aria-label="Encrypt email">' +
+    '    <div class="pt-button pt-disabled" data-tooltip="Not all recipients are Parseltongue users" aria-label="Not all recipients are Parseltongue users">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
-    '    <div class="pt-button pt-locked" style="display:none" data-tooltip="Decrypt email" aria-label="Decrypt email">' +
+    '    <div class="pt-button pt-enabled">' +
+    '    <div class="pt-unlocked" data-tooltip="Encrypt email" aria-label="Encrypt email">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
+    '    </div>' +
+    '    <div class="pt-locked" style="display:none" data-tooltip="Decrypt email" aria-label="Decrypt email">' +
+    '        <img class="pt-button-img" style="width:100%;"/>' +
+    '    </div>' +
     '    </div>' +
     '</td>';
 
@@ -121,7 +126,7 @@ function makePtButtons($buttonable, $email_toolbar) {
         format_button.addClass("has-pt-buttons");
         var $ptButton = $(PT_BUTTON_HTML);
         $ptButton.addClass(GMAIL_TOOLBAR_CLASS);
-        $ptButton.hide();
+        // $ptButton.hide();
 
         format_button.before($ptButton);
 
@@ -132,7 +137,12 @@ function makePtButtons($buttonable, $email_toolbar) {
             'float': 'right',
             'cursor': 'pointer',
         });
+        $ptButton.find('.pt-disabled').css({
+            'cursor': 'default',
+            'opacity': 0.5,
+        });
 
+        var disabledImgSrc = chrome.extension.getURL('img/snake-btn.png');
         var unlockedImgSrc = chrome.extension.getURL('img/snake-btn.png');
         var lockedImgSrc = chrome.extension.getURL('img/snake-icon.png');
 
@@ -144,6 +154,8 @@ function makePtButtons($buttonable, $email_toolbar) {
             e.preventDefault();
             togglePtButton($(this), false);
         }).find('.pt-button-img').attr('src', lockedImgSrc); // set lock image
+
+        $ptButton.find('.pt-disabled').find('.pt-button-img').attr('src', disabledImgSrc);
 
         bindPtButtons($ptButton);
     }
@@ -179,6 +191,20 @@ function makeOverlay($email) {
 
     $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS).addClass(PRE_DRAFT_CLASS);
     $textarea.addClass('has-overlay');
+}
+
+function toggleEnablePtButton($ptButtons, enablePtBtn) {
+    var selectorToShow = '.pt-disabled';
+    var selectorToHide = '.pt-enabled';
+    if (enablePtBtn) {
+        selectorToShow = '.pt-enabled';
+        selectorToHide = '.pt-disabled';
+    }
+    var $toShow = $ptButtons.find(selectorToShow);
+    var $toHide = $ptButtons.find(selectorToHide);
+
+    $toShow.show();
+    $toHide.hide();
 }
 
 function togglePtButton($ptButton, doEncrypt) {
@@ -464,14 +490,11 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
         "usernames": usernames,
     }, function(response) {
         var res = $.parseJSON(response).res;
-        var ptButtonsWrapper = getPtButtonsFor($unencryptedArea);
-        if (ptButtonsWrapper) {
-            if (res.can_encrypt) {
-                ptButtonsWrapper.show();
-            } else {
-                ptButtonsWrapper.hide();
-            }
+        var $ptButtonsWrapper = getPtButtonsFor($unencryptedArea);
+        if ($ptButtonsWrapper) {
+            toggleEnablePtButton($ptButtonsWrapper, res.can_encrypt);
         }
+
         var oldEncrypt = getWillEncryptFor($unencryptedArea);
         setCanEncryptFor($unencryptedArea, res.can_encrypt);
         toggleEncrypt($unencryptedArea, oldEncrypt);
