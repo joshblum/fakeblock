@@ -18,24 +18,32 @@ function encrypt(plaintext, encrypt_for) {
     }
 
     //add self
+    //self or associated email may already be in this list, but minimal cost to encrypt shared secret twice 
     encrypt_for.push(sender_meta.username);
 
     var shared_secret = randString();
-    var users = {};
+    var keys = {};
     var cachedUsers = getCachedUsers(encrypt_for);
-    var username, user_data;
+    var username, pub_key, pub_key_id, encrypted_key;
     for (i in encrypt_for) {
         username = normalizeEmail(encrypt_for[i]);
-        user_data = genEncryptedMeta(cachedUsers[username], shared_secret);
-        if (Object.size(user_data)) { //user exists
-            users[username] = user_data
+        // encrypt_for should already be checked through other means
+        // but if username's pub key isn't available, don't encrypt
+        if (! (username in cachedUsers)) {
+            return plaintext;
         }
+
+        pub_key = cachedUsers[username];
+        pub_key_id = cryptico.publicKeyID(cachedUsers[username]);
+        encrypted_key = cryptico.encrypt(shared_secret, pub_key).cipher; 
+
+        keys[pub_key_id] = encrypted_key;
     }
 
     var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
 
     var res = {
-        "users": users,
+        "keys": keys,
         "cipher_text": cipher_text
     };
     return res

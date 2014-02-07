@@ -7,22 +7,15 @@ function decrypt(fakeblock) {
         return null;
     }
 
-    var encrypted_data = fakeblock.users[userMeta.username];
-    if (encrypted_data === undefined) {
+    var pub_key_id = cryptico.publicKeyID(userMeta.pub_key);
+    if (!(pub_key_id in fakeblock.keys)) {
         return null;
     }
-
-    var e_sentinals = encrypted_data.e_sentinals;
-    var e_shared_secrets = encrypted_data.e_shared_secrets;
+    var encrypted_key = fakeblock.keys[pub_key_id];
     var pri_key = deserializePriKey(userMeta.pri_key);
 
-    for (var i = 0; i < e_sentinals.length; i++) {
-        if (cryptico.decrypt(e_sentinals[i], pri_key).plaintext === SENTINAL) {
-            var shared_secret = cryptico.decrypt(e_shared_secrets[i], pri_key).plaintext;
-            return decryptAES(Base64.decode(fakeblock.cipher_text), shared_secret);
-        }
-    }
-    return null;
+    var key = cryptico.decrypt(encrypted_key, pri_key).plaintext;
+    return decryptAES(Base64.decode(fakeblock.cipher_text), key);
 }
 
 function decryptAES(cipher_text, secret) {

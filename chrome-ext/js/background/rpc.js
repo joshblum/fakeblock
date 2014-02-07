@@ -15,7 +15,6 @@ function executeMessage(request, sender, sendResponse) {
         "getUserMeta": [getUserMeta, true], //remove pri_key
         "refreshLocalStorage": [refreshLocalStorage, msg.username, msg.password, msg.encrypted_pri_key],
         "setDefaultEncrypt": [setDefaultEncrypt, msg.defaultEncrypt],
-        "extensionSync": [extensionSync],
         "loginPrompt": [handleLoginMsg],
         "ignoreLoginPrompt": [handleIgnoreMsg],
     };

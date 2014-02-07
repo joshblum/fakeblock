@@ -21,7 +21,7 @@ function getPubKeysFromServer(usernames) {
             var cachedUsers = loadLocalStore('cachedUsers');
             for (username in res) {
                 var pub_key = res[username];
-                if (pub_key.length != 0) {
+                if (pub_key) {
                     cachedUsers[username] = res[username];
                 }
             }
@@ -38,12 +38,10 @@ function getPubKeysFromServer(usernames) {
 }
 
 function refreshLocalStorage(username, password, encrypted_pri_key) {
-    writeLocalStorage("userMeta", {
-        'username': username,
-        'pri_key': recoverPriKey(encrypted_pri_key, password),
-        'defaultEncrypt': true,
-        'ignoreLoginPrompt' : false,
-    });
+    var cachedUsers = getCachedUsers([username]);
+    var pub_key = cachedUsers[username];
+    var userMeta = createUserMeta(username, pub_key, recoverPriKey(encrypted_pri_key, password));
+    writeLocalStorage("userMeta", userMeta);
 }
 
 function recoverPriKey(encrypted_pri_key, password) {
@@ -111,13 +109,22 @@ function uploadPriKey(username, pri_key) {
     });
 }
 
-// checks our server for messages for actions to complete
-function extensionSync() {
+function pullServerMessages() {
+    /*
+    checks our server for messages for actions to complete
+    */
+    var appDetails = chrome.app.getDetails();
+    if (! ('version' in appDetails)) {
+        return;
+    }
+    var version = appDetails['version'];
     var url = buildUrl(URLS.extension_sync);
     $.ajax({
         type: "POST",
         url: url,
-        data: {},
+        data: {
+            'version' : version,
+        },
         success: function(res) {
             try {
                 var messages = res.messages;
@@ -125,25 +132,43 @@ function extensionSync() {
                     executeServerMessage(message);
                 });
             } catch (err) {
-                var error_message = "Error executing server command during extensionSync " + err;
-                logErrorToServer(error_message);
+                logErrorToServer("Error executing server command during pullServerMessages" + err);
             }
         },
         failure: function() {
-            var e_message = "JS ERROR: extensionSync | " + username;
-            logErrorToServer(e_message);
+            logErrorToServer("JS ERROR: extensionSync | " + username);
             return false;
         }
     });
 }
 
-// takes a particular message from the server and runs the appropriate code
 function executeServerMessage(message) {
-    if (message == "clearCache") {
-        clearCachedUsers();
+    /*
+    takes a particular message from the server and runs the appropriate code
+    */
+    if (message in serverMessages) {
+        serverMessages[message]();
     }
 }
 
-function clearCachedUsers() {
+/*
+Server message methods
+-clearCache - clear all users' pub keys from cache
+-refreshPubKey - get own pub key from cache or server
+*/
+var serverMessages = {
+    'clearCache' : clearCache,
+    'refreshPubKey' : refreshPubKey,
+};
+
+function clearCache() {
     writeLocalStorage("cachedUsers", {});
+}
+
+function refreshPubKey() {
+    var userMeta = getUserMeta();
+    var cachedUsers = getCachedUsers([username]);
+    var pub_key = cachedUsers[username];
+    userMeta['pub_key'] = pub_key;
+    writeLocalStorage('userMeta', userMeta);
 }

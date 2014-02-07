@@ -86,3 +86,13 @@ function buildUrl(path, getParam) {
 function normalizeEmail(email) {
     return email.toLowerCase();
 }
+
+function createUserMeta(username, pub_key, pri_key) {
+    return {
+        "username": username,
+        "pub_key": pub_key,
+        "pri_key": pri_key,
+        "defaultEncrypt": true,
+        "ignoreLoginPrompt": false,
+    };
+}

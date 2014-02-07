@@ -107,12 +107,7 @@ function uploadUserData() {
         var success = uploadPubKey(username, pub_key);
         var success2 = uploadPriKey(username, encrypted_pri_key);
         // TODO: check if both uploads were successful
-        var userMeta = {
-            "username": username,
-            "pri_key": pri_key,
-            "defaultEncrypt": true,
-            "ignoreLoginPrompt": false,
-        };
+        var userMeta = createUserMeta(username, pub_key, pri_key); 
         writeLocalStorage("userMeta", userMeta);
         registration_data["completed"] = true;
         writeLocalStorage("registration", registration_data);

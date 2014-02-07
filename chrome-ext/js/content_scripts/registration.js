@@ -125,19 +125,7 @@ $(document).ready(function() {
         });
     }
 
-    // on any page, let's check and see if we need to sync with server
-    checkExtensionSync();
-
 });
-
-// send a message to back to communicate with server and check for actions it should perform
-function checkExtensionSync() {
-      sendMessage({
-        "action": "extensionSync"
-    }, function(response) {
-        //nothing
-    });
-}
 
 function bindReconfirm() {
     $(".reconfirm_button").click(function(e) {
