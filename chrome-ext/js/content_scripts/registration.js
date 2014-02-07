@@ -245,13 +245,3 @@ window.onerror = function(message, url, lineNumber) {
     logErrorToServer(error_message);
     return false;
 };
-
-function logErrorToServer(error_message) {
-    var post_data = {
-        "error": error_message
-    };
-    $.post("/error/", post_data, function(data) {});
-}
-
-
-

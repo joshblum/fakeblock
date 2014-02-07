@@ -46,10 +46,6 @@ function setupPrompt(baseUrl) {
     }, false);
 }
 
-function isLoggedIn(userMeta) {
-    return 'username' in userMeta;
-}
-
 function isGmailPage() {
     return window.location.host === "mail.google.com";
 }

@@ -26,10 +26,6 @@ function renderView() {
     }
 }
 
-function isLoggedIn(userMeta) {
-    return 'username' in userMeta;
-}
-
 function toggleSwitch(e, data) {
     userMeta.defaultEncrypt = $(e.target).prop("checked");
     setTip();
