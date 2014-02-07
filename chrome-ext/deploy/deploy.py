@@ -26,11 +26,6 @@ def rewrite_manifest(local):
     with open(MANIFEST_PATH, "r+") as f:
         data = json.load(f)
 
-        version = data["version"].split(".")
-        version[2] = str(int(version[2]) + 1)
-        version = ".".join(version)
-        data["version"] = version
-
         permissions = data["permissions"]
         content_scripts = data["content_scripts"][0]
         matches = content_scripts.get("matches", [])
@@ -39,6 +34,10 @@ def rewrite_manifest(local):
             permissions.append(DEV_URL)
             matches.append(DEV_URL)
         else:
+            version = data["version"].split(".")
+            version[2] = str(int(version[2]) + 1)
+            version = ".".join(version)
+            data["version"] = version
             permissions = _clean(permissions)
             matches = _clean(matches)
 
