@@ -31,8 +31,9 @@ def rewrite_manifest(local):
         matches = content_scripts.get("matches", [])
 
         if local:
-            permissions.append(DEV_URL)
-            matches.append(DEV_URL)
+            url = _match_all(DEV_URL)
+            permissions.append(url)
+            matches.append(url)
         else:
             version = data["version"].split(".")
             version[2] = str(int(version[2]) + 1)
@@ -47,6 +48,10 @@ def rewrite_manifest(local):
         f.seek(0)
         json.dump(data, f, indent=4, sort_keys=True)
         f.truncate()
+
+
+def _match_all(url):
+    return "%s/*" % url
 
 
 def _clean(l):

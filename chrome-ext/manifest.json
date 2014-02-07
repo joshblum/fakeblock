@@ -23,7 +23,7 @@
                 "https://mail.google.com/*", 
                 "http://getparseltongue.com/*", 
                 "https://getparseltongue.com/*", 
-                "http://127.0.0.1:8000"
+                "http://127.0.0.1:8000/*"
             ]
         }
     ], 
@@ -41,7 +41,7 @@
         "tabs", 
         "cookies", 
         "alarms", 
-        "http://127.0.0.1:8000"
+        "http://127.0.0.1:8000/*"
     ], 
     "short_name": "ParselTongue", 
     "version": "0.0.15", 
