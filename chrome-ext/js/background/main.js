@@ -6,18 +6,6 @@ var alarms = {
     'pullServerMessages' : pullServerMessages,
 };
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
-    if (alarm.name in alarms) {
-        alarms[alarm.name]();
-    }
-});
-
-// pull messages to execute from server now, and every hour after
-chrome.alarms.create('pullServerMessages', {
-    'when' : 0,
-    'periodInMinutes' : 1,
-});
-
 /* start tasks that must execute on DOM.ready */
 function messageListener() {
     chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -30,6 +18,9 @@ $(document).ready(function() {
     // redirect to register after install
     postInstall();
     messageListener();
+
+    // start all functions that need to execute periodically
+    setAlarmHandler();
 });
 
 // reload gmail tabs
@@ -57,4 +48,18 @@ function postInstall() {
         reloadGmailTabs();
         localStorage.first = "true";
     }
+}
+
+function setAlarmHandler() {
+    chrome.alarms.onAlarm.addListener(function(alarm) {
+        if (alarm.name in alarms) {
+            alarms[alarm.name]();
+        }
+    });
+
+    // pull messages to execute from server now, and every hour after
+    chrome.alarms.create('pullServerMessages', {
+        'when' : 0,
+        'periodInMinutes' : 60,
+    });
 }

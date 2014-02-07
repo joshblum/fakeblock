@@ -3,7 +3,8 @@ var URLS = {
     "pri_upload": "/upload_prikey/",
     "get_pubkeys": "/get_pubkeys/",
     "get_prikey": "/get_prikey/",
-    "extension_sync": "/extension_sync/"
+    "extension_sync": "/extension_sync/",
+    "extension_ack": "/extension_ack/",
 };
 
 function getPubKeysFromServer(usernames) {
@@ -119,6 +120,7 @@ function pullServerMessages() {
     }
     var version = appDetails['version'];
     var url = buildUrl(URLS.extension_sync);
+    var lastMessageId = -1;
     $.ajax({
         type: "POST",
         url: url,
@@ -129,7 +131,8 @@ function pullServerMessages() {
             try {
                 var messages = res.messages;
                 $.each(messages, function(i, message) {
-                    executeServerMessage(message);
+                    executeServerMessage(message.message);
+                    lastMessageId = message.id;
                 });
             } catch (err) {
                 logErrorToServer("Error executing server command during pullServerMessages" + err);
@@ -139,6 +142,16 @@ function pullServerMessages() {
             logErrorToServer("JS ERROR: extensionSync | " + username);
             return false;
         }
+    })
+    .always(function() {
+        var ackUrl = buildUrl(URLS.extension_ack);
+        $.ajax({
+            type: 'POST',
+            url: ackUrl,
+            data: {
+                'last_message' : lastMessageId,
+            }
+        });
     });
 }
 
@@ -167,6 +180,7 @@ function clearCache() {
 
 function refreshPubKey() {
     var userMeta = getUserMeta();
+    var username = userMeta.username;
     var cachedUsers = getCachedUsers([username]);
     var pub_key = cachedUsers[username];
     userMeta['pub_key'] = pub_key;
