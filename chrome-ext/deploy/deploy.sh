@@ -5,6 +5,6 @@ python deploy/deploy.py
 
 #remove old zip and add new one
 rm ../chrome-ext.zip
-zip -r ../chrome-ext.zip ../chrome-ext/
+zip -r ../chrome-ext.zip ./
 
 python deploy/deploy.py --local

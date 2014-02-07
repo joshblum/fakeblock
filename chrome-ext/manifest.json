@@ -44,7 +44,7 @@
         "http://127.0.0.1:8000/*"
     ], 
     "short_name": "ParselTongue", 
-    "version": "0.0.15", 
+    "version": "0.0.17", 
     "web_accessible_resources": [
         "libs/jquery-1.10.2.min.js", 
         "libs/jquery-1.10.2.min.map", 
