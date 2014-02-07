@@ -26,12 +26,12 @@ def rewriteManifest():
         data["version"] = version
 
         permissions = data["permissions"]
-        permissions = [perm for perm in permissions if "127.0.0.1" not in perm]
+        permissions = [perm for perm in permissions if DEV_URL not in perm]
         data["permissions"] = permissions
 
         content_scripts = data["content_scripts"][0]
         matches = content_scripts.get('matches', [])
-        matches = [match for match in matches if "127.0.0.1" not in match] 
+        matches = [match for match in matches if DEV_URL not in match] 
         content_scripts["matches"] = matches
 
         f.seek(0)
