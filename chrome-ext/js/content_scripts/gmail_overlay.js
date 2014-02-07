@@ -340,15 +340,7 @@ function canEncryptHandler($unencryptedArea, usernameToDelete) {
     requests canEncryptFor to see if all usernames for an unencrypted area are pt users
     if usernameToDelete is specified, then doesn't include that username in the request 
     */
-    var usernames = getUsernamesFor($unencryptedArea);
-
-    if (usernameToDelete) {
-        var usernameDeleteIndex = usernames.indexOf(usernameToDelete);
-        if (usernameDeleteIndex >= 0) {
-            usernames.splice(usernameDeleteIndex, 1);
-        }
-    }
-
+    var usernames = getUsernamesFor($unencryptedArea, usernameToDelete);
     requestCanEncryptFor($unencryptedArea, usernames);
 }
 
@@ -370,12 +362,14 @@ function getFromUsernameFor($unencryptedArea) {
     return getEmailFromString($fromElm.text());
 }
 
-function getUsernamesFor($unencryptedArea) {
+function getUsernamesFor($unencryptedArea, usernameToDelete) {
     /*
     returns usernames currently on the page for an unencrypted area
     normalizes email addresses to all lower case
     removes duplicates and undefined email addresses 
         (the invalid email addresses according to gmail)
+
+    if usernameToDelete is defined, then remove only one copy of it from list
     */
     var $usernameElms = $unencryptedArea
         .closest(getSelectorForClass(EMAIL_WINDOW_CLASS))
@@ -387,6 +381,13 @@ function getUsernamesFor($unencryptedArea) {
     var usernames = $usernameElms.toArray().map(function(elm) {
         return $(elm).attr('email').toLowerCase();
     });
+
+    if (usernameToDelete) {
+        var usernameDeleteIndex = usernames.indexOf(usernameToDelete);
+        if (usernameDeleteIndex >= 0) {
+            usernames.splice(usernameDeleteIndex, 1);
+        }
+    }
 
     var usernamesToReturn = [];
 
