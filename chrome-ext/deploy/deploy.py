@@ -67,7 +67,7 @@ if __name__ == "__main__":
     parser = OptionParser()
 
     parser.add_option("-l", "--local",
-                      action="store_True", dest="local", default=False,
+                      action="store_true", dest="local", default=False,
                       help="Set manifest to local settings.")
 
     (options, args) = parser.parse_args()
