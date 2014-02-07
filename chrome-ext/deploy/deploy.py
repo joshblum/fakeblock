@@ -1,3 +1,4 @@
+from optparse import OptionParser
 import json
 
 MAINJS_PATH = "js/global/common.js"
@@ -6,16 +7,21 @@ DEV_URL = "http://127.0.0.1:8000"
 PROD_URL = "https://getparseltongue.com"
 
 
-def rewriteBaseUrl():
+def rewrite_baseurl(local):
     with open(MAINJS_PATH, "r+") as f:
         text = f.read()
-        text = text.replace(DEV_URL, PROD_URL)
+
+        if local:
+            text = text.replace(PROD_URL, DEV_URL)
+        else:
+            text = text.replace(DEV_URL, PROD_URL)
+
         f.seek(0)
         f.write(text)
         f.truncate()
 
 
-def rewriteManifest():
+def rewrite_manifest(local):
 
     with open(MANIFEST_PATH, "r+") as f:
         data = json.load(f)
@@ -26,7 +32,17 @@ def rewriteManifest():
         data["version"] = version
 
         permissions = data["permissions"]
-        permissions = [perm for perm in permissions if "127.0.0.1" not in perm]
+        content_scripts = data["content_scripts"][0]
+        matches = content_scripts.get("matches", [])
+
+        if local:
+            permissions.append(DEV_URL)
+            matches.append(DEV_URL)
+        else:
+            permissions = _clean(permissions)
+            matches = _clean(matches)
+
+        content_scripts['matches'] = matches
         data["permissions"] = permissions
 
         f.seek(0)
@@ -34,15 +50,25 @@ def rewriteManifest():
         f.truncate()
 
 
-def main():
+def _clean(l):
+    return [i for i in l if DEV_URL not in i]
+
+
+def main(local):
     """"
         rewrite main.js to replace the baseUrl
         and update manifest.json to have a new manifest
     """
 
-    rewriteBaseUrl()
-
-    rewriteManifest()
+    rewrite_baseurl(local)
+    rewrite_manifest(local)
 
 if __name__ == "__main__":
-    main()
+    parser = OptionParser()
+
+    parser.add_option("-l", "--local",
+                      action="store_True", dest="local", default=False,
+                      help="Set manifest to local settings.")
+
+    (options, args) = parser.parse_args()
+    main(options.local)
