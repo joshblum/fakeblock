@@ -12,7 +12,7 @@
             "js": [
                 "libs/jquery-1.10.2.min.js", 
                 "libs/jquery-1.10.2.min.map", 
-                "js/global/common.js"
+                "js/global/common.js",
                 "js/content_scripts/common.js", 
                 "js/content_scripts/gmail_overlay.js", 
                 "js/content_scripts/main.js", 
