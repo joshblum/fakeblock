@@ -1,3 +1,8 @@
+///////////Global vars/////////////
+// global website base, set to localhost for testing, use deploy script to change
+var baseUrl = "http://127.0.0.1:8000";
+// var baseUrl = "https://getparseltongue.com";
+
 //http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {
     var size = 0,

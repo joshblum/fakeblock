@@ -15,10 +15,6 @@
     }
 */
 
-///////////Global vars/////////////
-// global website base, set to localhost for testing, use deploy script to change
-//var baseUrl = "http://127.0.0.1:8000";
-var baseUrl = "https://getparseltongue.com";
 var SENTINAL = "fakeblock";
 
 
