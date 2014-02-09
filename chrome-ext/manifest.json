@@ -17,8 +17,9 @@
                 "js/content_scripts/gmail_overlay.js", 
                 "js/content_scripts/main.js", 
                 "js/content_scripts/registration.js", 
-                "js/content_scripts/prompt.js"
-            ], 
+                "js/content_scripts/prompt.js",
+                "js/content_scripts/gmail.min.js"
+            ],
             "matches": [
                 "https://mail.google.com/*", 
                 "http://getparseltongue.com/*", 

@@ -171,7 +171,7 @@ Server message methods
 */
 var serverMessages = {
     'clearCache' : clearCache,
-    'refreshPubKey' : refreshPubKey,
+    'refreshPubKey' : refreshPubKey
 };
 
 function clearCache() {
