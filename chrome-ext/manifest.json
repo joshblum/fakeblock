@@ -18,7 +18,7 @@
                 "js/content_scripts/main.js", 
                 "js/content_scripts/registration.js", 
                 "js/content_scripts/prompt.js",
-                "js/content_scripts/gmail.min.js"
+                "js/content_scripts/decrypt_previews.js"
             ],
             "matches": [
                 "https://mail.google.com/*", 

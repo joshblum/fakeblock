@@ -11,17 +11,17 @@ var PT_TEXT_REGEX = new RegExp(escapeString(getTextFromHtml(FAKEBLOCK_OPEN_TAG))
 
 function escapeString(str) {
     /*
-    escape strings for a regex
-    */
+     escape strings for a regex
+     */
     // escape all pipes
     return str.replace(/\|/g, '\\|');
 }
 
 function getTextFromHtml(html) {
     /*
-    returns the text of the given html, with all html tags stripped
-    returns null if html is null
-    */
+     returns the text of the given html, with all html tags stripped
+     returns null if html is null
+     */
     if (html == null) {
         return null;
     }
@@ -44,10 +44,10 @@ jQuery.fn.justtext = function() {
 
 function getDivsContainingFakeBlock($container) {
     /* 
-    get divs that are all of the following:
-        -immediate parent of a fakeblock to be decrypted
-        -not in the encrypted textarea overlay
-    */
+     get divs that are all of the following:
+     -immediate parent of a fakeblock to be decrypted
+     -not in the encrypted textarea overlay
+     */
     return $container.find('div').add($container).filter(function(i, elm) {
         var isEncrypted = PT_TEXT_REGEX.test($(elm).justtext());
 
@@ -58,8 +58,8 @@ function getDivsContainingFakeBlock($container) {
 
 function getHtmlToReplace($encryptedElm) {
     /*
-    returns an array of the encrypted parts of the html in $encryptedElm
-    */
+     returns an array of the encrypted parts of the html in $encryptedElm
+     */
     var all_html = $encryptedElm.html();
     var to_return = [];
     var result = PT_HTML_REGEX.exec(all_html);
@@ -74,23 +74,25 @@ function getHtmlToReplace($encryptedElm) {
 
 function getEncryptedJson(encryptedText) {
     /*
-    given an encryped parseltongue block of text
-    return the json holding the ciphertext, etc.
-    */
+     given an encryped parseltongue block of text
+     return the json holding the ciphertext, etc.
+     */
     var match = PT_TEXT_REGEX.exec(encryptedText);
     if (!match) {
         return null;
     }
     var byte_str = match[1];
     var json = decodeByteString(byte_str);
-    return $.parseJSON(json);
+    var to_return = $.parseJSON(json);
+    return to_return;
 }
+
 
 function decryptHandler($container) {
     /*
-    try and decrypt all possible DOM elements in $container
-    finds and replaces all matching parseltongue blocks
-    */
+     try and decrypt all possible DOM elements in $container
+     finds and replaces all matching parseltongue blocks
+     */
     var $encryptedElms = getDivsContainingFakeBlock($container);
     if ($encryptedElms.length == 0) {
         return;
@@ -98,9 +100,12 @@ function decryptHandler($container) {
     decryptElements($encryptedElms);
 }
 
+// dryRun=True, means return array of encryptedJson, one for each encrypted Element (used to decrypt previews)
+// otherwise dryRun=False, means it will actually do the decryption and then alter the page
 function decryptElements($encryptedElms, isDraft) {
     var decryptDict = {};
     $.each($encryptedElms, function(i, elm) {
+
         var htmlsToReplace = getHtmlToReplace($(elm));
 
         var isEncryptedDraft = $(elm).html().indexOf(htmlsToReplace[0]) == 0;
@@ -112,6 +117,7 @@ function decryptElements($encryptedElms, isDraft) {
             return getTextFromHtml(html);
         });
 
+
         for (var j in htmlsToReplace) {
             if (encryptedTexts[j] == null) {
                 continue;
@@ -122,12 +128,13 @@ function decryptElements($encryptedElms, isDraft) {
     });
 }
 
+
 function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
     /*
-    given a DOM element with encrypted content, the encrypted html content to replace, 
-    and the text of the encrypted html, send a message to decrypt the encrypted text
-    and replace the encrypted html of the element if successful
-    */
+     given a DOM element with encrypted content, the encrypted html content to replace,
+     and the text of the encrypted html, send a message to decrypt the encrypted text
+     and replace the encrypted html of the element if successful
+     */
     sendMessage({
         'action': 'decrypt',
         'json': encryptedJson,
@@ -143,7 +150,7 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
         var decryptedHtml = allHtml.replace(htmlToReplace, decryptedText);
         $encryptedElm.html(decryptedHtml);
 
-        isEncryptedDraft = allHtml.indexOf(htmlToReplace) == 0 && 
+        isEncryptedDraft = allHtml.indexOf(htmlToReplace) == 0 &&
             $encryptedElm.closest(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS)).length > 0;
         setDraftStateFor($encryptedElm, isEncryptedDraft);
 
@@ -158,7 +165,7 @@ function setDraftStateFor($draftable, isEncrypted) {
     if (!$draftable.hasClass(PRE_DRAFT_CLASS)) {
         return;
     }
-    var draftText = $draftable.justtext(); 
+    var draftText = $draftable.justtext();
 
     var ptButtonSelector = isEncrypted ? '.pt-unlocked' : '.pt-locked';
     var $ptButtons = getPtButtonsFor($draftable);
@@ -173,8 +180,16 @@ function setDraftStateFor($draftable, isEncrypted) {
     $draftable.removeClass(PRE_DRAFT_CLASS);
 }
 
-
+var DECRYPT_PREVIEWS_ON = true;
 $(document).ready(function() {
+
+    // inject javascript into actual page
+    if (DECRYPT_PREVIEWS_ON) {
+        if (onGmail()) {
+            injectJavascriptIntoGmail();
+        }
+    }
+
     setTimeout(function() {
         decryptHandler($('body'));
     }, 1000);
@@ -183,4 +198,30 @@ $(document).ready(function() {
     $(document).on('DOMNodeInserted', function(e) {
         decryptHandler($(e.target));
     });
+
+
 });
+
+function onGmail() {
+    var d = document.domain;
+    return (d == "mail.google.com");
+}
+
+var JQUERY_URL = "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js";
+//var JQUERY_URL = "https://parseltongue.s3.amazonaws.com/js/jquery-1.10.2.min.js";
+var PT_JAVASCRIPT_URL = "https://parseltongue.s3.amazonaws.com/js/inject_into_gmail.js";
+function injectJavascriptIntoGmail() {
+    var jq = document.createElement('script');
+    jq.src = JQUERY_URL;
+    document.getElementsByTagName('body')[0].appendChild(jq);
+    var pt_javascript = document.createElement('script');
+    pt_javascript.src = PT_JAVASCRIPT_URL;
+    document.getElementsByTagName('body')[0].appendChild(pt_javascript);
+    // Event listener
+    window.addEventListener('message', function(event) {
+        if (event.data.type && (event.data.type == "PT_MESSAGE")) {
+            var visible_inbox = event.data.visible_inbox;
+            decryptPreviews(visible_inbox);
+        }
+    });
+}
