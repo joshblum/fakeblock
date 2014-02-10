@@ -56,13 +56,26 @@ function getDivsContainingFakeBlock($container) {
     });
 }
 
+// dear stephanie, I know you will hate this. I don't like it either :p
+// however, I have no idea why matching the second time finds fakeblocks sometimes, where the first attempt did not
+// try it for yourself, if you remove the second attempt...
+// some previews randomly won't decrypt & when you click on an email it won't click. If you know the underlying issue
+// that is great, but in the mean time I am confused and this works for some reason.
+function matchFakeBlock(some_text) {
+    var result = PT_HTML_REGEX.exec(some_text);
+    if (result == null) {
+        result = PT_HTML_REGEX.exec(some_text);
+    }
+    return result;
+}
+
 function getHtmlToReplace($encryptedElm) {
     /*
      returns an array of the encrypted parts of the html in $encryptedElm
      */
     var all_html = $encryptedElm.html();
     var to_return = [];
-    var result = PT_HTML_REGEX.exec(all_html);
+    var result = matchFakeBlock(all_html);
 
     while (result != null) {
         to_return.push(result[0]);
@@ -137,7 +150,7 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
      */
     sendMessage({
         'action': 'decrypt',
-        'json': encryptedJson,
+        'json': encryptedJson
     }, function(response) {
         var isEncryptedDraft = false;
         var decryptedText = $.parseJSON(response).res;

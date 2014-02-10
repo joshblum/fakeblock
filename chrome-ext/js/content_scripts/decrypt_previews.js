@@ -1,6 +1,7 @@
 var EMAIL_ROW_SELECTOR = "tr.zA";
 var EMAIL_PREVIEW_SELECTOR = "span.y2";
 
+
 function decryptPreviews(visible_inbox_data) {
     var email_rows = $(EMAIL_ROW_SELECTOR);
     $.each(email_rows, function(i,e) {
@@ -12,11 +13,7 @@ function decryptPreviews(visible_inbox_data) {
             if (isPTEncrypted(email_content_just_text)) {
                 var email_preview_div = $(e).find(EMAIL_PREVIEW_SELECTOR);
                 var old_preview = email_preview_div.html();
-                var first_fakeblock = PT_HTML_REGEX.exec(email_content_just_text);
-                // for some reason a second attempt sometimes decrypts it... :/
-                if (first_fakeblock == null) {
-                    first_fakeblock = PT_HTML_REGEX.exec(email_content_just_text);
-                }
+                var first_fakeblock = matchFakeBlock(email_content_just_text);
                 // if it starts with a fakeblock, decrypt that fakblock and overwrite the old preview
                 if (first_fakeblock != null) {
                     var encryptedJson = getEncryptedJson(first_fakeblock);
@@ -42,6 +39,7 @@ function decryptPreviews(visible_inbox_data) {
         }
     });
 }
+
 
 function isPTEncrypted(email_content) {
     if (email_content == null) {
