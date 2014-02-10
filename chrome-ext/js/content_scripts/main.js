@@ -1,13 +1,19 @@
 var DRAFT_SEPARATOR_REGEX = '(' + DRAFT_SEPARATOR + ')?';
-var PT_HTML_REGEX = new RegExp(escapeString(FAKEBLOCK_OPEN_TAG.split('').join(DRAFT_SEPARATOR_REGEX)) +
-    '(.*)' +
-    escapeString(FAKEBLOCK_CLOSE_TAG.split('').join(DRAFT_SEPARATOR_REGEX)),
-    'g'
-);
-var PT_TEXT_REGEX = new RegExp(escapeString(getTextFromHtml(FAKEBLOCK_OPEN_TAG)) +
-    '(.*)' +
-    escapeString(getTextFromHtml(FAKEBLOCK_CLOSE_TAG))
-);
+function getPT_HTML_REGEX() {
+    var to_return =  new RegExp(escapeString(FAKEBLOCK_OPEN_TAG.split('').join(DRAFT_SEPARATOR_REGEX)) +
+        '(.*)' +
+        escapeString(FAKEBLOCK_CLOSE_TAG.split('').join(DRAFT_SEPARATOR_REGEX)),
+        'g'
+    );
+    return to_return;
+}
+function getPT_TEXT_REGEX() {
+    var to_return = new RegExp(escapeString(getTextFromHtml(FAKEBLOCK_OPEN_TAG)) +
+        '(.*)' +
+        escapeString(getTextFromHtml(FAKEBLOCK_CLOSE_TAG))
+    );
+    return to_return;
+}
 
 function escapeString(str) {
     /*
@@ -49,24 +55,11 @@ function getDivsContainingFakeBlock($container) {
      -not in the encrypted textarea overlay
      */
     return $container.find('div').add($container).filter(function(i, elm) {
-        var isEncrypted = PT_TEXT_REGEX.test($(elm).justtext());
+        var isEncrypted = getPT_TEXT_REGEX().test($(elm).justtext());
 
         return isEncrypted &&
             $(elm).closest(getSelectorForClass(FAKEBLOCK_TEXTAREA_CLASS)).length == 0;
     });
-}
-
-// dear stephanie, I know you will hate this. I don't like it either :p
-// however, I have no idea why matching the second time finds fakeblocks sometimes, where the first attempt did not
-// try it for yourself, if you remove the second attempt...
-// some previews randomly won't decrypt & when you click on an email it won't click. If you know the underlying issue
-// that is great, but in the mean time I am confused and this works for some reason.
-function matchFakeBlock(some_text) {
-    var result = PT_HTML_REGEX.exec(some_text);
-    if (result == null) {
-        result = PT_HTML_REGEX.exec(some_text);
-    }
-    return result;
 }
 
 function getHtmlToReplace($encryptedElm) {
@@ -75,11 +68,11 @@ function getHtmlToReplace($encryptedElm) {
      */
     var all_html = $encryptedElm.html();
     var to_return = [];
-    var result = matchFakeBlock(all_html);
-
+    var pt_html_regex = getPT_HTML_REGEX();
+    var result = pt_html_regex.exec(all_html);
     while (result != null) {
         to_return.push(result[0]);
-        result = PT_HTML_REGEX.exec(all_html);
+        result = pt_html_regex.exec(all_html);
     }
 
     return to_return;
@@ -90,7 +83,7 @@ function getEncryptedJson(encryptedText) {
      given an encryped parseltongue block of text
      return the json holding the ciphertext, etc.
      */
-    var match = PT_TEXT_REGEX.exec(encryptedText);
+    var match = getPT_TEXT_REGEX().exec(encryptedText);
     if (!match) {
         return null;
     }

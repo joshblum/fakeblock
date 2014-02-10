@@ -13,7 +13,8 @@ function decryptPreviews(visible_inbox_data) {
             if (isPTEncrypted(email_content_just_text)) {
                 var email_preview_div = $(e).find(EMAIL_PREVIEW_SELECTOR);
                 var old_preview = email_preview_div.html();
-                var first_fakeblock = matchFakeBlock(email_content_just_text);
+                var pt_html_regex = getPT_HTML_REGEX();
+                var first_fakeblock = pt_html_regex.exec(email_content_just_text);
                 // if it starts with a fakeblock, decrypt that fakblock and overwrite the old preview
                 if (first_fakeblock != null) {
                     var encryptedJson = getEncryptedJson(first_fakeblock);
