@@ -217,9 +217,9 @@ var JQUERY_URL = "https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min
 //var JQUERY_URL = "https://parseltongue.s3.amazonaws.com/js/jquery-1.10.2.min.js";
 var PT_JAVASCRIPT_URL = "https://parseltongue.s3.amazonaws.com/js/inject_into_gmail.js";
 function injectJavascriptIntoGmail() {
-    var jq = document.createElement('script');
-    jq.src = JQUERY_URL;
-    document.getElementsByTagName('body')[0].appendChild(jq);
+//    var jq = document.createElement('script');
+//    jq.src = JQUERY_URL;
+//    document.getElementsByTagName('body')[0].appendChild(jq);
     var pt_javascript = document.createElement('script');
     pt_javascript.src = PT_JAVASCRIPT_URL;
     document.getElementsByTagName('body')[0].appendChild(pt_javascript);
