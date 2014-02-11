@@ -11,8 +11,11 @@ var COMPOSE_FROM_EMAIL_CLASS = 'az2';
 var PAGE_FROM_EMAIL_CLASS = 'msg';
 var GMAIL_TOOLBAR_CLASS = 'gU';
 
+var TO_DISABLED_TOOLTIP = 'Not all recipients are Parseltongue users';
+var FROM_DISABLED_TOOLTIP = 'Visit your settings to register this "From" email address'; 
+
 var PT_BUTTON_HTML = '<td class="pt-buttons-wrapper">' +
-    '    <div class="pt-button pt-disabled" data-tooltip="Not all recipients are Parseltongue users" aria-label="Not all recipients are Parseltongue users">' +
+    '    <div class="pt-button pt-disabled" data-tooltip="' + FROM_DISABLED_TOOLTIP + '" aria-label="' + FROM_DISABLED_TOOLTIP  + '">' +
     '        <img class="pt-button-img" style="width:100%;"/>' +
     '    </div>' +
     '    <div class="pt-button pt-enabled">' +
@@ -26,7 +29,8 @@ var PT_BUTTON_HTML = '<td class="pt-buttons-wrapper">' +
     '</td>';
 
 var doEncryptMap = {};
-var canEncryptMap = {};
+var canEncryptFromMap = {};
+var canEncryptToMap = {};
 var tabIndexMap = {};
 var draftMap = {};
 
@@ -44,12 +48,12 @@ $(function() {
         } else if ($(e.target).parent().hasClass(FAKEBLOCK_TEXTAREA_CLASS) &&
             $(e.target).hasClass('gmail_extra') && !loadingDraft) {
             // if an old email thread gets revealed in the original textarea
-            //      if encryption is on, append the old email thread div to the overlay
-            //      if encryption is off, explicitly decrypt any encrypted old email thread text in original textarea
-            //          since encryption is disabled in the original textarea
             var $unencryptedArea = getUnencryptedAreaFor($(e.target));
+            // if encryption is on, append the old email thread div to the overlay
             if (getWillEncryptFor($unencryptedArea)) {
                 $unencryptedArea.append($(e.target));
+            // if encryption is off, explicitly decrypt any encrypted old email thread text in original textarea
+            //   since encryption is disabled in the original textarea
             } else {
                 decryptElements($(e.target));
             }
@@ -190,7 +194,8 @@ function makeOverlay($email) {
 
     // initialize all encrypt settings to false at first
     // when usernames are added/encrypt button is clicked, this will toggle to true
-    setCanEncryptFor($unencryptedArea, false);
+    setCanEncryptToFor($unencryptedArea, false);
+    setCanEncryptFromFor($unencryptedArea, false);
     setDoEncryptFor($unencryptedArea, false);
 
     $textarea.addClass(FAKEBLOCK_TEXTAREA_CLASS).addClass(PRE_DRAFT_CLASS);
@@ -256,6 +261,16 @@ function toggleOverlay($unencryptedArea, doShow) {
     }
 
 }
+
+function toggleDisabledTooltip($ptButtons, showToTooltip) {
+    var msg = FROM_DISABLED_TOOLTIP;
+    if (showToTooltip) {
+        msg = TO_DISABLED_TOOLTIP;
+    }
+
+    var $ptBtn = $ptButtons.find('.pt-disabled');
+    $ptBtn.attr('data-tooltip', msg);
+} 
 
 function toggleEncrypt($unencryptedArea, oldEncrypt) {
     /*
@@ -340,16 +355,30 @@ function canEncryptHandler($unencryptedArea, usernameToDelete) {
     requests canEncryptFor to see if all usernames for an unencrypted area are pt users
     if usernameToDelete is specified, then doesn't include that username in the request 
     */
-    var usernames = getUsernamesFor($unencryptedArea, usernameToDelete);
-    requestCanEncryptFor($unencryptedArea, usernames);
+    var usernameDict = {
+        'to' : getToUsernamesFor($unencryptedArea, usernameToDelete),
+        'from' : getFromUsernamesFor($unencryptedArea),
+    };
+    requestCanEncryptFor($unencryptedArea, usernameDict);
 }
 
-function getFromUsernameFor($unencryptedArea) {
+function getUsernamesFor($unencryptedArea, usernameToDelete) {
+    /*
+    Get all usernames, recipients and sender, for a textarea.
+    May contain duplicates if sender address matches a recipient address, but duplicates in recipient
+    addresses are removed
+    */
+    return getFromUsernamesFor($unencryptedArea)
+        .concat(getToUsernamesFor($unencryptedArea, usernameToDelete));
+}
+
+function getFromUsernamesFor($unencryptedArea) {
     /*
     Try to return the from email address. Tries to find a match in this order
         -looking at 'from' field in a compose window, needed if multiple addresses on one gmail
         -looking for the primary account email in a div on the page
-        -if neither is found, return null
+        -if neither is found, return empty list 
+    Returns a list for consistency with 'getToUsernamesFor'
     */
     var $fromElm = $unencryptedArea
         .closest(getSelectorForClass(EMAIL_WINDOW_CLASS))
@@ -359,10 +388,16 @@ function getFromUsernameFor($unencryptedArea) {
         $fromElm = $(getSelectorForClass(PAGE_FROM_EMAIL_CLASS));
     }
 
-    return getEmailFromString($fromElm.text());
+    var emailToReturn = []
+    var email = getEmailFromString($fromElm.text());
+    if (email != null) {
+        emailToReturn.push(email);
+    }
+
+    return emailToReturn;
 }
 
-function getUsernamesFor($unencryptedArea, usernameToDelete) {
+function getToUsernamesFor($unencryptedArea, usernameToDelete) {
     /*
     returns usernames currently on the page for an unencrypted area
     normalizes email addresses to all lower case
@@ -397,22 +432,25 @@ function getUsernamesFor($unencryptedArea, usernameToDelete) {
         }
     }
 
-    var fromEmail = getFromUsernameFor($unencryptedArea);
-    usernamesToReturn.push(fromEmail);
-
     return usernamesToReturn;
 }
 
 function getWillEncryptFor($unencryptedArea) {
-    return getMapValueFor($unencryptedArea, doEncryptMap) && getMapValueFor($unencryptedArea, canEncryptMap);
+    return getMapValueFor($unencryptedArea, doEncryptMap) && 
+        getMapValueFor($unencryptedArea, canEncryptToMap) &&
+        getMapValueFor($unencryptedArea, canEncryptFromMap);
 }
 
 function setDoEncryptFor($unencryptedArea, doEncrypt) {
     return setMapValueFor($unencryptedArea, doEncryptMap, doEncrypt);
 }
 
-function setCanEncryptFor($unencryptedArea, canEncrypt) {
-    return setMapValueFor($unencryptedArea, canEncryptMap, canEncrypt);
+function setCanEncryptToFor($unencryptedArea, canEncrypt) {
+    return setMapValueFor($unencryptedArea, canEncryptToMap, canEncrypt);
+}
+
+function setCanEncryptFromFor($unencryptedArea, canEncrypt) {
+    return setMapValueFor($unencryptedArea, canEncryptFromMap, canEncrypt);
 }
 
 function getTabIndexFor($unencryptedArea) {
@@ -496,12 +534,16 @@ function requestCanEncryptFor($unencryptedArea, usernames) {
     }, function(response) {
         var res = $.parseJSON(response).res;
         var $ptButtonsWrapper = getPtButtonsFor($unencryptedArea);
-        if ($ptButtonsWrapper) {
-            toggleEnablePtButton($ptButtonsWrapper, res.can_encrypt);
+        if ($ptButtonsWrapper.length > 0) {
+            // if the usernames given can't be encrypted for, then show the 'from' or 'to' tooltip on disabled btn
+            // if the usernames can be encrypted for, then show the opposite tooltip 
+            toggleDisabledTooltip($ptButtonsWrapper, res.can_encrypt_from); 
+            toggleEnablePtButton($ptButtonsWrapper, res.can_encrypt_from && res.can_encrypt_to);
         }
 
         var oldEncrypt = getWillEncryptFor($unencryptedArea);
-        setCanEncryptFor($unencryptedArea, res.can_encrypt);
+        setCanEncryptFromFor($unencryptedArea, res.can_encrypt_from);
+        setCanEncryptToFor($unencryptedArea, res.can_encrypt_to);
         toggleEncrypt($unencryptedArea, oldEncrypt);
     });
 }

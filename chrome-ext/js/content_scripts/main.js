@@ -186,7 +186,7 @@ function setDraftStateFor($draftable, isEncrypted) {
     $draftable.removeClass(PRE_DRAFT_CLASS);
 }
 
-var DECRYPT_PREVIEWS_ON = true;
+var DECRYPT_PREVIEWS_ON = false;
 $(document).ready(function() {
 
     // inject javascript into actual page

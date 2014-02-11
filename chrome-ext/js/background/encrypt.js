@@ -78,41 +78,48 @@ function updateCache(encrypt_for) {
 
 /*
  returns boolean based on whether or not all usernames are parseltongue users
- input list of usernames includes the from email address, and a list of to email addresses, duplicates removed
- if from email address also appears in to email addresses, both copies are included in input list 
+ input list of usernames, duplicates removed 
 */
-function canEncryptFor(usernames) {
-    var canEncrypt = false;
+function canEncryptFor(usernameDict) {
+    var canEncryptRes = {
+        "can_encrypt_to" : false,
+        "can_encrypt_from" : false,
+    };
 
     var sender_meta = getUserMeta();
 
-    // can't encrypt if
-    //      -user not signed in
-    //      -the only username included is the from email address (usernames only has one email)
-    //      -one of the usernames is null (not a valid email address) 
+    // can't encrypt if user not signed in
+    // or if an incomplete username dictionary object is passed in
     if (!Object.size(sender_meta) ||
-        usernames.length <= 1 ||
-        usernames.indexOf(null) >= 0) {
+        !("to" in usernameDict) ||
+        !("from" in usernameDict)) {
+        return canEncryptRes;
+   }
 
-        return {
-            "can_encrypt": canEncrypt,
-        }
-
-    }
+    var usernames = usernameDict["to"].concat(usernameDict["from"]);
     var cachedUsers = getCachedUsers(usernames);
-    var can_encrypt = true;
 
-    for (i in usernames) {
+    canEncryptRes["can_encrypt_to"] = canEncryptForList(usernameDict["to"], cachedUsers)
+    canEncryptRes["can_encrypt_from"] = canEncryptForList(usernameDict["from"], cachedUsers)
+
+    return canEncryptRes;
+}
+
+function canEncryptForList(usernames, ptUsers) {
+    if (usernames.length == 0 || usernames.indexOf(null) >= 0) {
+        return false;
+    }
+    var canEncrypt = true;
+
+    for (var i = 0; i < usernames.length; i++) {
         var username = usernames[i];
-        if (!(username in cachedUsers)) {
-            can_encrypt = false;
+        if (!(username in ptUsers)) {
+            canEncrypt = false;
             break
         }
     }
 
-    return {
-        "can_encrypt": can_encrypt,
-    };
+    return canEncrypt 
 }
 
 /*
