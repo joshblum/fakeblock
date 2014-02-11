@@ -9,6 +9,7 @@ function decryptPreviews(visible_inbox_data) {
             var email_data = visible_inbox_data[i];
             var email_id = email_data.email_id;
             var email_content = email_data.email_content;
+            // TODO: sanitize email_content... its origin is the javascript scope of the DOM and cannot be trusted
             var email_content_just_text = getTextFromHtml(email_content);
             if (isPTEncrypted(email_content_just_text)) {
                 var email_preview_div = $(e).find(EMAIL_PREVIEW_SELECTOR);
