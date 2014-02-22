@@ -171,7 +171,8 @@ Server message methods
 */
 var serverMessages = {
     'clearCache' : clearCache,
-    'refreshPubKey' : refreshPubKey
+    'refreshPubKey' : refreshPubKey,
+    'parseltongueLogout': parseltongueLogout()
 };
 
 function clearCache() {
