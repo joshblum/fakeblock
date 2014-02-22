@@ -78,7 +78,7 @@ function getHtmlToReplace($encryptedElm) {
     return to_return;
 }
 
-function getEncryptedJson(encryptedText) {
+function getCipherText(encryptedText) {
     /*
      given an encryped parseltongue block of text
      return the json holding the ciphertext, etc.
@@ -88,9 +88,8 @@ function getEncryptedJson(encryptedText) {
         return null;
     }
     var byte_str = match[1];
-    var json = decodeByteString(byte_str);
-    var to_return = $.parseJSON(json);
-    return to_return;
+    var cipher_text = decodeByteString(byte_str);
+    return cipher_text;
 }
 
 
@@ -128,14 +127,14 @@ function decryptElements($encryptedElms, isDraft) {
             if (encryptedTexts[j] == null) {
                 continue;
             }
-            var encryptedJson = getEncryptedJson(encryptedTexts[j]);
-            decryptEncryptedHtml($(elm), htmlsToReplace[j], encryptedJson);
+            var cipher_text = getCipherText(encryptedTexts[j]);
+            decryptEncryptedHtml($(elm), htmlsToReplace[j], cipher_text);
         }
     });
 }
 
 
-function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
+function decryptEncryptedHtml($encryptedElm, htmlToReplace, cipher_text) {
     /*
      given a DOM element with encrypted content, the encrypted html content to replace,
      and the text of the encrypted html, send a message to decrypt the encrypted text
@@ -143,7 +142,7 @@ function decryptEncryptedHtml($encryptedElm, htmlToReplace, encryptedJson) {
      */
     sendMessage({
         'action': 'decrypt',
-        'json': encryptedJson
+        'cipher_text': cipher_text
     }, function(response) {
         var isEncryptedDraft = false;
         var decryptedText = $.parseJSON(response).res;

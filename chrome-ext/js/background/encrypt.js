@@ -21,10 +21,10 @@ function encrypt(plaintext, encrypt_for) {
     //self or associated email may already be in this list, but minimal cost to encrypt shared secret twice 
     encrypt_for.push(sender_meta.username);
 
-    var shared_secret = randString();
-    var keys = {};
+    var pub_keys = [];
     var cachedUsers = getCachedUsers(encrypt_for);
     var username, pub_key, pub_key_id, encrypted_key;
+
     for (i in encrypt_for) {
         username = normalizeEmail(encrypt_for[i]);
         // encrypt_for should already be checked through other means
@@ -34,20 +34,28 @@ function encrypt(plaintext, encrypt_for) {
         }
 
         pub_key = cachedUsers[username];
-        pub_key_id = cryptico.publicKeyID(cachedUsers[username]);
-        encrypted_key = cryptico.encrypt(shared_secret, pub_key).cipher; 
-
-        keys[pub_key_id] = encrypted_key;
+        var pub_key_object = convertPGPPKeyTextToKeyObject(pub_key);
+        pub_keys.push(pub_key_object);
     }
 
-    var cipher_text = Base64.encode(encryptAES(plaintext, shared_secret));
+    /**
+     * Encrypts message text with keys
+     * @param  {Array<module:key~Key>}  keys array of keys, used to encrypt the message
+     * @param  {String} text message as native JavaScript string
+     * @param  {function} callback (optional) callback(error, result) for async style
+     * @return {String}      encrypted ASCII armored message
+     * @static
+     */
+    var cipher_text = window.openpgp.encryptMessage(pub_keys, plaintext);
 
     var res = {
-        "keys": keys,
         "cipher_text": cipher_text
     };
     return res
 }
+
+
+
 
 function getCachedUsers(encrypt_for) {
     updateCache(encrypt_for);

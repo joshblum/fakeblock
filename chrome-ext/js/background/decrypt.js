@@ -1,23 +1,31 @@
 //returns a plaintext result of the decryption
-//or an empty string if decryption fails.
-function decrypt(fakeblock) {
+
+function decrypt(cipher_text) {
     var userMeta = loadLocalStore('userMeta');
     if (!Object.size(userMeta)) {
         //maybe should use null instead of ""
         return null;
     }
 
-    var pub_key_id = cryptico.publicKeyID(userMeta.pub_key);
-    if (!(pub_key_id in fakeblock.keys)) {
-        return null;
-    }
-    var encrypted_key = fakeblock.keys[pub_key_id];
-    var pri_key = deserializePriKey(userMeta.pri_key);
+    // openpgp pri key object from local storage
+    var pri_key_object = getPriKeyObjectFromLocalStorage();
+    var cipher_text_object = convertPGPMessageToMessageObject(cipher_text);
 
-    var key = cryptico.decrypt(encrypted_key, pri_key).plaintext;
-    return decryptAES(Base64.decode(fakeblock.cipher_text), key);
+    /**
+ * Decrypts message
+ * @param  {module:key~Key}     privateKey private key with decrypted secret key data
+ * @param  {module:message~Message} msg    the message object with the encrypted data
+ * @param  {function} callback (optional) callback(error, result) for async style
+ * @return {(String|null)}        decrypted message as as native JavaScript string
+ *                              or null if no literal data found
+ * @static
+ */
+    var decrypted_text =  window.openpgp.decryptMessage(pri_key_object, cipher_text_object);
+    return decrypted_text;
 }
 
+
+/// old
 function decryptAES(cipher_text, secret) {
     var decrypted = CryptoJS.AES.decrypt(cipher_text, secret);
     return decrypted.toString(CryptoJS.enc.Utf8);

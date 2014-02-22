@@ -15,6 +15,10 @@ function messageListener() {
 }
 
 $(document).ready(function() {
+
+    // testing open pgp
+    openpgp_test();
+
     // redirect to register after install
     postInstall();
     messageListener();

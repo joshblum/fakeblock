@@ -3,6 +3,8 @@
 var rsaBitLength = 1024;
 // default to 256-bit aes key
 var aesBitLength = 256;
+// the password which private key is "encrypted" with is parseltongue
+var PARSELTONGUE_DEFAULT_PASSWORD = "parseltongue";
 
 //generate a random passphrase
 //used to generate passphrases
@@ -20,29 +22,48 @@ function arrayBufferToString(buf) {
     return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
 
-//generates and returns a public/private key pair
-//for a user
-function genKeys() {
-    var pri_key;
-    do {
-        pri_key = genPriKey();
-    } while (pri_key == null)
-
-    var pub_key = cryptico.publicKeyString(pri_key);
+function genKeys(email, password) {
+    /**
+     * Generates a new OpenPGP key pair. Currently only supports RSA keys.
+     * Primary and subkey will be of same type.
+     * @param {module:enums.publicKey} keyType    to indicate what type of key to make.
+     *                             RSA is 1. See {@link http://tools.ietf.org/html/rfc4880#section-9.1}
+     * @param {Integer} numBits    number of bits for the key creation. (should be 1024+, generally)
+     * @param {String}  userId     assumes already in form of "User Name <username@email.com>"
+     * @param {String}  passphrase The passphrase used to encrypt the resulting private key
+     * @param  {function} callback (optional) callback(error, result) for async style
+     * @return {Object} {key: Array<module:key~Key>, privateKeyArmored: Array<String>, publicKeyArmored: Array<String>}
+     * @static
+     */
+    // the password which private key is "encrypted" with to store in localstorage is parseltongue
+    var found_valid_key_pair = false;
+    var key_pair;
+    // create a key pair and then test to see if it worked. Do this up to 5 times... it always works first time anyway
+    for (var i=0;i<5;i++) {
+        if (!found_valid_key_pair) {
+            key_pair = window.openpgp.generateKeyPair(1, rsaBitLength, email, PARSELTONGUE_DEFAULT_PASSWORD);
+            found_valid_key_pair = openpgp_test(key_pair);
+        }
+    }
+    if (!found_valid_key_pair) {
+        logErrorToServer("Failed to create valid pgp key pair for " + email);
+    }
+    var pri_key = key_pair.privateKeyArmored;
+    var pub_key = key_pair.publicKeyArmored;
     return {
         "pri_key": pri_key,
-        "pub_key": pub_key,
+        "pub_key": pub_key
     }
 }
 
-function genPriKey() {
-    var priKey = cryptico.generateRSAKey(randString(rsaBitLength), rsaBitLength);
-    try {
-        JSON.stringify(priKey);
-    } catch (e) {
-        return null;
-    }
-    return priKey;
+// gets a private key object ready for use from local storage
+function getPriKeyObjectFromLocalStorage() {
+    var userMeta = loadLocalStore('userMeta');
+    var pri_key = userMeta.pri_key;
+    // creates an openpgp private key object from the private key text
+    var pri_key_object = convertPGPPKeyTextToKeyObject(pri_key);
+    pri_key_object.decrypt(PARSELTONGUE_DEFAULT_PASSWORD);
+    return pri_key_object;
 }
 
 //convert json_parsed_key into an RSA object
@@ -65,8 +86,7 @@ function deserializePriKey(json_parsed_key) {
 // and then stores all 3 to local storage
 // registration stores pub/pri/encrypted_pri_key which have not been uploaded yet
 function userInitialize(username, password) {
-    // debugger;
-    var key_pair = genKeys();
+    var key_pair = genKeys(username, password);
     var encrypted_pri_key = encryptPriKey(key_pair.pri_key, password);
     var registration = {
         "pri_key": key_pair.pri_key,

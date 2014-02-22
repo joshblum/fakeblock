@@ -18,7 +18,7 @@ function decryptPreviews(visible_inbox_data) {
                 var first_fakeblock = pt_html_regex.exec(email_content_just_text);
                 // if it starts with a fakeblock, decrypt that fakblock and overwrite the old preview
                 if (first_fakeblock != null) {
-                    var encryptedJson = getEncryptedJson(first_fakeblock);
+                    var encryptedJson = getCipherText(first_fakeblock);
                     sendMessage({
                         'action': 'decrypt',
                         'json': encryptedJson

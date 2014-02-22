@@ -513,9 +513,9 @@ function requestEncrypt($encryptedArea, message, usernames) {
         if (typeof res === "string") {
             msg = res;
         } else {
-            var json_encoded = JSON.stringify(res);
+            var cipher_text = res.cipher_text;
             msg = FAKEBLOCK_OPEN_TAG +
-                encodeString(json_encoded) +
+                encodeString(cipher_text) +
                 FAKEBLOCK_CLOSE_TAG;
         }
         $encryptedArea.html(msg);

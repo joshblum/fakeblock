@@ -7,7 +7,7 @@ function executeMessage(request, sender, sendResponse) {
     var ACTION_MAP = {
         "encrypt": [encrypt, msg.message, msg.usernames],
         "canEncryptFor": [canEncryptFor, msg.usernames],
-        "decrypt": [decrypt, msg.json],
+        "decrypt": [decrypt, msg.cipher_text],
         "userInitialize": [userInitialize, msg.username, msg.password],
         "uploadUserData": [uploadUserData],
         "getPriKeyFromServer": [getPriKeyFromServer],
